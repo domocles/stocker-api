@@ -1,4 +1,4 @@
-package com.eep.stocker.controllers;
+package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
