@@ -1,5 +1,6 @@
 package com.eep.stocker.controllers;
 
+import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.services.StockableProductService;
 import org.slf4j.Logger;
@@ -27,11 +28,15 @@ public class HomeController {
     }
 
     @GetMapping("/api/stockable-products/get/{id}")
-    public Optional<StockableProduct> getById(@PathVariable Long id) {
-        return stockableProductService.getStockableProductByID(id);
+    public StockableProduct getById(@PathVariable Long id) {
+        Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
+        if(stockableProduct.isPresent()) {
+            return stockableProduct.get();
+        } else {
+            log.info("RecordNotFoundException on material '"+id+"'");
+            throw new RecordNotFoundException("Material ID: '" + id + "' does not exist");
+        }
     }
-
-
 
     @PostConstruct
     private void initialize() {
