@@ -18,14 +18,16 @@ public class StockableProductService {
     private IStockableProductRepository stockableProductRepository;
 
     public StockableProduct saveStockableProduct(StockableProduct stockableProduct) {
-        Optional<StockableProduct> sb = stockableProductRepository.findFirstByMpn(stockableProduct.getMpn());
-        if(sb.isPresent()) {
-            throw new MpnNotUniqueException(stockableProduct.getMpn() + " already exists");
-        }
+        //todo add logging to this
         return this.stockableProductRepository.save(stockableProduct);
     }
 
+    public Optional<StockableProduct> findStockableProductByMpn(String mpn) {
+        return this.stockableProductRepository.findFirstByMpn(mpn);
+    }
+
     public Optional<StockableProduct> getStockableProductByID(Long ID) {
+        //todo add logging to this
         return this.stockableProductRepository.findById(ID);
     }
 }

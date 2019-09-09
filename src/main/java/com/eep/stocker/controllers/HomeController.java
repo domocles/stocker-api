@@ -39,9 +39,27 @@ public class HomeController {
     }
 
     @PostMapping(path = "/api/stockable-products/create", consumes = "application/json", produces = "application/json")
-    public StockableProduct createStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) throws ConstraintViolationException {
-        log.info("Saving StockableProduct: " + stockableProduct.toString());
-        StockableProduct sb = null;
+    public StockableProduct createStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) {
+        log.info("Saving Stockable Product: " + stockableProduct.toString());
+        log.info("Checking the MPN doesn't already exist");
+        Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(stockableProduct.getMpn());
+        if(sb.isPresent()) {
+            log.info("MPN already exists: '" + stockableProduct.getMpn() + "'");
+            throw new MpnNotUniqueException(stockableProduct.getMpn() + " already exists");
+        }
+        return stockableProductService.saveStockableProduct(stockableProduct);
+    }
+
+    @PutMapping(path = "/api/stockable-products/update", consumes = "application/json", produces = "application/json")
+    public StockableProduct updateStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) {
+        log.info("Updating Stockable Product: " + stockableProduct.toString());
+        log.info("Checking that mpn does not conflict with any other products");
+        Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(stockableProduct.getMpn());
+        if(sb.isPresent()) {
+            if(sb.get().getId() != stockableProduct.getId()) {
+                throw new MpnNotUniqueException(stockableProduct.getMpn() + " already belongs to another product");
+            }
+        }
         return stockableProductService.saveStockableProduct(stockableProduct);
     }
 
@@ -58,22 +76,6 @@ public class HomeController {
         flex51x100.getTags().add("ilok");
 
         this.stockableProductService.saveStockableProduct(flex51x100);
-
-        StockableProduct flex51x150 = new StockableProduct();
-        flex51x150.setName("FX51x152ILOK");
-        flex51x150.setMpn("FX24");
-        flex51x150.setCategory("Flex");
-        flex51x150.setDescription("ilok lined flex, 51mm ID, 150mm long");
-        flex51x150.setInStock(125.0D);
-        flex51x150.setStockPrice(1.76D);
-        flex51x150.getTags().add("Flex");
-        flex51x150.getTags().add("ilok");
-
-        try {
-            this.stockableProductService.saveStockableProduct(flex51x150);
-        } catch (MpnNotUniqueException e) {
-            log.error("Constraint violation exception! " + e.getMessage());
-        }
     }
 
 }
