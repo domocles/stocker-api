@@ -1,9 +1,9 @@
 package com.eep.stocker.controllers.error.exceptions;
 
-public class ConstraintException extends RuntimeException {
+public class MpnNotUniqueException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
-    public ConstraintException(String message) {
+    public MpnNotUniqueException(String message) {
         super(message);
     }
 }

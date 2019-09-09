@@ -1,13 +1,12 @@
 package com.eep.stocker.controllers;
 
-import com.eep.stocker.controllers.error.exceptions.ConstraintException;
+import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.services.StockableProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -72,7 +71,7 @@ public class HomeController {
 
         try {
             this.stockableProductService.saveStockableProduct(flex51x150);
-        } catch (DataIntegrityViolationException e) {
+        } catch (MpnNotUniqueException e) {
             log.error("Constraint violation exception! " + e.getMessage());
         }
     }
