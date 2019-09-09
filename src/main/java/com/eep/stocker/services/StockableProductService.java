@@ -30,4 +30,8 @@ public class StockableProductService {
         //todo add logging to this
         return this.stockableProductRepository.findById(ID);
     }
+
+    public void deleteStockableProduct(StockableProduct stockableProduct) {
+        this.stockableProductRepository.delete(stockableProduct);
+    }
 }

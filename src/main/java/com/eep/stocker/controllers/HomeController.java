@@ -7,11 +7,13 @@ import com.eep.stocker.services.StockableProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
-import javax.validation.ConstraintViolationException;
+
 import javax.validation.Valid;
+import javax.ws.rs.core.Response;
 import java.util.Optional;
 
 @RestController
@@ -61,6 +63,18 @@ public class HomeController {
             }
         }
         return stockableProductService.saveStockableProduct(stockableProduct);
+    }
+
+    @DeleteMapping(path = "/api/stockable-products/delete/{id}")
+    public Response deleteStockableProduct(@PathVariable Long id) throws ResourceNotFoundException {
+        Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
+        if(stockableProduct.isPresent()) {
+            stockableProductService.deleteStockableProduct(stockableProduct.get());
+            return Response.status(204)
+                    .entity("Stockable Product is deleted").build();
+        } else {
+            throw new ResourceNotFoundException("StockableProduct with id '" + id + "' doesn't exist");
+        }
     }
 
     @PostConstruct
