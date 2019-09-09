@@ -1,5 +1,6 @@
 package com.eep.stocker.controllers;
 
+import com.eep.stocker.controllers.error.exceptions.ConstraintException;
 import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.services.StockableProductService;
@@ -7,12 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.validation.ConstraintViolationException;
+import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
@@ -29,13 +29,21 @@ public class HomeController {
 
     @GetMapping("/api/stockable-products/get/{id}")
     public StockableProduct getById(@PathVariable Long id) {
+        log.info("get stockable material by id called: '"+id+"'");
         Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
         if(stockableProduct.isPresent()) {
             return stockableProduct.get();
         } else {
-            log.info("RecordNotFoundException on material '"+id+"'");
+            log.info("RecordNotFoundException on StockableProduct '"+id+"'");
             throw new RecordNotFoundException("Material ID: '" + id + "' does not exist");
         }
+    }
+
+    @PostMapping(path = "/api/stockable-products/create", consumes = "application/json", produces = "application/json")
+    public StockableProduct createStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) throws ConstraintViolationException {
+        log.info("Saving StockableProduct: " + stockableProduct.toString());
+        StockableProduct sb = null;
+        return stockableProductService.saveStockableProduct(stockableProduct);
     }
 
     @PostConstruct
