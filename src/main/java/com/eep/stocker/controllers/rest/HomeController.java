@@ -14,6 +14,7 @@ import javax.annotation.PostConstruct;
 
 import javax.validation.Valid;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -30,7 +31,7 @@ public class HomeController {
 
     @GetMapping("/api/stockable-products/get/{id}")
     public StockableProduct getById(@PathVariable Long id) {
-        log.info("get stockable material by id called: '"+id+"'");
+        log.info("get stockable products by id called: '"+id+"'");
         Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
         if(stockableProduct.isPresent()) {
             return stockableProduct.get();
@@ -38,6 +39,13 @@ public class HomeController {
             log.info("RecordNotFoundException on StockableProduct '"+id+"'");
             throw new RecordNotFoundException("Material ID: '" + id + "' does not exist");
         }
+    }
+
+    @GetMapping("/api/stockable-products/get")
+    public List<StockableProduct> getAllStockableProducts() {
+        log.info("get all stockable-products called");
+        List<StockableProduct> allStockableProducts = stockableProductService.getAllStockableProducts();
+        return allStockableProducts;
     }
 
     @PostMapping(path = "/api/stockable-products/create", consumes = "application/json", produces = "application/json")
