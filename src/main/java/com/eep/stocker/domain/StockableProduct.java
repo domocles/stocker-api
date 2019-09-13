@@ -2,6 +2,7 @@ package com.eep.stocker.domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.DefaultValue;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -29,19 +30,23 @@ public class StockableProduct {
     @Column(name = "tags")
     private Set<String> tags = new HashSet<>();
 
+    @DefaultValue("Units")
+    private String units;
+
     private double stockPrice;
 
     private double inStock;
 
     public StockableProduct() { }
 
-    public StockableProduct(Long id, String name, String mpn, String description, String category, Set<String> tags, double stockPrice, double inStock) {
+    public StockableProduct(Long id, String name, String mpn, String description, String category, Set<String> tags, String units, double stockPrice, double inStock) {
         this.id = id;
         this.name = name;
         this.mpn = mpn;
         this.description = description;
         this.category = category;
         this.tags = tags;
+        this.units = units;
         this.stockPrice = stockPrice;
         this.inStock = inStock;
     }
@@ -94,6 +99,10 @@ public class StockableProduct {
         return tags;
     }
 
+    public String getUnits() { return units; }
+
+    public void setUnits(String units) { this.units = units; }
+
     public double getStockPrice() {
         return stockPrice;
     }
@@ -123,6 +132,7 @@ public class StockableProduct {
                 Double.compare(that.getInStock(), getInStock()) == 0 &&
                 getName().equals(that.getName()) &&
                 getMpn().equals(that.getMpn()) &&
+                getUnits().equals(that.getUnits()) &&
                 Objects.equals(getDescription(), that.getDescription()) &&
                 getCategory().equals(that.getCategory()) &&
                 Objects.equals(getTags(), that.getTags());
@@ -130,7 +140,7 @@ public class StockableProduct {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getMpn(), getDescription(), getCategory(), getTags(), getStockPrice(), getInStock());
+        return Objects.hash(getName(), getMpn(), getDescription(), getCategory(), getTags(), getUnits(), getStockPrice(), getInStock());
     }
 
     @Override
@@ -142,6 +152,7 @@ public class StockableProduct {
                 ", description='" + description + '\'' +
                 ", category='" + category + '\'' +
                 ", tags=" + tags +
+                ", units=" + units +
                 ", stockPrice=" + stockPrice +
                 ", inStock=" + inStock +
                 '}';
