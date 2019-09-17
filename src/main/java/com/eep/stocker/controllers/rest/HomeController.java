@@ -48,6 +48,13 @@ public class HomeController {
         return allStockableProducts;
     }
 
+    @GetMapping("/api/stockable-products/categories")
+    public List<String> getAllCategories() {
+        log.info("get all categories");
+        List<String> categories = stockableProductService.getAllCategories();
+        return categories;
+    }
+
     @PostMapping(path = "/api/stockable-products/create", consumes = "application/json", produces = "application/json")
     public StockableProduct createStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) {
         log.info("Saving Stockable Product: " + stockableProduct.toString());
@@ -96,6 +103,7 @@ public class HomeController {
         flex51x100.setStockPrice(1.51D);
         flex51x100.getTags().add("Flex");
         flex51x100.getTags().add("ilok");
+        flex51x100.setUnits("Flexes");
 
         this.stockableProductService.saveStockableProduct(flex51x100);
     }

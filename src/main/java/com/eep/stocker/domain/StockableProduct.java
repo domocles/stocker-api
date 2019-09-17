@@ -30,8 +30,7 @@ public class StockableProduct {
     @Column(name = "tags")
     private Set<String> tags = new HashSet<>();
 
-    @DefaultValue("Units")
-    private String units;
+    private String units = "Units";
 
     private double stockPrice;
 

@@ -36,6 +36,10 @@ public class StockableProductService {
         return this.stockableProductRepository.findAll();
     }
 
+    public List<String> getAllCategories() {
+        return this.stockableProductRepository.findDistinctCategories();
+    }
+
     public void deleteStockableProduct(StockableProduct stockableProduct) {
         this.stockableProductRepository.delete(stockableProduct);
     }
