@@ -3,6 +3,7 @@ package com.eep.stocker.controllers.rest;
 import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.domain.StockableProductNote;
 import com.eep.stocker.services.StockableProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,6 +105,14 @@ public class HomeController {
         flex51x100.getTags().add("Flex");
         flex51x100.getTags().add("ilok");
         flex51x100.setUnits("Flexes");
+
+        StockableProductNote note = new StockableProductNote();
+        note.setNote("This is a note you know");
+        flex51x100.addNote(note);
+        StockableProductNote note2 = new StockableProductNote();
+        note2.setNote("This is another note");
+        flex51x100.addNote(note2);
+
 
         this.stockableProductService.saveStockableProduct(flex51x100);
     }

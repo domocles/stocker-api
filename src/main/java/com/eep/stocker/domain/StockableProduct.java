@@ -2,12 +2,12 @@ package com.eep.stocker.domain;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.DefaultValue;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import java.util.*;
 
-@Entity
+@Entity(name="StockableProduct")
+@Table(name="stockable_product")
 public class StockableProduct {
 
     @Id
@@ -35,6 +35,9 @@ public class StockableProduct {
     private double stockPrice;
 
     private double inStock;
+
+    @OneToMany(mappedBy = "stockableProduct", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StockableProductNote> notes = new ArrayList<>();
 
     public StockableProduct() { }
 
@@ -120,6 +123,24 @@ public class StockableProduct {
 
     public void addTag(String tag) {
         this.getTags().add(tag);
+    }
+
+    public List<StockableProductNote> getNotes() {
+        return notes;
+    }
+
+    public void setNotes(List<StockableProductNote> notes) {
+        this.notes = notes;
+    }
+
+    public void addNote(StockableProductNote note) {
+        notes.add(note);
+        note.setStockableProduct(this);
+    }
+
+    public void removeNote(StockableProductNote note) {
+        notes.remove(note);
+        note.setStockableProduct(null);
     }
 
     @Override
