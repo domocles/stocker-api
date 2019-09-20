@@ -31,6 +31,7 @@ public class StockableProductNoteController {
 
     @PostMapping(path = "/api/stockable-product-note/create", consumes = "application/json", produces = "application/json")
     public StockableProductNote saveNote(@Valid @RequestBody StockableProductNote note) {
+
         log.info("Saving note");
         return stockableProductNoteService.saveNote(note);
     }
