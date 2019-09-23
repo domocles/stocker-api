@@ -17,6 +17,13 @@ public class Supplier {
 
     public Supplier() {}
 
+    public Supplier(String supplierName, String defaultCurrency, String emailAddress, String telephoneNumber) {
+        this.supplierName = supplierName;
+        this.defaultCurrency = defaultCurrency;
+        this.emailAddress = emailAddress;
+        this.telephoneNumber = telephoneNumber;
+    }
+
     public Long getId() {
         return id;
     }

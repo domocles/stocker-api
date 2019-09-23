@@ -31,4 +31,8 @@ public class SupplierService {
         Optional<Supplier> supplier = supplierRepository.findFirstBySupplierName(name);
         return supplier.isPresent();
     }
+
+    public Optional<Supplier> getSupplierFromId(Long id) {
+        return supplierRepository.findById(id);
+    }
 }

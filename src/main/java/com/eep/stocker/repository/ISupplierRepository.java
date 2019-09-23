@@ -10,4 +10,5 @@ public interface ISupplierRepository extends CrudRepository<Supplier, Long> {
     List<Supplier> findAll();
 
     Optional<Supplier> findFirstBySupplierName(String supplierName);
+    Optional<Supplier> findById(Long id);
 }
