@@ -101,7 +101,7 @@ public class SupplierQuote {
     @Override
     public String toString() {
         return "SupplierQuote{" +
-                ", stockableProduct=" + stockableProduct +
+                "stockableProduct=" + stockableProduct +
                 ", supplier=" + supplier +
                 ", quotationDate=" + quotationDate +
                 ", qty=" + qty +

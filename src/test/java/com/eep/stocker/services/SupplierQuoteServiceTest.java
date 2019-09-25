@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -112,7 +113,18 @@ class SupplierQuoteServiceTest {
     }
 
     @Test
-    void saveSupplierQuote() {
+    void getAllSupplierQuotesTest() {
+        given(supplierQuoteRepository.findAll()).willReturn(Arrays.asList(MF286Quote, FJIQuote));
+
+        List<SupplierQuote> quotes = supplierQuoteService.getAllSupplierQuotes();
+
+        assertThat(quotes.size()).isEqualTo(2);
+        assertThat(quotes.contains(MF286Quote)).isTrue();
+        assertThat(quotes.contains(FJIQuote)).isTrue();
+    }
+
+    @Test
+    void saveSupplierQuoteTest() {
         assertThat(supplierQuoteService).isNotNull();
 
         SupplierQuote newSupplierQuote = getNewSupplierQuote().get();
@@ -125,7 +137,7 @@ class SupplierQuoteServiceTest {
     }
 
     @Test
-    void getSupplierQuoteById() {
+    void getSupplierQuoteByIdTest() {
         given(supplierQuoteRepository.findById(1L)).willReturn(getSavedSupplierQuote());
 
         Optional<SupplierQuote> quote = supplierQuoteService.getSupplierQuoteById(1L);
@@ -136,7 +148,7 @@ class SupplierQuoteServiceTest {
     }
 
     @Test
-    void getAllSupplierQuotesForSupplier() {
+    void getAllSupplierQuotesForSupplierTest() {
         given(supplierQuoteRepository.findBySupplier(shelleys)).willReturn(Arrays.asList(savedSupplierQuote,
                 MF286Quote));
 
@@ -149,7 +161,7 @@ class SupplierQuoteServiceTest {
     }
 
     @Test
-    void getAllSupplierQuotesForStockableProduct() {
+    void getAllSupplierQuotesForStockableProductTest() {
         given(supplierQuoteRepository.findByStockableProduct(MF220))
                 .willReturn(Arrays.asList(savedSupplierQuote, FJIQuote));
 
@@ -162,12 +174,23 @@ class SupplierQuoteServiceTest {
     }
 
     @Test
-    void getLastSupplierQuoteForStockableProductAndSupplier() {
+    void getLastSupplierQuoteForStockableProductAndSupplierTest() {
         given(supplierQuoteRepository.findTopByStockableProductAndSupplierOrderByQuotationDateDesc(MF220, shelleys))
                 .willReturn(savedSupplierQuote);
 
         SupplierQuote quote = supplierQuoteService.getLastSupplierQuoteForStockableProductAndSupplier(MF220, shelleys);
         assertThat(quote.getSupplier().getSupplierName()).isEqualTo("Shelley Parts Ltd");
         assertThat(quote.getStockableProduct().getName()).isEqualTo("MF220");
+    }
+
+    @Test
+    void updateSupplierQuoteTest() {
+        given(supplierQuoteRepository.save(any(SupplierQuote.class))).willReturn(savedSupplierQuote);
+
+        SupplierQuote quote = supplierQuoteService.updateSupplierQuote(savedSupplierQuote);
+
+        assertThat(quote).isEqualTo(savedSupplierQuote);
+        assertThat(quote.getId()).isNotNull();
+
     }
 }

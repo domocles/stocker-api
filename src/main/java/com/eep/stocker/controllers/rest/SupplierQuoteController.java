@@ -3,6 +3,7 @@ package com.eep.stocker.controllers.rest;
 import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.SupplierQuoteDoesNotExistException;
+import com.eep.stocker.controllers.error.exceptions.SupplierQuoteErrorException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.domain.SupplierQuote;
@@ -11,11 +12,11 @@ import com.eep.stocker.services.SupplierQuoteService;
 import com.eep.stocker.services.SupplierService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.Date;
@@ -33,6 +34,11 @@ public class SupplierQuoteController {
         this.supplierQuoteService = supplierQuoteService;
         this.supplierService = supplierService;
         this.stockableProductService = stockableProductService;
+    }
+
+    @GetMapping("/api/supplier-quote/get")
+    public List<SupplierQuote> getAllSupplierQuotes() {
+        return supplierQuoteService.getAllSupplierQuotes();
     }
 
     @GetMapping("/api/supplier-quote/supplier/get/{id}")
@@ -64,6 +70,19 @@ public class SupplierQuoteController {
             throw new SupplierQuoteDoesNotExistException("Supplier Quote with id: " + id + " does not exist");
         }
     }
+
+    @PostMapping(value = "/api/supplier-quote", consumes = "application/json", produces = "application/json")
+    public SupplierQuote createNewSupplierQuote(@Valid @RequestBody SupplierQuote supplierQuote) {
+        return supplierQuoteService.saveSupplierQuote(supplierQuote);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    private void supplierNotFoundHandler(SupplierDoesNotExistException ex) {}
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    private void supplierQuoteErrorHandler(SupplierQuoteErrorException ex) {}
 
     @PostConstruct
     private void createSomeStockableQuotes() {

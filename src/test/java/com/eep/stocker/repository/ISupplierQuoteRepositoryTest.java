@@ -105,7 +105,7 @@ class ISupplierQuoteRepositoryTest {
     }
 
     @Test
-    void findBySupplier() {
+    void findBySupplierTest() {
         shelleys = entityManager.persistFlushFind(shelleys);
         mf220 = entityManager.persistFlushFind(mf220);
         ov12 = entityManager.persistFlushFind(ov12);
@@ -120,7 +120,7 @@ class ISupplierQuoteRepositoryTest {
     }
 
     @Test
-    void findByStockableProduct() {
+    void findByStockableProductTest() {
         shelleys = entityManager.persistFlushFind(shelleys);
         cls = entityManager.persistFlushFind(cls);
         mf220 = entityManager.persistFlushFind(mf220);
@@ -149,5 +149,14 @@ class ISupplierQuoteRepositoryTest {
         SupplierQuote quote = repository.findTopByStockableProductAndSupplierOrderByQuotationDateDesc(mf220, shelleys);
 
         assertThat(quote).isEqualTo(mf220Quote3);
+    }
+
+    @Test
+    void findAllByNonExistantSupplierTest() {
+        shelleys = entityManager.persistFlushFind(shelleys);
+        List<SupplierQuote> quotes = repository.findBySupplier(shelleys);
+
+        assertThat(quotes).isNotNull();
+        assertThat(quotes.size()).isEqualTo(0);
     }
 }

@@ -1,5 +1,6 @@
 package com.eep.stocker.services;
 
+import com.eep.stocker.controllers.error.exceptions.SupplierQuoteErrorException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.domain.SupplierQuote;
@@ -39,5 +40,13 @@ public class SupplierQuoteService {
 
     public SupplierQuote getLastSupplierQuoteForStockableProductAndSupplier(StockableProduct stockableProduct, Supplier supplier) {
         return supplierQuoteRepository.findTopByStockableProductAndSupplierOrderByQuotationDateDesc(stockableProduct, supplier);
+    }
+
+    public List<SupplierQuote> getAllSupplierQuotes() {
+        return supplierQuoteRepository.findAll();
+    }
+
+    public SupplierQuote updateSupplierQuote(SupplierQuote supplierQuote) {
+        return supplierQuoteRepository.save(supplierQuote);
     }
 }

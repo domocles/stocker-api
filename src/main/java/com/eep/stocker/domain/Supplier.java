@@ -1,6 +1,7 @@
 package com.eep.stocker.domain;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity(name ="supplier")
 @Table(name = "supplier")
@@ -62,5 +63,21 @@ public class Supplier {
 
     public void setTelephoneNumber(String telephoneNumber) {
         this.telephoneNumber = telephoneNumber;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Supplier)) return false;
+        Supplier supplier = (Supplier) o;
+        return Objects.equals(getSupplierName(), supplier.getSupplierName()) &&
+                Objects.equals(getDefaultCurrency(), supplier.getDefaultCurrency()) &&
+                Objects.equals(getEmailAddress(), supplier.getEmailAddress()) &&
+                Objects.equals(getTelephoneNumber(), supplier.getTelephoneNumber());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getSupplierName(), getDefaultCurrency(), getEmailAddress(), getTelephoneNumber());
     }
 }

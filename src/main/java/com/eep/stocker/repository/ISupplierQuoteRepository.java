@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ISupplierQuoteRepository extends CrudRepository<SupplierQuote, Long> {
+    List<SupplierQuote> findAll();
     List<SupplierQuote> findBySupplier(Supplier supplier);
     List<SupplierQuote> findByStockableProduct(StockableProduct stockableProduct);
     SupplierQuote findTopByStockableProductAndSupplierOrderByQuotationDateDesc(StockableProduct stockableProduct, Supplier supplier);

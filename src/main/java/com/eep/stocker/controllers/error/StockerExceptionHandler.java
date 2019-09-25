@@ -2,6 +2,7 @@ package com.eep.stocker.controllers.error;
 
 import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
+import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -21,6 +23,15 @@ public class StockerExceptionHandler extends ResponseEntityExceptionHandler {
     private String INCORRECT_REQUEST = "INCORRECT_REQUEST";
     private String BAD_REQUEST = "BAD_REQUEST";
     private String CONFLICT_MPN = "CONFLICTING MPN";
+
+    @ExceptionHandler(SupplierDoesNotExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public final ResponseEntity<ErrorResponse> handleSupplierNotFound(RecordNotFoundException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(BAD_REQUEST, details);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(RecordNotFoundException.class)
     public final ResponseEntity<ErrorResponse> handleMaterialNotFound(RecordNotFoundException ex, WebRequest request) {
