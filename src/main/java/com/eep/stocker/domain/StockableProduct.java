@@ -36,9 +36,6 @@ public class StockableProduct {
 
     private double inStock;
 
-    @OneToMany(mappedBy = "stockableProduct", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<StockableProductNote> notes = new ArrayList<>();
-
     public StockableProduct() { }
 
     public StockableProduct(Long id, String name, String mpn, String description, String category, Set<String> tags, String units, double stockPrice, double inStock) {
@@ -123,24 +120,6 @@ public class StockableProduct {
 
     public void addTag(String tag) {
         this.getTags().add(tag);
-    }
-
-    public List<StockableProductNote> getNotes() {
-        return notes;
-    }
-
-    public void setNotes(List<StockableProductNote> notes) {
-        this.notes = notes;
-    }
-
-    public void addNote(StockableProductNote note) {
-        notes.add(note);
-        note.setStockableProduct(this);
-    }
-
-    public void removeNote(StockableProductNote note) {
-        notes.remove(note);
-        note.setStockableProduct(null);
     }
 
     @Override

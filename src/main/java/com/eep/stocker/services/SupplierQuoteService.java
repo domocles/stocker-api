@@ -1,6 +1,5 @@
 package com.eep.stocker.services;
 
-import com.eep.stocker.controllers.error.exceptions.SupplierQuoteErrorException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.domain.SupplierQuote;

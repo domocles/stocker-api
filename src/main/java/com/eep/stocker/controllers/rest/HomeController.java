@@ -4,7 +4,9 @@ import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.StockableProductNote;
+import com.eep.stocker.services.StockableProductNoteService;
 import com.eep.stocker.services.StockableProductService;
+import com.eep.stocker.services.SupplierQuoteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,9 @@ public class HomeController {
 
     @Autowired
     private StockableProductService stockableProductService;
+
+    @Autowired
+    private StockableProductNoteService stockableProductNoteService;
 
     @GetMapping("/test")
     public String test() {
@@ -108,13 +113,17 @@ public class HomeController {
 
         StockableProductNote note = new StockableProductNote();
         note.setNote("This is a note you know");
-        flex51x100.addNote(note);
+        note.setStockableProduct(flex51x100);
+
         StockableProductNote note2 = new StockableProductNote();
         note2.setNote("This is another note");
-        flex51x100.addNote(note2);
+        note2.setStockableProduct(flex51x100);
 
 
         this.stockableProductService.saveStockableProduct(flex51x100);
+        this.stockableProductNoteService.saveNote(note);
+        this.stockableProductNoteService.saveNote(note2);
+
     }
 
 }
