@@ -193,4 +193,16 @@ class PurchaseOrderControllerIntegrationTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getPurchaseOrderReference()).isEqualTo("PO-004");
     }
+
+    @Test
+    public void purchaseOrderDeleteTest() {
+        given(purchaseOrderService.getPurchaseOrderFromId(any(Long.class))).willReturn(Optional.of(po1));
+
+        ResponseEntity<String> response = restTemplate.exchange("/api/purchase-order/delete/1",
+                HttpMethod.DELETE,
+                null,
+                String.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
 }

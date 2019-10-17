@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -94,5 +95,15 @@ class PurchaseOrderServiceTest {
         assertThat(orders).isNotNull();
         assertThat(orders).contains(po1);
         assertThat(orders).contains(po2);
+    }
+
+    @Test
+    public void getPurchaseOrderFromIdTest() {
+        given(purchaseOrderService.getPurchaseOrderFromId(any(Long.class))).willReturn(Optional.of(po1));
+
+        Optional<PurchaseOrder> purchaseOrder = purchaseOrderService.getPurchaseOrderFromId(1L);
+
+        assertThat(purchaseOrder.isPresent()).isTrue();
+        assertThat(purchaseOrder.get()).isEqualTo(po1);
     }
 }

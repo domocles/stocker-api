@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PurchaseOrderService {
@@ -35,5 +36,13 @@ public class PurchaseOrderService {
 
     public PurchaseOrder savePurchaseOrder(PurchaseOrder purchaseOrder) {
         return purchaseOrderRepository.save(purchaseOrder);
+    }
+
+    public Optional<PurchaseOrder> getPurchaseOrderFromId(Long purchaseOrderId) {
+        return purchaseOrderRepository.findById(purchaseOrderId);
+    }
+
+    public void deletePurchaseOrder(PurchaseOrder purchaseOrder) {
+        purchaseOrderRepository.delete(purchaseOrder);
     }
 }

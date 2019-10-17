@@ -1,8 +1,6 @@
 package com.eep.stocker.controllers.error;
 
-import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
-import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
-import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
+import com.eep.stocker.controllers.error.exceptions.*;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +21,25 @@ public class StockerExceptionHandler extends ResponseEntityExceptionHandler {
     private String INCORRECT_REQUEST = "INCORRECT_REQUEST";
     private String BAD_REQUEST = "BAD_REQUEST";
     private String CONFLICT_MPN = "CONFLICTING MPN";
+    private String NOT_FOUND = "NOT FOUND";
+
+    @ExceptionHandler(PurchaseOrderDoesNotExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public final ResponseEntity<ErrorResponse> handlePurchaseOrderNotFound(PurchaseOrderDoesNotExistException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(BAD_REQUEST, details);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(StockableProductDoesNotExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public final ResponseEntity<ErrorResponse> handleStockableProductNotFound(StockableProductDoesNotExistException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(BAD_REQUEST, details);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(SupplierDoesNotExistException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -47,6 +64,14 @@ public class StockerExceptionHandler extends ResponseEntityExceptionHandler {
         details.add(ex.getLocalizedMessage());
         ErrorResponse error = new ErrorResponse(CONFLICT_MPN, details);
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(PurchaseOrderLineDoesNotExistException.class)
+    public final ResponseEntity<ErrorResponse> handlePurchaseOrderLineDoesNotExistException(PurchaseOrderLineDoesNotExistException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(NOT_FOUND, details);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
     @Override

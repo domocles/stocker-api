@@ -111,6 +111,8 @@ public class HomeController {
         flex51x100.getTags().add("ilok");
         flex51x100.setUnits("Flexes");
 
+        flex51x100 = this.stockableProductService.saveStockableProduct(flex51x100);
+
         StockableProductNote note = new StockableProductNote();
         note.setNote("This is a note you know");
         note.setStockableProduct(flex51x100);
@@ -119,8 +121,6 @@ public class HomeController {
         note2.setNote("This is another note");
         note2.setStockableProduct(flex51x100);
 
-
-        this.stockableProductService.saveStockableProduct(flex51x100);
         this.stockableProductNoteService.saveNote(note);
         this.stockableProductNoteService.saveNote(note2);
 

@@ -1,5 +1,6 @@
 package com.eep.stocker.controllers.rest;
 
+import com.eep.stocker.controllers.error.exceptions.PurchaseOrderDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
 import com.eep.stocker.domain.PurchaseOrder;
 import com.eep.stocker.domain.Supplier;
@@ -11,6 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Date;
@@ -61,7 +63,19 @@ public class PurchaseOrderController {
         return purchaseOrderService.savePurchaseOrder(purchaseOrder);
     }
 
+    @DeleteMapping("/api/purchase-order/delete/{purchaseOrderId}")
+    public String deletePurchaseOrder(@PathVariable Long purchaseOrderId) {
+        Optional<PurchaseOrder> purchaseOrder = purchaseOrderService.getPurchaseOrderFromId(purchaseOrderId);
+        if(purchaseOrder.isPresent()) {
+            purchaseOrderService.deletePurchaseOrder(purchaseOrder.get());
+            return "Purchase Order with ID " + purchaseOrderId + " deleted";
+        } else {
+            throw new PurchaseOrderDoesNotExistException("Purchase Order with ID of " + purchaseOrderId + " does not exist");
+        }
+    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     private void supplierNotFoundHandler(SupplierDoesNotExistException ex) {}
+
 }
