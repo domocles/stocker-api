@@ -5,10 +5,11 @@ import java.util.Date;
 import java.util.Objects;
 
 @Entity(name = "purchaseorder")
-@Table(name = "purchaseorder")
+@Table(name = "purchase_order")
 public class PurchaseOrder {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "purchase_order_id")
     private Long id;
 
     private String purchaseOrderReference;

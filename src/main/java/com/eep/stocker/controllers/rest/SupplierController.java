@@ -24,11 +24,13 @@ public class SupplierController {
 
     @GetMapping("/api/suppliers/get")
     public List<Supplier> getAllSuppliers() {
+        log.info("get: /api/suppliers/get called");
         return supplierService.getAllSuppliers();
     }
 
     @PostMapping(path = "/api/suppliers/create", produces = "application/json", consumes = "application/json")
     public Supplier createSupplier(@RequestBody Supplier supplier) {
+        log.info("post: /api/suppliers/create called");
         return supplierService.saveSupplier(supplier);
     }
 

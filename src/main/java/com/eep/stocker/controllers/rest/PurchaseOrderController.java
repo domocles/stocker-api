@@ -33,13 +33,13 @@ public class PurchaseOrderController {
 
     @GetMapping("/api/purchase-order/get")
     public List<PurchaseOrder> getAllPurchaseOrders() {
-        log.info("Get all purchase orders called");
+        log.info("get: /api/purchase-order/get called");
         return purchaseOrderService.getAllPurchaseOrders();
     }
 
     @GetMapping("/api/purchase-order/supplier/get/{supplierId}")
     public List<PurchaseOrder> getAllPurchaseOrdersForSupplier(@PathVariable Long supplierId) {
-        log.info("Get all purchase orders for supplier: " + supplierId);
+        log.info("get: /api/purchase-order/supplier/get/" + supplierId + " called");
         Optional<Supplier> supplier = this.supplierService.getSupplierFromId(supplierId);
         if(supplier.isPresent()) {
             return purchaseOrderService.getAllPurchaseOrdersForSupplier(supplier.get());
@@ -50,21 +50,25 @@ public class PurchaseOrderController {
 
     @GetMapping("/api/purchase-order/{fromDate}/{toDate}")
     public List<PurchaseOrder> getAllPurchaseOrdersBetween(@PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate, @PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
+        log.info("get: /api/purchase-order/" + fromDate + "/" + toDate + " called");
         return purchaseOrderService.getAllPurchaseOrdersBetween(fromDate, toDate);
     }
 
     @PostMapping("/api/purchase-order/create")
     public PurchaseOrder createPurchaseOrder(@RequestBody @Valid  PurchaseOrder purchaseOrder) {
+        log.info("post: /api/purchase-order/create called");
         return purchaseOrderService.savePurchaseOrder(purchaseOrder);
     }
 
     @PutMapping("/api/purchase-order/update")
     public PurchaseOrder updatePurchaseOrder(@RequestBody @Valid PurchaseOrder purchaseOrder) {
+        log.info("put: /api/purchase-order/update");
         return purchaseOrderService.savePurchaseOrder(purchaseOrder);
     }
 
     @DeleteMapping("/api/purchase-order/delete/{purchaseOrderId}")
     public String deletePurchaseOrder(@PathVariable Long purchaseOrderId) {
+        log.info("delete: /api/purchase-order/delete/" + purchaseOrderId + " called");
         Optional<PurchaseOrder> purchaseOrder = purchaseOrderService.getPurchaseOrderFromId(purchaseOrderId);
         if(purchaseOrder.isPresent()) {
             purchaseOrderService.deletePurchaseOrder(purchaseOrder.get());

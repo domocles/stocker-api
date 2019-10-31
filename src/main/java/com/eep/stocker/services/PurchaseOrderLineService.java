@@ -3,6 +3,7 @@ package com.eep.stocker.services;
 import com.eep.stocker.domain.PurchaseOrder;
 import com.eep.stocker.domain.PurchaseOrderLine;
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.repository.IPurchaseOrderLineRepository;
 import org.springframework.stereotype.Service;
 

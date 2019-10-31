@@ -26,13 +26,13 @@ public class StockableProductNoteController {
 
     @GetMapping("/api/stockable-product-note/stockable-product/get/{id}")
     public List<StockableProductNote> getAllNotesForStockableProduct(@PathVariable Long id) {
+        log.info("get: /api/stockable-product-note/stockable-product/get/" + id + " called");
         return this.stockableProductNoteService.getAllNotesForStockableProductId(id);
     }
 
     @PostMapping(path = "/api/stockable-product-note/create", consumes = "application/json", produces = "application/json")
     public StockableProductNote saveNote(@Valid @RequestBody StockableProductNote note) {
-
-        log.info("Saving note");
+        log.info("post: /api/stockable-product-note/create called");
         return stockableProductNoteService.saveNote(note);
     }
 }

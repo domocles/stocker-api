@@ -6,18 +6,18 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity(name ="purchaseorderline")
-@Table(name ="purchaseorderline")
+@Table(name ="purchase_order_line")
 public class PurchaseOrderLine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "purchase_order_id")
     private PurchaseOrder purchaseOrder;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "stockable_product_id")
     private StockableProduct stockableProduct;
 

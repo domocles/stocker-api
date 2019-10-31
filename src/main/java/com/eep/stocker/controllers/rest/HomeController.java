@@ -37,7 +37,7 @@ public class HomeController {
 
     @GetMapping("/api/stockable-products/get/{id}")
     public StockableProduct getById(@PathVariable Long id) {
-        log.info("get stockable products by id called: '"+id+"'");
+        log.info("get: /api/stockable-products/get/"+id+" called");
         Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
         if(stockableProduct.isPresent()) {
             return stockableProduct.get();
@@ -49,22 +49,21 @@ public class HomeController {
 
     @GetMapping("/api/stockable-products/get")
     public List<StockableProduct> getAllStockableProducts() {
-        log.info("get all stockable-products called");
+        log.info("get: /api/stockable-products/get called");
         List<StockableProduct> allStockableProducts = stockableProductService.getAllStockableProducts();
         return allStockableProducts;
     }
 
     @GetMapping("/api/stockable-products/categories")
     public List<String> getAllCategories() {
-        log.info("get all categories");
+        log.info("get: /api/stockable-products/categories called");
         List<String> categories = stockableProductService.getAllCategories();
         return categories;
     }
 
     @PostMapping(path = "/api/stockable-products/create", consumes = "application/json", produces = "application/json")
     public StockableProduct createStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) {
-        log.info("Saving Stockable Product: " + stockableProduct.toString());
-        log.info("Checking the MPN doesn't already exist");
+        log.info("post: /api/stockable-products/create called");
         Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(stockableProduct.getMpn());
         if(sb.isPresent()) {
             log.info("MPN already exists: '" + stockableProduct.getMpn() + "'");
@@ -75,8 +74,7 @@ public class HomeController {
 
     @PutMapping(path = "/api/stockable-products/update", consumes = "application/json", produces = "application/json")
     public StockableProduct updateStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) {
-        log.info("Updating Stockable Product: " + stockableProduct.toString());
-        log.info("Checking that mpn does not conflict with any other products");
+        log.info("put: /api/stockable-products/update called");
         Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(stockableProduct.getMpn());
         if(sb.isPresent()) {
             if(sb.get().getId() != stockableProduct.getId()) {
@@ -88,6 +86,7 @@ public class HomeController {
 
     @DeleteMapping(path = "/api/stockable-products/delete/{id}")
     public Response deleteStockableProduct(@PathVariable Long id) throws ResourceNotFoundException {
+        log.info("delete: /api/stockable-products/delete/" + id + " called");
         Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
         if(stockableProduct.isPresent()) {
             stockableProductService.deleteStockableProduct(stockableProduct.get());

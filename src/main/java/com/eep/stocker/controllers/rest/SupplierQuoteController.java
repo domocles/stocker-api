@@ -38,11 +38,13 @@ public class SupplierQuoteController {
 
     @GetMapping("/api/supplier-quote/get")
     public List<SupplierQuote> getAllSupplierQuotes() {
+        log.info("get: /api/supplier-quote/get called");
         return supplierQuoteService.getAllSupplierQuotes();
     }
 
     @GetMapping("/api/supplier-quote/supplier/get/{id}")
     public List<SupplierQuote> getSupplierQuotesForSupplier(@PathVariable Long id) {
+        log.info("get: /api/supplier-quote/supplier/get/" + id + " called");
         Optional<Supplier> supplier = supplierService.getSupplierFromId(id);
         if(supplier.isPresent()) {
             return supplierQuoteService.getAllSupplierQuotesForSupplier(supplier.get());
@@ -53,6 +55,7 @@ public class SupplierQuoteController {
 
     @GetMapping("/api/supplier-quote/stockable-product/{id}")
     public List<SupplierQuote> getSupplierQuotesForStockableProduct(@PathVariable Long id) {
+        log.info("get: /api/supplier-quote/stockable-product/" + id + " called");
         Optional<StockableProduct> stockableProduct =  stockableProductService.getStockableProductByID(id);
         if(stockableProduct.isPresent()) {
             return supplierQuoteService.getAllSupplierQuotesForStockableProduct(stockableProduct.get());
@@ -63,6 +66,7 @@ public class SupplierQuoteController {
 
     @GetMapping("/api/supplier-quote/get/{id}")
     public SupplierQuote getSupplierById(@PathVariable Long id) {
+        log.info("get: /api/supplier-quote/get/" + id + " called");
         Optional<SupplierQuote> quote = supplierQuoteService.getSupplierQuoteById(id);
         if(quote.isPresent()) {
             return quote.get();
@@ -73,7 +77,7 @@ public class SupplierQuoteController {
 
     @PostMapping(value = "/api/supplier-quote"/*, consumes = "application/json", produces = "application/json"*/)
     public SupplierQuote createNewSupplierQuote(@Valid @RequestBody SupplierQuote supplierQuote) {
-        log.info("Saving supplier quote: " + supplierQuote);
+        log.info("post: /api/supplier-quote called");
         return supplierQuoteService.saveSupplierQuote(supplierQuote);
     }
 
