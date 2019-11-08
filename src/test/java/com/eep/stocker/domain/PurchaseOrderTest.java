@@ -32,7 +32,7 @@ class PurchaseOrderTest {
 
         theDate = new Date();
 
-        purchaseOrder = new PurchaseOrder("REF1", shelleys, theDate);
+        purchaseOrder = new PurchaseOrder("REF1", shelleys, theDate, Status.OPEN);
         purchaseOrder.setId(12L);
     }
 

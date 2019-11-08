@@ -7,6 +7,7 @@ import java.util.Objects;
 @Entity(name = "purchaseorder")
 @Table(name = "purchase_order")
 public class PurchaseOrder {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "purchase_order_id")
@@ -19,12 +20,16 @@ public class PurchaseOrder {
 
     private Date purchaseOrderDate;
 
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.OPEN;
+
     public PurchaseOrder() {}
 
-    public PurchaseOrder(String purchaseOrderReference, Supplier supplier, Date purchaseOrderDate) {
+    public PurchaseOrder(String purchaseOrderReference, Supplier supplier, Date purchaseOrderDate, Status status) {
         this.purchaseOrderReference = purchaseOrderReference;
         this.supplier = supplier;
         this.purchaseOrderDate = purchaseOrderDate;
+        this.status = status;
     }
 
     public Long getId() {
@@ -57,6 +62,14 @@ public class PurchaseOrder {
 
     public void setPurchaseOrderDate(Date purchaseOrderDate) {
         this.purchaseOrderDate = purchaseOrderDate;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override

@@ -21,19 +21,24 @@ public class PurchaseOrderLine {
     @JoinColumn(name = "stockable_product_id")
     private StockableProduct stockableProduct;
 
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.OPEN;
+
     private Double qty;
     private Double price;
     private String note;
 
     public PurchaseOrderLine() {}
 
-    public PurchaseOrderLine(Long id, PurchaseOrder purchaseOrder, StockableProduct stockableProduct, Double qty, Double price, String note) {
+    public PurchaseOrderLine(Long id, PurchaseOrder purchaseOrder, StockableProduct stockableProduct, Double qty, Double price,
+                             String note, Status status) {
         this.id = id;
         this.purchaseOrder = purchaseOrder;
         this.stockableProduct = stockableProduct;
         this.qty = qty;
         this.price = price;
         this.note = note;
+        this.status = status;
     }
 
     public Long getId() {
@@ -82,6 +87,14 @@ public class PurchaseOrderLine {
 
     public void setNote(String note) {
         this.note = note;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     @Override
