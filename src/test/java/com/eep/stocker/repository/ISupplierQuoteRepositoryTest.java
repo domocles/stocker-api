@@ -3,8 +3,6 @@ package com.eep.stocker.repository;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.domain.SupplierQuote;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -17,7 +15,6 @@ import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 @RunWith(SpringRunner.class)
 @DataJpaTest
 class ISupplierQuoteRepositoryTest {
