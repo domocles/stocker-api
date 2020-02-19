@@ -11,6 +11,7 @@ public class PurchaseOrderLine {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "purchase_order_line_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)

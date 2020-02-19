@@ -12,7 +12,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -61,7 +60,7 @@ public class DeliveryController {
         if(supplier.isPresent()) {
             return deliveryService.getAllDeliveriesForSupplier(supplier.get());
         } else {
-            throw new SupplierDoesNotExistException("Supplier withh id of " + supplierId + " does not exist");
+            throw new SupplierDoesNotExistException("Supplier with id of " + supplierId + " does not exist");
         }
     }
 

@@ -9,6 +9,7 @@ import java.util.Objects;
 public class Delivery {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "delivery_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.EAGER)
