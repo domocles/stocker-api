@@ -92,6 +92,14 @@ public class StockerExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(StockTransactionDoesNotExistException.class)
+    public final ResponseEntity<ErrorResponse> handleStockTransactionDoesNotExistException(StockTransactionDoesNotExistException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(NOT_FOUND, details);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     @Override
     public final ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest req) {
         List<String> errors = new ArrayList<>();
