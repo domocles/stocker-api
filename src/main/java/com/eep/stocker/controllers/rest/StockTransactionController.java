@@ -58,6 +58,18 @@ public class StockTransactionController {
         }
     }
 
+    @GetMapping("/api/stock-transaction/balance/{id}")
+    public Integer getBalanceForStockableProduct(@PathVariable long id) {
+        log.info("get: /api/stock-transaction/balance/" + id + " called");
+        Optional<StockableProduct> product = stockableProductService.getStockableProductByID(id);
+        if(product.isPresent()) {
+            int balance = stockTransactionService.getStockTransactionBalanceForStockableProduct(product.get());
+            return balance;
+        } else {
+            throw new StockableProductDoesNotExistException("Stockable product with id of " + id + " does not exist");
+        }
+    }
+
     @PostMapping("/api/stock-transaction/post")
     public StockTransaction createStockTransaction(@RequestBody @Valid StockTransaction stockTransaction) {
         log.info("post: /api/stock-transaction/post called");

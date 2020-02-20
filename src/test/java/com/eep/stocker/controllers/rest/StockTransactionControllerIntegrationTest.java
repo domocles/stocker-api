@@ -218,4 +218,46 @@ class StockTransactionControllerIntegrationTest {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getDetails().get(0)).isEqualTo("Stock transaction with id of 4 does not exist");
     }
+
+    @Test
+    void testGetBalanceOfStockForStockableProduct() {
+        given(stockableProductService.getStockableProductByID(5L)).willReturn(Optional.of(mf220));
+        given(stockableProductService.getStockableProductByID(6L)).willReturn(Optional.of(mf236));
+        given(stockTransactionService.getStockTransactionBalanceForStockableProduct(mf220))
+                .willReturn(50);
+        given(stockTransactionService.getStockTransactionBalanceForStockableProduct(mf236))
+                .willReturn(100);
+
+        ResponseEntity<Integer> response = restTemplate.exchange("/api/stock-transaction/balance/5",
+                HttpMethod.GET,
+                null,
+                Integer.class);
+
+        ResponseEntity<Integer> response2 = restTemplate.exchange("/api/stock-transaction/balance/6",
+                HttpMethod.GET,
+                null,
+                Integer.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).isEqualTo(50);
+
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response2.getBody()).isNotNull();
+        assertThat(response2.getBody()).isEqualTo(100);
+    }
+
+    @Test
+    void testGetBalanceForNonExistantStockableProductThrowsExceptionTest() {
+        given(stockableProductService.getStockableProductByID(anyLong())).willReturn(Optional.empty());
+
+        ResponseEntity<ErrorResponse> response = restTemplate.exchange("/api/stock-transaction/balance/6",
+                HttpMethod.GET,
+                null,
+                ErrorResponse.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getDetails().get(0)).isEqualTo("Stockable product with id of 6 does not exist");
+    }
 }
