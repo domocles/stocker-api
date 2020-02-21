@@ -115,13 +115,30 @@ class IStockTransactionRepositoryTest {
         stockTransaction2 = testEntityManager.persistFlushFind(stockTransaction2);
         stockTransaction3 = testEntityManager.persistFlushFind(stockTransaction3);
 
-        Optional<Integer> sumOfOv12Transactions = repository.getSumOfStockTransactionsForStockableProduct(ov12);
-        Optional<Integer> sumOfmf220Transactions = repository.getSumOfStockTransactionsForStockableProduct(mf220);
+        Optional<Double> sumOfOv12Transactions = repository.getSumOfStockTransactionsForStockableProduct(ov12);
+        Optional<Double> sumOfmf220Transactions = repository.getSumOfStockTransactionsForStockableProduct(mf220);
 
         assertThat(sumOfOv12Transactions).isPresent();
         assertThat(sumOfmf220Transactions).isPresent();
-        assertThat(sumOfOv12Transactions).get().isEqualTo(300);
-        assertThat(sumOfmf220Transactions).get().isEqualTo(25);
+        assertThat(sumOfOv12Transactions).get().isEqualTo(300.0);
+        assertThat(sumOfmf220Transactions).get().isEqualTo(25.0);
+    }
+
+    @Test
+    public void sumAllStockTransacationsForStockableProductByIdTest() {
+        mf220 = testEntityManager.persistFlushFind(mf220);
+        ov12 = testEntityManager.persistFlushFind(ov12);
+        stockTransaction1 = testEntityManager.persistFlushFind(stockTransaction1);
+        stockTransaction2 = testEntityManager.persistFlushFind(stockTransaction2);
+        stockTransaction3 = testEntityManager.persistFlushFind(stockTransaction3);
+
+        Optional<Double> sumOfOv12Transactions = repository.getSumOfStockTransactionsForStockableProductById(ov12.getId());
+        Optional<Double> sumOfmf220Transactions = repository.getSumOfStockTransactionsForStockableProductById(mf220.getId());
+
+        assertThat(sumOfOv12Transactions).isPresent();
+        assertThat(sumOfmf220Transactions).isPresent();
+        assertThat(sumOfOv12Transactions).get().isEqualTo(300.0);
+        assertThat(sumOfmf220Transactions).get().isEqualTo(25.0);
     }
 
     @Test
@@ -129,7 +146,7 @@ class IStockTransactionRepositoryTest {
         mf220 = testEntityManager.persistFlushFind(mf220);
         ov12 = testEntityManager.persistFlushFind(ov12);
 
-        Optional<Integer> sumOfOv12Transactions = repository.getSumOfStockTransactionsForStockableProduct(ov12);
+        Optional<Double> sumOfOv12Transactions = repository.getSumOfStockTransactionsForStockableProduct(ov12);
 
         assertThat(sumOfOv12Transactions).isNotPresent();
     }

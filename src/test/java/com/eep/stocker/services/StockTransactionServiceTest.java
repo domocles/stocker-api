@@ -3,6 +3,7 @@ package com.eep.stocker.services;
 import com.eep.stocker.domain.StockTransaction;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.repository.IStockTransactionRepository;
+import com.eep.stocker.repository.IStockableProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -11,6 +12,7 @@ import org.mockito.MockitoAnnotations;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +24,9 @@ import static org.mockito.BDDMockito.given;
 class StockTransactionServiceTest {
     @Mock
     private IStockTransactionRepository stockTransactionRepository;
+
+    @Mock
+    private IStockableProductRepository stockableProductRepository;
 
     private StockTransactionService stockTransactionService;
 
@@ -35,7 +40,7 @@ class StockTransactionServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.stockTransactionService = new StockTransactionService(stockTransactionRepository);
+        this.stockTransactionService = new StockTransactionService(stockTransactionRepository, stockableProductRepository);
 
         mf220 = new StockableProduct();
         mf220.setId(1L);
@@ -112,12 +117,12 @@ class StockTransactionServiceTest {
     @Test
     public void getSumOfTransactionsForStockableProductTest() {
         given(stockTransactionRepository.getSumOfStockTransactionsForStockableProduct(any(StockableProduct.class)))
-                .willReturn(Optional.of(50));
+                .willReturn(Optional.of(50.0));
 
-        int stockTransactionBalance = stockTransactionService
+        double stockTransactionBalance = stockTransactionService
                 .getStockTransactionBalanceForStockableProduct(ov12);
 
-        assertThat(stockTransactionBalance).isEqualTo(50);
+        assertThat(stockTransactionBalance).isEqualTo(50.0);
     }
 
     @Test
@@ -125,10 +130,25 @@ class StockTransactionServiceTest {
         given(stockTransactionRepository.getSumOfStockTransactionsForStockableProduct(any(StockableProduct.class)))
                 .willReturn(Optional.empty());
 
-        int stockTransactionBalance = stockTransactionService
+        double stockTransactionBalance = stockTransactionService
                 .getStockTransactionBalanceForStockableProduct(ov12);
 
-        assertThat(stockTransactionBalance).isEqualTo(0);
+        assertThat(stockTransactionBalance).isEqualTo(0.0);
     }
 
+    @Test
+    public void getAllStockBalancesTest() {
+        given(stockableProductRepository.findAllIdsForStockableProduct()).willReturn(Arrays.asList(1L, 2L));
+        given(stockTransactionRepository.getSumOfStockTransactionsForStockableProductById(1L)).willReturn(Optional.of(50.0));
+        given(stockTransactionRepository.getSumOfStockTransactionsForStockableProductById(2L)).willReturn(Optional.of(150.0));
+
+        Map<Long, Double> stockBalances = stockTransactionService.getStockTransactionBalanceForAllStockableProducts();
+
+        assertThat(stockBalances.size()).isEqualTo(2);
+        assertThat(stockBalances.containsKey(1L));
+        assertThat(stockBalances.get(1L)).isEqualTo(50);
+
+        assertThat(stockBalances.containsKey(2L));
+        assertThat(stockBalances.get(2L)).isEqualTo(150);
+    }
 }

@@ -13,4 +13,7 @@ public interface IStockableProductRepository extends CrudRepository<StockablePro
 
     @Query("SELECT DISTINCT category FROM StockableProduct")
     List<String> findDistinctCategories();
+
+    @Query("SELECT DISTINCT id FROM StockableProduct ")
+    List<Long> findAllIdsForStockableProduct();
 }

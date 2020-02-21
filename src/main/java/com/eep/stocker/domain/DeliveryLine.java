@@ -20,17 +20,28 @@ public class DeliveryLine {
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
+    @OneToOne
+    @JoinColumn(name = "stock_transaction_id")
+    private StockTransaction stockTransaction;
+
     private Double quantityDelivered;
 
     private String note;
 
-    public DeliveryLine() {}
+    public DeliveryLine() {
+        this.stockTransaction = new StockTransaction();
+    }
 
-    public DeliveryLine(PurchaseOrderLine purchaseOrderLine, Delivery delivery, Double quantityDelivered, String note) {
+    public DeliveryLine(PurchaseOrderLine purchaseOrderLine,
+                        Delivery delivery,
+                        Double quantityDelivered,
+                        String note,
+                        StockTransaction stockTransaction) {
         this.purchaseOrderLine = purchaseOrderLine;
         this.delivery = delivery;
         this.quantityDelivered = quantityDelivered;
         this.note = note;
+        this.stockTransaction = stockTransaction;
     }
 
     public Long getId() {
@@ -65,6 +76,14 @@ public class DeliveryLine {
         this.quantityDelivered = quantityDelivered;
     }
 
+    public StockTransaction getStockTransaction() {
+        return stockTransaction;
+    }
+
+    public void setStockTransaction(StockTransaction stockTransaction) {
+        this.stockTransaction = stockTransaction;
+    }
+
     public String getNote() {
         return note;
     }
@@ -80,13 +99,14 @@ public class DeliveryLine {
         DeliveryLine that = (DeliveryLine) o;
         return Objects.equals(getPurchaseOrderLine(), that.getPurchaseOrderLine()) &&
                 Objects.equals(getDelivery(), that.getDelivery()) &&
+                Objects.equals(getStockTransaction(), that.getStockTransaction()) &&
                 Objects.equals(getQuantityDelivered(), that.getQuantityDelivered()) &&
                 Objects.equals(getNote(), that.getNote());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getPurchaseOrderLine(), getDelivery(), getQuantityDelivered(), getNote());
+        return Objects.hash(getPurchaseOrderLine(), getDelivery(), getStockTransaction(), getQuantityDelivered(), getNote());
     }
 
     @Override
@@ -95,6 +115,7 @@ public class DeliveryLine {
                 "id=" + id +
                 ", purchaseOrderLine=" + purchaseOrderLine +
                 ", delivery=" + delivery +
+                ", stockTransaction=" + stockTransaction +
                 ", quantityDelivered=" + quantityDelivered +
                 ", note='" + note + '\'' +
                 '}';

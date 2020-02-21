@@ -224,19 +224,19 @@ class StockTransactionControllerIntegrationTest {
         given(stockableProductService.getStockableProductByID(5L)).willReturn(Optional.of(mf220));
         given(stockableProductService.getStockableProductByID(6L)).willReturn(Optional.of(mf236));
         given(stockTransactionService.getStockTransactionBalanceForStockableProduct(mf220))
-                .willReturn(50);
+                .willReturn(50.0);
         given(stockTransactionService.getStockTransactionBalanceForStockableProduct(mf236))
-                .willReturn(100);
+                .willReturn(100.0);
 
-        ResponseEntity<Integer> response = restTemplate.exchange("/api/stock-transaction/balance/5",
+        ResponseEntity<Double> response = restTemplate.exchange("/api/stock-transaction/balance/5",
                 HttpMethod.GET,
                 null,
-                Integer.class);
+                Double.class);
 
-        ResponseEntity<Integer> response2 = restTemplate.exchange("/api/stock-transaction/balance/6",
+        ResponseEntity<Double> response2 = restTemplate.exchange("/api/stock-transaction/balance/6",
                 HttpMethod.GET,
                 null,
-                Integer.class);
+                Double.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();

@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -150,6 +151,11 @@ class DeliveryLineControllerIntegrationTest {
         deliveryLine1.setPurchaseOrderLine(poLine1);
         deliveryLine1.setNote("A note");
         deliveryLine1.setQuantityDelivered(15.0D);
+        StockTransaction transaction1 = new StockTransaction(poLine1.getStockableProduct(),
+                deliveryLine1.getQuantityDelivered(), "Delivery No. " + delivery1.getReference(),
+                "Test stock transaction", LocalDate.now());
+        transaction1.setId(1L);
+        deliveryLine1.setStockTransaction(transaction1);
 
         deliveryLine2 = new DeliveryLine();
         deliveryLine2.setId(2L);
@@ -157,6 +163,11 @@ class DeliveryLineControllerIntegrationTest {
         deliveryLine2.setPurchaseOrderLine(poLine1);
         deliveryLine2.setNote("A note");
         deliveryLine2.setQuantityDelivered(10.0D);
+        StockTransaction transaction2 = new StockTransaction(poLine1.getStockableProduct(),
+                deliveryLine2.getQuantityDelivered(), "Delivery No. " + delivery2.getReference(),
+                "Test stock transaction", LocalDate.now());
+        transaction2.setId(2L);
+        deliveryLine2.setStockTransaction(transaction2);
 
         deliveryLine3 = new DeliveryLine();
         deliveryLine3.setId(3L);
@@ -164,6 +175,11 @@ class DeliveryLineControllerIntegrationTest {
         deliveryLine3.setPurchaseOrderLine(poLine2);
         deliveryLine3.setNote("A note");
         deliveryLine3.setQuantityDelivered(100.0D);
+        StockTransaction transaction3 = new StockTransaction(poLine2.getStockableProduct(),
+                deliveryLine3.getQuantityDelivered(), "Delivery No. " + delivery3.getReference(),
+                "Test stock transaction", LocalDate.now());
+        transaction3.setId(3L);
+        deliveryLine3.setStockTransaction(transaction3);
     }
 
     @Test
@@ -262,6 +278,10 @@ class DeliveryLineControllerIntegrationTest {
         unsavedDeliveryLine.setNote("A note");
         unsavedDeliveryLine.setQuantityDelivered(25.0D);
         unsavedDeliveryLine.setDelivery(delivery2);
+        StockTransaction transaction = new StockTransaction(poLine1.getStockableProduct(),
+                unsavedDeliveryLine.getQuantityDelivered(), "Delivery No. " + delivery2.getReference(),
+                "Test stock transaction", LocalDate.now());
+        unsavedDeliveryLine.setStockTransaction(transaction);
 
         DeliveryLine savedDeliveryLine = new DeliveryLine();
         savedDeliveryLine.setId(1L);
@@ -269,6 +289,10 @@ class DeliveryLineControllerIntegrationTest {
         savedDeliveryLine.setNote("A note");
         savedDeliveryLine.setQuantityDelivered(25.0D);
         savedDeliveryLine.setDelivery(delivery2);
+        StockTransaction stockTransaction = new StockTransaction(poLine1.getStockableProduct(),
+                unsavedDeliveryLine.getQuantityDelivered(), "Delivery No. " + delivery2.getReference(),
+                "Test stock transaction", LocalDate.now());
+        savedDeliveryLine.setStockTransaction(stockTransaction);
 
         given(deliveryLineService.save(unsavedDeliveryLine)).willReturn(savedDeliveryLine);
 

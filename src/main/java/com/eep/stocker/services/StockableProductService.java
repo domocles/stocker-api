@@ -2,6 +2,7 @@ package com.eep.stocker.services;
 
 import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.repository.IStockTransactionRepository;
 import com.eep.stocker.repository.IStockableProductRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +19,11 @@ public class StockableProductService {
     @Autowired
     private IStockableProductRepository stockableProductRepository;
 
+    @Autowired
+    private IStockTransactionRepository stockTransactionRepository;
+
     public StockableProduct saveStockableProduct(StockableProduct stockableProduct) {
-        //todo add logging to this
+        log.info("saveStockableProduct called");
         return this.stockableProductRepository.save(stockableProduct);
     }
 
@@ -28,11 +32,22 @@ public class StockableProductService {
     }
 
     public Optional<StockableProduct> getStockableProductByID(Long ID) {
-        //todo add logging to this
+        log.info("getStockableProductByID called");
         return this.stockableProductRepository.findById(ID);
     }
 
     public List<StockableProduct> getAllStockableProducts() {
+        //get all the stockable products from the stockableProductRepository
+        List<StockableProduct> stockableProducts = stockableProductRepository.findAll();
+        //get the stock balance levels for each product and set stock quantity to it.
+        for(StockableProduct stockableProduct : stockableProducts) {
+            Optional<Double> stock = stockTransactionRepository.getSumOfStockTransactionsForStockableProductById(stockableProduct.getId());
+            if(stock.isPresent()) {
+                stockableProduct.setInStock(stock.get());
+            } else {
+                stockableProduct.setInStock(0);
+            }
+        }
         return this.stockableProductRepository.findAll();
     }
 

@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -32,6 +33,9 @@ class IDeliveryLineRepositoryTest {
     private PurchaseOrderLine poLine1;
     private PurchaseOrderLine unsavedPoLine1;
     private PurchaseOrderLine poLine2;
+    private StockTransaction transaction1;
+    private StockTransaction transaction2;
+    private StockTransaction transaction3;
     private StockableProduct mf220;
     private StockableProduct MF286;
 
@@ -80,6 +84,19 @@ class IDeliveryLineRepositoryTest {
                 "Flanges",
                 1.45D,
                 75.D);
+
+        //stock transactions
+        transaction1 = new StockTransaction(mf220,
+                15.0D, "Delivery No. " + "12345",
+                "Test stock transaction", LocalDate.now());
+
+        transaction2 = new StockTransaction(mf220,
+                10.D, "Delivery No. " + "12345",
+                "Test stock transaction", LocalDate.now());
+
+        transaction3 = new StockTransaction(MF286,
+                100.0D, "Delivery No. " + "12345",
+                "Test stock transaction", LocalDate.now());
 
         unsavedPoLine1 = new PurchaseOrderLine();
         unsavedPoLine1.setNote("First purchase order line");
@@ -130,18 +147,21 @@ class IDeliveryLineRepositoryTest {
         deliveryLine1.setPurchaseOrderLine(poLine1);
         deliveryLine1.setNote("A note");
         deliveryLine1.setQuantityDelivered(15.0D);
+        deliveryLine1.setStockTransaction(transaction1);
 
         deliveryLine2 = new DeliveryLine();
         deliveryLine2.setDelivery(delivery2);
         deliveryLine2.setPurchaseOrderLine(poLine1);
         deliveryLine2.setNote("A note");
         deliveryLine2.setQuantityDelivered(10.0D);
+        deliveryLine2.setStockTransaction(transaction2);
 
         deliveryLine3 = new DeliveryLine();
         deliveryLine3.setDelivery(delivery1);
         deliveryLine3.setPurchaseOrderLine(poLine2);
         deliveryLine3.setNote("A note");
         deliveryLine3.setQuantityDelivered(100.0D);
+        deliveryLine3.setStockTransaction(transaction3);
 
         shelleys = entityManager.persistFlushFind(shelleys);
         ukf = entityManager.persistFlushFind(ukf);
@@ -149,6 +169,9 @@ class IDeliveryLineRepositoryTest {
         po2 = entityManager.persistFlushFind(po2);
         mf220 = entityManager.persistFlushFind(mf220);
         MF286 = entityManager.persistFlushFind(MF286);
+        transaction1 = entityManager.persistFlushFind(transaction1);
+        transaction2 = entityManager.persistFlushFind(transaction2);
+        transaction3 = entityManager.persistFlushFind(transaction3);
         poLine1 = entityManager.persistFlushFind(poLine1);
         poLine2 = entityManager.persistFlushFind(poLine2);
         delivery1 = entityManager.persistFlushFind(delivery1);

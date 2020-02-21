@@ -4,7 +4,8 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
-@Entity
+@Entity(name = "StockTransaction")
+@Table(name = "post_comment")
 public class StockTransaction {
     private long id;
     private StockableProduct stockableProduct;
@@ -39,7 +40,7 @@ public class StockTransaction {
         this.id = id;
     }
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     public StockableProduct getStockableProduct() {
         return stockableProduct;
     }

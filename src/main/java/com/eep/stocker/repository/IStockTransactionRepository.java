@@ -13,5 +13,8 @@ public interface IStockTransactionRepository extends CrudRepository<StockTransac
     List<StockTransaction> findAllByStockableProduct(StockableProduct stockableProduct);
 
     @Query("SELECT SUM(s.quantity) FROM StockTransaction s WHERE s.stockableProduct = :sp")
-    Optional<Integer> getSumOfStockTransactionsForStockableProduct(StockableProduct sp);
+    Optional<Double> getSumOfStockTransactionsForStockableProduct(StockableProduct sp);
+
+    @Query("SELECT SUM(s.quantity) FROM StockTransaction s WHERE s.stockableProduct.id = :id")
+    Optional<Double> getSumOfStockTransactionsForStockableProductById(Long id);
 }
