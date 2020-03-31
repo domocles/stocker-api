@@ -1,7 +1,9 @@
 package com.eep.stocker.services;
 
+import com.eep.stocker.domain.PurchaseOrderLine;
 import com.eep.stocker.domain.StockTransaction;
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.repository.IDeliveryLineRepository;
 import com.eep.stocker.repository.IStockTransactionRepository;
 import com.eep.stocker.repository.IStockableProductRepository;
 import org.slf4j.Logger;
@@ -16,11 +18,14 @@ public class StockTransactionService {
 
     private IStockTransactionRepository stockTransactionRepository;
     private IStockableProductRepository stockableProductRepository;
+    private IDeliveryLineRepository deliveryLineRepository;
 
     public StockTransactionService(IStockTransactionRepository stockTransactionRepository,
-                                   IStockableProductRepository stockableProductRepository) {
+                                   IStockableProductRepository stockableProductRepository,
+                                   IDeliveryLineRepository deliveryLineRepository) {
         this.stockTransactionRepository = stockTransactionRepository;
         this.stockableProductRepository = stockableProductRepository;
+        this.deliveryLineRepository = deliveryLineRepository;
     }
 
     public List<StockTransaction> getAllStockTransactions() {
@@ -60,6 +65,14 @@ public class StockTransactionService {
 
     public double getStockTransactionBalanceForStockableProduct(StockableProduct stockableProduct) {
         Optional<Double> sum = stockTransactionRepository.getSumOfStockTransactionsForStockableProduct(stockableProduct);
+        if(sum.isPresent()) {
+            return sum.get();
+        }
+        return 0.0;
+    }
+
+    public double getBalanceForPurchaseOrderLine(PurchaseOrderLine purchaseOrderLine) {
+        Optional<Double> sum = deliveryLineRepository.getSumOfDeliveriesForPurchaseOrderLine(purchaseOrderLine);
         if(sum.isPresent()) {
             return sum.get();
         }

@@ -1,10 +1,8 @@
 package com.eep.stocker.services;
 
-import com.eep.stocker.domain.DeliveryLine;
-import com.eep.stocker.domain.PurchaseOrder;
-import com.eep.stocker.domain.StockableProduct;
-import com.eep.stocker.domain.Supplier;
+import com.eep.stocker.domain.*;
 import com.eep.stocker.repository.IDeliveryLineRepository;
+import com.google.common.primitives.Doubles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,5 +60,15 @@ public class DeliveryLineService {
     public List<DeliveryLine> getAllDeliveryLinesForDelivery(Long id) {
         log.info("GetAllDeliveryLinesForDelivery called");
         return deliveryLineRepository.findAllByDelivery_Id(id);
+    }
+
+    public Optional<Double> getSumDeliveredForOrderLine(PurchaseOrderLine orderLine) {
+        log.info("Get sum delivered for order line called");
+        Optional<Double> totalDeliveredOptional = deliveryLineRepository.getSumOfDeliveriesForPurchaseOrderLine(orderLine);
+        if(totalDeliveredOptional.isPresent()) {
+            Double totalDelivered = Doubles.constrainToRange(totalDeliveredOptional.get(), 0.0, orderLine.getQty());
+            return Optional.of(totalDelivered);
+        }
+        return totalDeliveredOptional;
     }
 }

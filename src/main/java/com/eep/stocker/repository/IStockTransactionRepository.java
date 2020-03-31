@@ -1,5 +1,6 @@
 package com.eep.stocker.repository;
 
+import com.eep.stocker.domain.PurchaseOrderLine;
 import com.eep.stocker.domain.StockTransaction;
 import com.eep.stocker.domain.StockableProduct;
 import org.springframework.data.jpa.repository.Query;
@@ -17,4 +18,5 @@ public interface IStockTransactionRepository extends CrudRepository<StockTransac
 
     @Query("SELECT SUM(s.quantity) FROM StockTransaction s WHERE s.stockableProduct.id = :id")
     Optional<Double> getSumOfStockTransactionsForStockableProductById(Long id);
+
 }

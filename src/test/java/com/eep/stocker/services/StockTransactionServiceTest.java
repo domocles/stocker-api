@@ -2,6 +2,7 @@ package com.eep.stocker.services;
 
 import com.eep.stocker.domain.StockTransaction;
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.repository.IDeliveryLineRepository;
 import com.eep.stocker.repository.IStockTransactionRepository;
 import com.eep.stocker.repository.IStockableProductRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,6 +29,9 @@ class StockTransactionServiceTest {
     @Mock
     private IStockableProductRepository stockableProductRepository;
 
+    @Mock
+    private IDeliveryLineRepository deliveryLineRepository;
+
     private StockTransactionService stockTransactionService;
 
     private StockableProduct mf220;
@@ -40,7 +44,7 @@ class StockTransactionServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.initMocks(this);
-        this.stockTransactionService = new StockTransactionService(stockTransactionRepository, stockableProductRepository);
+        this.stockTransactionService = new StockTransactionService(stockTransactionRepository, stockableProductRepository, deliveryLineRepository);
 
         mf220 = new StockableProduct();
         mf220.setId(1L);

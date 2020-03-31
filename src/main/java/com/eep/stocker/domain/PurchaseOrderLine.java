@@ -26,6 +26,7 @@ public class PurchaseOrderLine {
     private Status status = Status.OPEN;
 
     private Double qty;
+    private Double balance;
     private Double price;
     private String note;
 
@@ -40,6 +41,7 @@ public class PurchaseOrderLine {
         this.price = price;
         this.note = note;
         this.status = status;
+        this.balance = qty;
     }
 
     public Long getId() {
@@ -96,6 +98,14 @@ public class PurchaseOrderLine {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
     }
 
     @Override

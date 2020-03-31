@@ -1,16 +1,14 @@
 package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.controllers.error.exceptions.PurchaseOrderDoesNotExistException;
+import com.eep.stocker.controllers.error.exceptions.PurchaseOrderLineDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
 import com.eep.stocker.domain.PurchaseOrder;
 import com.eep.stocker.domain.PurchaseOrderLine;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.Supplier;
-import com.eep.stocker.services.PurchaseOrderLineService;
-import com.eep.stocker.services.PurchaseOrderService;
-import com.eep.stocker.services.StockableProductService;
-import com.eep.stocker.services.SupplierService;
+import com.eep.stocker.services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -29,15 +27,18 @@ public class PurchaseOrderLineController {
     private StockableProductService stockableProductService;
     private PurchaseOrderService purchaseOrderService;
     private SupplierService supplierService;
+    private DeliveryLineService deliveryLineService;
 
     public PurchaseOrderLineController(PurchaseOrderLineService purchaseOrderLineService,
                                        StockableProductService stockableProductService,
                                        PurchaseOrderService purchaseOrderService,
-                                       SupplierService supplierService) {
+                                       SupplierService supplierService,
+                                       DeliveryLineService deliveryLineService) {
         this.orderLineService = purchaseOrderLineService;
         this.stockableProductService = stockableProductService;
         this.purchaseOrderService = purchaseOrderService;
         this.supplierService = supplierService;
+        this.deliveryLineService = deliveryLineService;
     }
 
     @GetMapping("/api/purchase-order-line/get")
@@ -69,6 +70,29 @@ public class PurchaseOrderLineController {
         } else {
             log.info("Purchase order with ID of " + purchaseOrderId + " does not exist");
             throw new PurchaseOrderDoesNotExistException("Purchase order with ID of " + purchaseOrderId + " does not exist");
+        }
+    }
+
+    @GetMapping("/api/purchase-order-line/get/balance/{purchaseOrderLineId}")
+    public Double getBalanceOfPurchaseOrderLine(@PathVariable Long purchaseOrderLineId) {
+        log.info("get: /api/purchase-order-line/get/balance/" + purchaseOrderLineId + " called");
+        Optional<PurchaseOrderLine> poLineOptional = orderLineService.getPurchaseOrderLineById(purchaseOrderLineId);
+        if(poLineOptional.isPresent()) {
+            PurchaseOrderLine poLine = poLineOptional.get();
+            Optional<Double> deliveredOptional = deliveryLineService.getSumDeliveredForOrderLine(poLine);
+            Double delivered;
+            if(deliveredOptional.isPresent()) {
+                delivered = deliveredOptional.get();
+            } else {
+                delivered = 0.0;
+            }
+
+            Double balance = poLine.getQty() - delivered;
+            return balance;
+
+        } else {
+            log.info("Purchase order line with ID of " + purchaseOrderLineId + " does not exist");
+            throw  new PurchaseOrderLineDoesNotExistException("Purchase order line with ID of " + purchaseOrderLineId + " does not exist");
         }
     }
 

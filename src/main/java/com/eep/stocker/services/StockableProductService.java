@@ -28,12 +28,32 @@ public class StockableProductService {
     }
 
     public Optional<StockableProduct> findStockableProductByMpn(String mpn) {
-        return this.stockableProductRepository.findFirstByMpn(mpn);
+        Optional<StockableProduct> stockableProduct = this.stockableProductRepository.findFirstByMpn(mpn);
+        return  updateStockOfStockableProduct(stockableProduct.get());
     }
 
     public Optional<StockableProduct> getStockableProductByID(Long ID) {
         log.info("getStockableProductByID called");
-        return this.stockableProductRepository.findById(ID);
+        return updateStockOfStockableProduct(ID);
+    }
+
+    private Optional<StockableProduct> updateStockOfStockableProduct(Long id) {
+        Optional<StockableProduct> stockableProductOptional = this.stockableProductRepository.findById(id);
+        if(stockableProductOptional.isPresent()) {
+            return  updateStockOfStockableProduct(stockableProductOptional.get());
+        }
+        return Optional.empty();
+    }
+
+    private Optional<StockableProduct> updateStockOfStockableProduct(StockableProduct stockableProduct) {
+        log.info("Getting stock of stockable product");
+        Optional<Double> stock = stockTransactionRepository.getSumOfStockTransactionsForStockableProductById(stockableProduct.getId());
+        if (stock.isPresent()) {
+            stockableProduct.setInStock(stock.get());
+        } else {
+            stockableProduct.setInStock(0);
+        }
+        return Optional.of(stockableProduct);
     }
 
     public List<StockableProduct> getAllStockableProducts() {

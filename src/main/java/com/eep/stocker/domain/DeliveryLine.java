@@ -20,7 +20,7 @@ public class DeliveryLine {
     @JoinColumn(name = "delivery_id")
     private Delivery delivery;
 
-    @OneToOne
+    @OneToOne(orphanRemoval = true)
     @JoinColumn(name = "stock_transaction_id")
     private StockTransaction stockTransaction;
 
