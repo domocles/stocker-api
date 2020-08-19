@@ -1,6 +1,7 @@
 package com.eep.stocker.controllers.rest;
 
 
+import com.eep.stocker.controllers.error.exceptions.DomainObjectDoesNotExistException;
 import com.eep.stocker.domain.StockableProductNote;
 import com.eep.stocker.services.StockableProductNoteService;
 import com.eep.stocker.services.StockableProductService;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.ws.rs.Path;
 import java.util.List;
 
 @RestController
@@ -24,15 +26,34 @@ public class StockableProductNoteController {
         this.stockableProductNoteService = stockableProductNoteService;
     }
 
+    @GetMapping("/api/stockable-product-note/get")
+    public List<StockableProductNote> getAllStockableProductNotes() {
+        log.info("get: /api/stockable-product-note/get/ called");
+        return this.stockableProductNoteService.get();
+    }
+
+    @GetMapping("/api/stockable-product-note/get/{id}")
+    public StockableProductNote getStockableProductNoteById(@PathVariable long id) {
+        log.info("get: /api/stockable-product-note/get/{} called", id);
+        return this.stockableProductNoteService.getById(id)
+                .orElseThrow(() -> new DomainObjectDoesNotExistException("StockableProductNote does not exist"));
+    }
+
     @GetMapping("/api/stockable-product-note/stockable-product/get/{id}")
     public List<StockableProductNote> getAllNotesForStockableProduct(@PathVariable Long id) {
-        log.info("get: /api/stockable-product-note/stockable-product/get/" + id + " called");
+        log.info("get: /api/stockable-product-note/stockable-product/get/{} called", id);
         return this.stockableProductNoteService.getAllNotesForStockableProductId(id);
     }
 
     @PostMapping(path = "/api/stockable-product-note/create", consumes = "application/json", produces = "application/json")
     public StockableProductNote saveNote(@Valid @RequestBody StockableProductNote note) {
         log.info("post: /api/stockable-product-note/create called");
+        return stockableProductNoteService.saveNote(note);
+    }
+
+    @PutMapping(path = "/api/stock-able-product-note/update")
+    public StockableProductNote updateNote(@Valid @RequestBody StockableProductNote note) {
+        log.info("post: /api/stockable-product-note/udate called");
         return stockableProductNoteService.saveNote(note);
     }
 }

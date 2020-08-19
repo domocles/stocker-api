@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class StockableProductNoteService {
@@ -27,4 +28,11 @@ public class StockableProductNoteService {
         return stockableProductNoteRepository.save(note);
     }
 
+    public List<StockableProductNote> get() {
+        return stockableProductNoteRepository.findAll();
+    }
+
+    public Optional<StockableProductNote> getById(long id) {
+        return stockableProductNoteRepository.findById(id);
+    }
 }

@@ -28,8 +28,11 @@ public class StockableProductService {
     }
 
     public Optional<StockableProduct> findStockableProductByMpn(String mpn) {
+        log.info("findStockableProductByMpn called " + mpn);
         Optional<StockableProduct> stockableProduct = this.stockableProductRepository.findFirstByMpn(mpn);
-        return  updateStockOfStockableProduct(stockableProduct.get());
+        if(stockableProduct.isPresent())
+            return  updateStockOfStockableProduct(stockableProduct.get());
+        else return Optional.empty();
     }
 
     public Optional<StockableProduct> getStockableProductByID(Long ID) {

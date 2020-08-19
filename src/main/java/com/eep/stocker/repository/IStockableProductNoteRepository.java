@@ -7,5 +7,6 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface IStockableProductNoteRepository extends CrudRepository<StockableProductNote, Long> {
+    List<StockableProductNote> findAll();
     List<StockableProductNote> findAllByStockableProduct_Id(Long id);
 }

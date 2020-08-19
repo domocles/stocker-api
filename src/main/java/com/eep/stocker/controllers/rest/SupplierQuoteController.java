@@ -75,9 +75,9 @@ public class SupplierQuoteController {
         }
     }
 
-    @PostMapping(value = "/api/supplier-quote"/*, consumes = "application/json", produces = "application/json"*/)
+    @PostMapping(value = "/api/supplier-quote/create")
     public SupplierQuote createNewSupplierQuote(@Valid @RequestBody SupplierQuote supplierQuote) {
-        log.info("post: /api/supplier-quote called");
+        log.info("post: /api/supplier-quote/create called");
         return supplierQuoteService.saveSupplierQuote(supplierQuote);
     }
 

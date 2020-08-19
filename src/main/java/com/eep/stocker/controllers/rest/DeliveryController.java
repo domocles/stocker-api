@@ -31,12 +31,12 @@ public class DeliveryController {
 
     @GetMapping("/api/delivery/get/{id}")
     public Delivery getDeliveryById(@PathVariable Long id) {
-        log.info("get: /api/delivery/get/" + id + " called");
+        log.info("get: /api/delivery/get/{} called", id);
         Optional<Delivery> delivery = deliveryService.getDeliveryById(id);
         if(delivery.isPresent()) {
             return delivery.get();
         } else {
-            throw new DeliveryDoesNotExistException("Delivery with id of " + id + " does not exist");
+            throw new DeliveryDoesNotExistException(String.format("Delivery with id of %d does not exist", id));
         }
     }
 
@@ -49,13 +49,13 @@ public class DeliveryController {
     @GetMapping("/api/delivery/{fromDate}/{toDate}")
     public List<Delivery> getAllDeliveriesBetween(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
                                                   @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
-        log.info("get: /api/delivery/" + fromDate + "/" + toDate + " called");
+        log.info("get: /api/delivery/{}/{} called", fromDate, toDate);
         return deliveryService.getAllDeliveriesBetween(fromDate, toDate);
     }
 
     @GetMapping("/api/delivery/supplier/{supplierId}")
     public List<Delivery> getAllDeliveriesForSupplier(@PathVariable Long supplierId) {
-        log.info("get: /api/delivery/supplier/" + supplierId + " called");
+        log.info(String.format("get: /api/delivery/supplier/%d called", supplierId));
         Optional<Supplier> supplier = supplierService.getSupplierFromId(supplierId);
         if(supplier.isPresent()) {
             return deliveryService.getAllDeliveriesForSupplier(supplier.get());

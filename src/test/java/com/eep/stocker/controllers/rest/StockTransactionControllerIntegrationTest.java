@@ -170,7 +170,7 @@ class StockTransactionControllerIntegrationTest {
 
         given(stockTransactionService.saveStockTransaction(unsavedStockTransaction)).willReturn(savedStockTransaction);
 
-        ResponseEntity<StockTransaction> response = restTemplate.postForEntity("/api/stock-transaction/post",
+        ResponseEntity<StockTransaction> response = restTemplate.postForEntity("/api/stock-transaction/create",
                 unsavedStockTransaction,
                 StockTransaction.class);
 
@@ -183,7 +183,7 @@ class StockTransactionControllerIntegrationTest {
     void testSendWrongObjectTypeToSaveTest() {
         //given(stockTransactionService.saveStockTransaction(unsavedStockTransaction)).willReturn(savedStockTransaction);
 
-        ResponseEntity<StockTransaction> response = restTemplate.postForEntity("/api/stock-transaction/post",
+        ResponseEntity<StockTransaction> response = restTemplate.postForEntity("/api/stock-transaction/create",
                 mf220,
                 StockTransaction.class);
 
@@ -214,9 +214,9 @@ class StockTransactionControllerIntegrationTest {
                 null,
                 ErrorResponse.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getDetails().get(0)).isEqualTo("Stock transaction with id of 4 does not exist");
+        assertThat(response.getBody().getDetails().get(0)).isEqualTo("StockTransaction with id of 4 does not exist");
     }
 
     @Test

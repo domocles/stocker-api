@@ -1,5 +1,6 @@
 package com.eep.stocker.controllers.rest;
 
+import com.eep.stocker.controllers.error.exceptions.DomainObjectDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.PurchaseOrderDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
 import com.eep.stocker.domain.PurchaseOrder;
@@ -44,7 +45,7 @@ public class PurchaseOrderController {
         if(supplier.isPresent()) {
             return purchaseOrderService.getAllPurchaseOrdersForSupplier(supplier.get());
         } else {
-            throw new SupplierDoesNotExistException("Supplier with id of " + supplierId + " does not exist");
+            throw new DomainObjectDoesNotExistException("Supplier with id of " + supplierId + " does not exist");
         }
     }
 
@@ -78,8 +79,8 @@ public class PurchaseOrderController {
         }
     }
 
-    @ExceptionHandler
+    /*@ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    private void supplierNotFoundHandler(SupplierDoesNotExistException ex) {}
+    private void supplierNotFoundHandler(SupplierDoesNotExistException ex) {}*/
 
 }

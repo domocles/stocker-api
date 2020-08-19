@@ -1,5 +1,6 @@
 package com.eep.stocker.services;
 
+import com.eep.stocker.controllers.error.exceptions.DomainObjectAlreadyExistsException;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.repository.ISupplierRepository;
 import org.slf4j.Logger;
@@ -34,5 +35,12 @@ public class SupplierService {
 
     public Optional<Supplier> getSupplierFromId(Long id) {
         return supplierRepository.findById(id);
+    }
+
+    public Optional<Supplier> deleteSupplierById(long id) {
+        Optional<Supplier> supplier = supplierRepository.findById(id);
+        if(supplier.isPresent())
+            this.supplierRepository.delete(supplier.get());
+        return supplier;
     }
 }

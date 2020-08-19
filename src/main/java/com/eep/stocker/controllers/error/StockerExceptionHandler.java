@@ -100,6 +100,38 @@ public class StockerExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(ReferenceGeneratorDoesNotExistException.class)
+    public final ResponseEntity<ErrorResponse> handleReferenceGeneratorDoesNotExistException(ReferenceGeneratorDoesNotExistException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(NOT_FOUND, details);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ReferenceGeneratorAlreadyExistsException.class)
+    public final ResponseEntity<ErrorResponse> handleReferenceGeneratorAlreadyExistsException(ReferenceGeneratorAlreadyExistsException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(BAD_REQUEST, details);
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(DomainObjectAlreadyExistsException.class)
+    public final ResponseEntity<ErrorResponse> handleDomainObjectAlreadyExistsException(DomainObjectAlreadyExistsException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(BAD_REQUEST, details);
+        return new ResponseEntity<>(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(DomainObjectDoesNotExistException.class)
+    public final ResponseEntity<ErrorResponse> handleDomainObjectDoesNotExistException(DomainObjectDoesNotExistException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(BAD_REQUEST, details);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     public final ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest req) {
         List<String> errors = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.eep.stocker.controllers.rest;
 
+import com.eep.stocker.controllers.error.exceptions.DomainObjectDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.StockTransactionDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
 import com.eep.stocker.domain.StockTransaction;
@@ -37,7 +38,7 @@ public class StockTransactionController {
 
     @GetMapping("/api/stock-transaction/get/{id}")
     public StockTransaction getStockTransactionById(@PathVariable long id) {
-        log.info("get: /api/stock-transaction/get/" + id + " called");
+        log.info("get: /api/stock-transaction/get/{}", id);
         Optional<StockTransaction> stockTransaction = stockTransactionService.getStockTransactionById(id);
         if(stockTransaction.isPresent()) {
             return stockTransaction.get();
@@ -48,19 +49,17 @@ public class StockTransactionController {
 
     @GetMapping("/api/stock-transaction/stockable-product/get/{id}")
     public List<StockTransaction> getStockTransactionsForStockableProduct(@PathVariable long id) {
-        log.info("get: /api/stock-transaction/stockable-product/get" + id + " called");
+        log.info("get: /api/stock-transaction/stockable-product/get/{} called", id);
         Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
-        if(stockableProduct.isPresent()) {
-            List<StockTransaction> stockTransactions = stockTransactionService.getAllStockTransactionsForStockableProduct(stockableProduct.get());
-            return stockTransactions;
-        } else {
-            throw new StockableProductDoesNotExistException("Stockable product with id of " + id + " does not exist");
-        }
+
+        return stockableProduct.map(stockTransactionService::getAllStockTransactionsForStockableProduct)
+                .orElseThrow(() -> new StockableProductDoesNotExistException("Stockable product with id of " + id + " does not exist"));
+
     }
 
     @GetMapping("/api/stock-transaction/balance/{id}")
     public Double getBalanceForStockableProduct(@PathVariable long id) {
-        log.info("get: /api/stock-transaction/balance/" + id + " called");
+        log.info("get: /api/stock-transaction/balance/{} called", id);
         Optional<StockableProduct> product = stockableProductService.getStockableProductByID(id);
         if(product.isPresent()) {
             double balance = stockTransactionService.getStockTransactionBalanceForStockableProduct(product.get());
@@ -70,28 +69,24 @@ public class StockTransactionController {
         }
     }
 
-    @PostMapping("/api/stock-transaction/post")
+    @PostMapping("/api/stock-transaction/create")
     public StockTransaction createStockTransaction(@RequestBody @Valid StockTransaction stockTransaction) {
         log.info("post: /api/stock-transaction/post called");
-        StockTransaction transaction = stockTransactionService.saveStockTransaction(stockTransaction);
-        return transaction;
+        return stockTransactionService.saveStockTransaction(stockTransaction);
     }
 
-    @PutMapping("/api/stock-transaction/put")
+    @PutMapping("/api/stock-transaction/update")
     public StockTransaction updateStockTransaction(@RequestBody @Valid StockTransaction stockTransaction) {
         log.info("post: /api/stock-transaction/post called");
-        StockTransaction transaction = stockTransactionService.saveStockTransaction(stockTransaction);
-        return transaction;
+        //todo throw a DomainObjectNotFound if the stock transaction does not exist
+        return stockTransactionService.saveStockTransaction(stockTransaction);
+
     }
 
     @DeleteMapping("/api/stock-transaction/delete/{id}")
     public StockTransaction deleteStockTransaction(@PathVariable long id) {
-        log.info("delete: /api/stock-transaction/delete/" + id + " called");
+        log.info("delete: /api/stock-transaction/delete/{} called", id);
         Optional<StockTransaction> transaction = stockTransactionService.getStockTransactionById(id);
-        if(transaction.isPresent()) {
-            return stockTransactionService.deleteStockTransaction(transaction.get());
-        } else {
-            throw new StockTransactionDoesNotExistException("Stock transaction with id of " + id + " does not exist");
-        }
+        return transaction.orElseThrow(() -> new DomainObjectDoesNotExistException("StockTransaction with id of " + id + " does not exist"));
     }
 }

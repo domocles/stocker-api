@@ -113,12 +113,12 @@ class PurchaseOrderControllerIntegrationTest {
         given(purchaseOrderService.getAllPurchaseOrdersForSupplier(supplier)).willThrow(SupplierDoesNotExistException.class);
 
         //act
-        ResponseEntity<List<PurchaseOrder>> response = restTemplate.exchange("/api/purchase-order/supplier/get/1",
+        ResponseEntity<Void> response = restTemplate.exchange("/api/purchase-order/supplier/get/1",
                                                                                 HttpMethod.GET,
                                                                                 null,
-                                                                                new ParameterizedTypeReference<List<PurchaseOrder>>() {});
+                                                                                Void.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
     @Test

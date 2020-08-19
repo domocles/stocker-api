@@ -35,12 +35,12 @@ public class DeliveryLineController {
 
     @GetMapping("/api/delivery-line/get/{id}")
     public DeliveryLine getDeliveryLineById(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/" + id + " called");
+        log.info("get: /api/delivery-line/get/{} called", id);
         Optional<DeliveryLine> deliveryLine = deliveryLineService.getDeliveryLineById(id);
         if(deliveryLine.isPresent()) {
             return  deliveryLine.get();
         } else {
-            throw new DeliveryDoesNotExistException("DeliveryLine with ID of " + id + " does not exist");
+            throw new DeliveryDoesNotExistException(String.format("DeliveryLine with ID of %s does not exist", id));
         }
     }
 
