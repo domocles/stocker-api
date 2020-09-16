@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,33 +48,33 @@ public class PurchaseOrderLineController {
 
     @GetMapping("/api/purchase-order-line/get/product/{productId}")
     public List<PurchaseOrderLine> getAllPurchaserOrderLinesForProduct(@PathVariable Long productId) {
-        log.info("get: /api/purchase-order-line/get/product/" + productId + " called");
+        log.info("get: /api/purchase-order-line/get/product/{} called", productId);
         Optional<StockableProduct> product = stockableProductService.getStockableProductByID(productId);
 
         if(product.isPresent()) {
-            log.info("Stockable Product = " + product.get());
+            log.info("Stockable Product = {}", product.get());
             return orderLineService.getAllPurchaseOrderLinesForProduct(product.get());
         } else {
-            throw new StockableProductDoesNotExistException("Stockable product with ID of " + productId + " does not exist");
+            throw new StockableProductDoesNotExistException(String.format("Stockable product with ID of %s does not exist", productId));
         }
     }
 
     @GetMapping("/api/purchase-order-line/get/purchase-order/{purchaseOrderId}")
     public List<PurchaseOrderLine> getAllPurchaseOrderLinesForPurchaseOrder(@PathVariable Long purchaseOrderId) {
-        log.info("get: /api/purchase-order-line/get/purchase-order/" + purchaseOrderId + " called");
+        log.info("get: /api/purchase-order-line/get/purchase-order/{} called", purchaseOrderId);
         Optional<PurchaseOrder> purchaseOrder = purchaseOrderService.getPurchaseOrderFromId(purchaseOrderId);
 
         if(purchaseOrder.isPresent()) {
             return orderLineService.getAllPurchaseOrderLinesForPurchaseOrder(purchaseOrder.get());
         } else {
-            log.info("Purchase order with ID of " + purchaseOrderId + " does not exist");
+            log.info("Purchase order with ID of {} does not exist", purchaseOrderId);
             throw new PurchaseOrderDoesNotExistException("Purchase order with ID of " + purchaseOrderId + " does not exist");
         }
     }
 
     @GetMapping("/api/purchase-order-line/get/balance/{purchaseOrderLineId}")
     public Double getBalanceOfPurchaseOrderLine(@PathVariable Long purchaseOrderLineId) {
-        log.info("get: /api/purchase-order-line/get/balance/" + purchaseOrderLineId + " called");
+        log.info("get: /api/purchase-order-line/get/balance/{} called", purchaseOrderLineId);
         Optional<PurchaseOrderLine> poLineOptional = orderLineService.getPurchaseOrderLineById(purchaseOrderLineId);
         if(poLineOptional.isPresent()) {
             PurchaseOrderLine poLine = poLineOptional.get();
@@ -91,14 +90,14 @@ public class PurchaseOrderLineController {
             return balance;
 
         } else {
-            log.info("Purchase order line with ID of " + purchaseOrderLineId + " does not exist");
+            log.info("Purchase order line with ID of {} does not exist", purchaseOrderLineId);
             throw  new PurchaseOrderLineDoesNotExistException("Purchase order line with ID of " + purchaseOrderLineId + " does not exist");
         }
     }
 
     @GetMapping("/api/purchase-order-line/get/supplier/{supplierId}")
     public List<PurchaseOrderLine> getAllPurchaseOrderLinesForSupplier(@PathVariable Long supplierId) {
-        log.info("get: /api/purchase-order-line/get/supplier/" + supplierId + " called");
+        log.info("get: /api/purchase-order-line/get/supplier/{} called", supplierId);
         Optional<Supplier> supplier = supplierService.getSupplierFromId(supplierId);
 
         if(supplier.isPresent()) {
@@ -109,7 +108,7 @@ public class PurchaseOrderLineController {
             });
             return purchaseOrderLines;
         } else {
-            log.info("Supplier with ID of " + supplierId + " does not exist");
+            log.info("Supplier with ID of {} does not exist", supplierId);
             throw new SupplierDoesNotExistException("Supplier with ID of " + supplierId + " does not exist");
         }
     }
@@ -128,11 +127,11 @@ public class PurchaseOrderLineController {
 
     @DeleteMapping("/api/purchase-order-line/delete/{orderLineId}")
     public String deletePurchaseOrder(@PathVariable Long orderLineId) {
-        log.info("delete: /api/purchase-order-line/delete/" + orderLineId + " called");
+        log.info("delete: /api/purchase-order-line/delete/{} called", orderLineId);
         Optional<PurchaseOrderLine> purchaseOrderLine = orderLineService.getPurchaseOrderLineById(orderLineId);
         if(purchaseOrderLine.isPresent()) {
             orderLineService.deletePurchaseOrderLine(purchaseOrderLine.get());
-            return "Purchase Order Line with ID " + orderLineId + " has been deleted";
+            return String.format("Purchase Order Line with ID %s has been deleted", orderLineId);
         } else {
             throw new PurchaseOrderDoesNotExistException("Purchase Order Line with ID " + orderLineId + " does not exist");
         }

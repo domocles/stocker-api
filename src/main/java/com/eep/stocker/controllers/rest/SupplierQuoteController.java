@@ -1,9 +1,6 @@
 package com.eep.stocker.controllers.rest;
 
-import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
-import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
-import com.eep.stocker.controllers.error.exceptions.SupplierQuoteDoesNotExistException;
-import com.eep.stocker.controllers.error.exceptions.SupplierQuoteErrorException;
+import com.eep.stocker.controllers.error.exceptions.*;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.domain.SupplierQuote;
@@ -66,13 +63,20 @@ public class SupplierQuoteController {
 
     @GetMapping("/api/supplier-quote/get/{id}")
     public SupplierQuote getSupplierById(@PathVariable Long id) {
-        log.info("get: /api/supplier-quote/get/" + id + " called");
+        log.info("get: /api/supplier-quote/get/{} called", id);
         Optional<SupplierQuote> quote = supplierQuoteService.getSupplierQuoteById(id);
         if(quote.isPresent()) {
             return quote.get();
         } else {
             throw new SupplierQuoteDoesNotExistException("Supplier Quote with id: " + id + " does not exist");
         }
+    }
+
+    @DeleteMapping("/api/supplier-quote/delete/{id}")
+    public SupplierQuote deleteSupplierQuoteById(@PathVariable Long id) {
+        log.info("delete: /api/supplier-quote/delete/{}", id);
+        Optional<SupplierQuote> quote = supplierQuoteService.deleteSupplierQuoteById(id);
+        return quote.orElseThrow(() -> new SupplierDoesNotExistException(String.format("Supplier quote %s does not exist", id)));
     }
 
     @PostMapping(value = "/api/supplier-quote/create")
@@ -91,7 +95,7 @@ public class SupplierQuoteController {
 
     @PostConstruct
     private void createSomeStockableQuotes() {
-        Supplier tkrypp = new Supplier();
+        /*Supplier tkrypp = new Supplier();
         tkrypp.setSupplierName("Thyssen Krypp");
         tkrypp.setEmailAddress("Greg.Anderson@thyssenkrupp.com");
         tkrypp.setTelephoneNumber("01384 563123");
@@ -107,15 +111,19 @@ public class SupplierQuoteController {
         fiftyMmTube.setCategory("Tube");
         fiftyMmTube.setMpn("EEP200919001");
 
-        fiftyMmTube = stockableProductService.saveStockableProduct(fiftyMmTube);
+        try {
+            fiftyMmTube = stockableProductService.saveStockableProduct(fiftyMmTube);
 
-        SupplierQuote supplierQuote = new SupplierQuote();
-        supplierQuote.setQuotationDate(new Date());
-        supplierQuote.setStockableProduct(fiftyMmTube);
-        supplierQuote.setSupplier(tkrypp);
-        supplierQuote.setPrice(2.75D);
-        supplierQuote.setQty(36.4);
+            SupplierQuote supplierQuote = new SupplierQuote();
+            supplierQuote.setQuotationDate(new Date());
+            supplierQuote.setStockableProduct(fiftyMmTube);
+            supplierQuote.setSupplier(tkrypp);
+            supplierQuote.setPrice(2.75D);
+            supplierQuote.setQty(36.4);
 
-        supplierQuoteService.saveSupplierQuote(supplierQuote);
+            supplierQuoteService.saveSupplierQuote(supplierQuote);
+        } catch(MpnNotUniqueException ex) {
+            log.error(ex.getLocalizedMessage());
+        }*/
     }
 }

@@ -21,7 +21,7 @@ import java.util.Optional;
 public class ReferenceGeneratorController {
     private static final Logger log = LoggerFactory.getLogger(ReferenceGeneratorController.class);
 
-    private ReferenceGeneratorService referenceGeneratorService;
+    private final ReferenceGeneratorService referenceGeneratorService;
 
     public ReferenceGeneratorController(ReferenceGeneratorService referenceGeneratorService) {
         this.referenceGeneratorService = referenceGeneratorService;
@@ -29,7 +29,7 @@ public class ReferenceGeneratorController {
 
     @GetMapping("/api/reference/{refgen_name}")
     public String getNewReference(@PathVariable String refgen_name) {
-        log.info("get: /api/reference/" + refgen_name + " called");
+        log.info("get: /api/reference/{} called",  refgen_name);
         Optional<String> nextRefOpt = referenceGeneratorService.getNextReference(refgen_name);
         if(nextRefOpt.isPresent())
             return nextRefOpt.get();
@@ -40,7 +40,7 @@ public class ReferenceGeneratorController {
 
     @PostMapping("/api/reference/{refgen_name}/{prefix}")
     public ResponseEntity<Void> createNewReference(@PathVariable String refgen_name, @PathVariable String prefix) {
-        log.info("post: /api/reference/" + refgen_name);
+        log.info("post: /api/reference/{}", refgen_name);
         boolean created = referenceGeneratorService.createReferenceGenerator(refgen_name, prefix, 1L);
         if(!created) {
             throw new ReferenceGeneratorAlreadyExistsException("Reference generator " + refgen_name + " already exists");

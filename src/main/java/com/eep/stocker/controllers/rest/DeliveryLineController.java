@@ -8,7 +8,6 @@ import com.eep.stocker.services.StockableProductService;
 import com.eep.stocker.services.SupplierService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,7 +23,6 @@ public class DeliveryLineController {
     private StockableProductService stockableProductService;
     private PurchaseOrderService purchaseOrderService;
 
-    @Autowired
     public DeliveryLineController(DeliveryLineService deliveryLineService, SupplierService supplierService,
                                   StockableProductService stockableProductService, PurchaseOrderService purchaseOrderService) {
         this.deliveryLineService = deliveryLineService;
@@ -46,7 +44,7 @@ public class DeliveryLineController {
 
     @GetMapping("/api/delivery-line/get/delivery/{id}")
     public List<DeliveryLine> getDeliveryLineByDelivery(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/delivery/" + id + " called");
+        log.info("get: /api/delivery-line/get/delivery/{} called", id);
        return deliveryLineService.getAllDeliveryLinesForDelivery(id);
     }
 
@@ -58,29 +56,29 @@ public class DeliveryLineController {
 
     @GetMapping("/api/delivery-line/get/supplier/{id}")
     public List<DeliveryLine> getAllDeliveryLinesForSupplier(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/supplier/" + id + " called");
+        log.info("get: /api/delivery-line/get/supplier/{} called", id);
         Optional<Supplier> supplier = supplierService.getSupplierFromId(id);
         if(supplier.isPresent()) {
             return deliveryLineService.getAllDeliveryLinesForSupplier(supplier.get());
         } else {
-            throw new SupplierDoesNotExistException("Supplier with ID of " + id + " does not exist");
+            throw new SupplierDoesNotExistException(String.format("Supplier with ID of %s does not exist", id));
         }
     }
 
     @GetMapping("/api/delivery-line/get/stockable-product/{id}")
     public List<DeliveryLine> getAllDeliveryLinesForStockableProduct(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/supplier/" + id + " called");
+        log.info("get: /api/delivery-line/get/supplier/{} called", id );
         Optional<StockableProduct> product = stockableProductService.getStockableProductByID(id);
         if(product.isPresent()) {
             return deliveryLineService.getAllDeliveryLinesForStockableProduct(product.get());
         } else {
-            throw new StockableProductDoesNotExistException("Stockable Product with ID of " + id + " does not exist");
+            throw new StockableProductDoesNotExistException(String.format("Stockable Product with ID of %s does not exist", id));
         }
     }
 
     @GetMapping("/api/delivery-line/get/purchase-order/{id}")
     public List<DeliveryLine> getAllDeliveryLinesForPurchaseOrder(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/purchase-order/" + id + " called");
+        log.info("get: /api/delivery-line/get/purchase-order/{} called", id);
         Optional<PurchaseOrder> purchaseOrder = purchaseOrderService.getPurchaseOrderFromId(id);
         if(purchaseOrder.isPresent()) {
             return deliveryLineService.getAllDeliveryLinesForPurchaseOrder(purchaseOrder.get());
@@ -91,7 +89,7 @@ public class DeliveryLineController {
 
     @DeleteMapping("/api/delivery-line/delete/{id}")
     public String deleteDeliveryLine(@PathVariable Long id) {
-        log.info("delete: /api/delivery-line/delete/" + id + " called");
+        log.info("delete: /api/delivery-line/delete/{}", id);
         Optional<DeliveryLine> deliveryLine = deliveryLineService.getDeliveryLineById(id);
         if(deliveryLine.isPresent()) {
             deliveryLineService.deleteDeliveryLine(deliveryLine.get());

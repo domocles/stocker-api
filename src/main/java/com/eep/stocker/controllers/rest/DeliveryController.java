@@ -25,6 +25,7 @@ public class DeliveryController {
 
     public DeliveryController(DeliveryService deliveryService,
                               SupplierService supplierService) {
+        log.info("DeliveryController constructor");
         this.deliveryService = deliveryService;
         this.supplierService = supplierService;
     }
@@ -55,7 +56,7 @@ public class DeliveryController {
 
     @GetMapping("/api/delivery/supplier/{supplierId}")
     public List<Delivery> getAllDeliveriesForSupplier(@PathVariable Long supplierId) {
-        log.info(String.format("get: /api/delivery/supplier/%d called", supplierId));
+        log.info("get: /api/delivery/supplier/{} called", supplierId);
         Optional<Supplier> supplier = supplierService.getSupplierFromId(supplierId);
         if(supplier.isPresent()) {
             return deliveryService.getAllDeliveriesForSupplier(supplier.get());
@@ -78,7 +79,7 @@ public class DeliveryController {
 
     @DeleteMapping("/api/delivery/delete/{id}")
     public String deleteDelivery(@PathVariable Long id) {
-        log.info("delete: /api/delivery/delete " + id + " called");
+        log.info("delete: /api/delivery/delete {} called", id);
         Optional<Delivery> delivery = deliveryService.getDeliveryById(id);
         if(delivery.isPresent()) {
             deliveryService.deleteDelivery(delivery.get());

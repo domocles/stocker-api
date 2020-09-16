@@ -1,6 +1,7 @@
 package com.eep.stocker.services;
 
 import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
+import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.repository.IStockTransactionRepository;
 import com.eep.stocker.repository.IStockableProductRepository;
@@ -24,6 +25,13 @@ public class StockableProductService {
 
     public StockableProduct saveStockableProduct(StockableProduct stockableProduct) {
         log.info("saveStockableProduct called");
+        Optional<StockableProduct> sb = this.stockableProductRepository.findFirstByMpn(stockableProduct.getMpn());
+        sb.ifPresent(s -> {throw new MpnNotUniqueException(String.format("%s is not a unique mpn", s.getMpn()));});
+        return this.stockableProductRepository.save(stockableProduct);
+    }
+
+    public StockableProduct updateStockableProduct(StockableProduct stockableProduct) {
+        log.info("update stockable product called");
         return this.stockableProductRepository.save(stockableProduct);
     }
 

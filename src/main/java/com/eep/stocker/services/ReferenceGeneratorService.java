@@ -43,16 +43,16 @@ public class ReferenceGeneratorService {
      * @return reference String e.g. "PO0000017"
      */
     public Optional<String> getNextReference(String name) {
-        log.info("get next reference for generator " + name + " called");
+        log.info("get next reference for generator {} called", name);
         Optional<ReferenceGenerator> referenceGeneratorOptional = referenceGeneratorRepository.findFirstByReferenceName(name);
         if(!referenceGeneratorOptional.isPresent()) {
-            log.info("reference generator " + name + " does not exist");
+            log.info("reference generator {} does not exist", name);
             return Optional.empty();
         }
 
         ReferenceGenerator referenceGenerator = referenceGeneratorOptional.get();
         String nextReference = referenceGenerator.generate();
-        log.info("reference " + nextReference + " generated");
+        log.info("reference {} generated", nextReference);
         referenceGeneratorRepository.save(referenceGenerator);
         return Optional.of(nextReference);
     }

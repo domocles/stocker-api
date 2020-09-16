@@ -48,4 +48,10 @@ public class SupplierQuoteService {
     public SupplierQuote updateSupplierQuote(SupplierQuote supplierQuote) {
         return supplierQuoteRepository.save(supplierQuote);
     }
+
+    public Optional<SupplierQuote> deleteSupplierQuoteById(Long id) {
+        Optional<SupplierQuote> quote = getSupplierQuoteById(id);
+        quote.ifPresent(q -> supplierQuoteRepository.delete(q));
+        return quote;
+    }
 }

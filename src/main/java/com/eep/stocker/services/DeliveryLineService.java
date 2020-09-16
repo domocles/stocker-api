@@ -23,7 +23,7 @@ public class DeliveryLineService {
     }
 
     public Optional<DeliveryLine> getDeliveryLineById(Long id) {
-        log.info("GetDeliveryLineById " + id + " called");
+        log.info("GetDeliveryLineById {} called", id);
         return deliveryLineRepository.findById(id);
     }
 
@@ -33,17 +33,17 @@ public class DeliveryLineService {
     }
 
     public List<DeliveryLine> getAllDeliveryLinesForSupplier(Supplier supplier) {
-        log.info("GetAllDeliveryLinesForSupplier " + supplier.getSupplierName());
+        log.info("GetAllDeliveryLinesForSupplier {}", supplier.getSupplierName());
         return deliveryLineRepository.findAllByPurchaseOrderLine_PurchaseOrder_Supplier(supplier);
     }
 
     public List<DeliveryLine> getAllDeliveryLinesForStockableProduct(StockableProduct stockableProduct) {
-        log.info("GetAllDeliveryLinesForStockableProduct " + stockableProduct.getName() + " called");
+        log.info("GetAllDeliveryLinesForStockableProduct {} called", stockableProduct.getName());
         return deliveryLineRepository.findAllByPurchaseOrderLine_StockableProduct(stockableProduct);
     }
 
     public List<DeliveryLine> getAllDeliveryLinesForPurchaseOrder(PurchaseOrder purchaseOrder) {
-        log.info("GetAllDeliveryLinesForPurchaseOrder " + purchaseOrder.getPurchaseOrderReference() + " called");
+        log.info("GetAllDeliveryLinesForPurchaseOrder {} called", purchaseOrder.getPurchaseOrderReference());
         return deliveryLineRepository.findAllByPurchaseOrderLine_PurchaseOrder(purchaseOrder);
     }
 

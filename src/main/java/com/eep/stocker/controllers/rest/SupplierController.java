@@ -24,7 +24,7 @@ public class SupplierController {
 
     @GetMapping("/api/suppliers/get/{id}")
     public Supplier getAllSuppliers(@PathVariable long id) {
-        log.info("get: /api/suppliers/get/" + id + " called");
+        log.info("get: /api/suppliers/get/{} called", id);
         return supplierService.getSupplierFromId(id).get();
     }
 
@@ -54,7 +54,7 @@ public class SupplierController {
 
     @DeleteMapping(path = "/api/suppliers/delete/{id}")
     public Supplier deleteSupplier(@PathVariable long id) {
-        log.info("delete: /api/suppliers/delete/" + id + " called");
+        log.info("delete: /api/suppliers/delete/{} called", id);
         Optional<Supplier> supplier = supplierService.deleteSupplierById(id);
         if(supplier.isPresent())
             return supplier.get();

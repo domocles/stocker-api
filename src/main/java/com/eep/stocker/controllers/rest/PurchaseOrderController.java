@@ -40,7 +40,7 @@ public class PurchaseOrderController {
 
     @GetMapping("/api/purchase-order/supplier/get/{supplierId}")
     public List<PurchaseOrder> getAllPurchaseOrdersForSupplier(@PathVariable Long supplierId) {
-        log.info("get: /api/purchase-order/supplier/get/" + supplierId + " called");
+        log.info("get: /api/purchase-order/supplier/get/{} called", supplierId);
         Optional<Supplier> supplier = this.supplierService.getSupplierFromId(supplierId);
         if(supplier.isPresent()) {
             return purchaseOrderService.getAllPurchaseOrdersForSupplier(supplier.get());
@@ -51,7 +51,7 @@ public class PurchaseOrderController {
 
     @GetMapping("/api/purchase-order/{fromDate}/{toDate}")
     public List<PurchaseOrder> getAllPurchaseOrdersBetween(@PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate, @PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
-        log.info("get: /api/purchase-order/" + fromDate + "/" + toDate + " called");
+        log.info("get: /api/purchase-order/{}/{} called", fromDate, toDate);
         return purchaseOrderService.getAllPurchaseOrdersBetween(fromDate, toDate);
     }
 
@@ -69,7 +69,7 @@ public class PurchaseOrderController {
 
     @DeleteMapping("/api/purchase-order/delete/{purchaseOrderId}")
     public String deletePurchaseOrder(@PathVariable Long purchaseOrderId) {
-        log.info("delete: /api/purchase-order/delete/" + purchaseOrderId + " called");
+        log.info("delete: /api/purchase-order/delete/{} called", purchaseOrderId);
         Optional<PurchaseOrder> purchaseOrder = purchaseOrderService.getPurchaseOrderFromId(purchaseOrderId);
         if(purchaseOrder.isPresent()) {
             purchaseOrderService.deletePurchaseOrder(purchaseOrder.get());

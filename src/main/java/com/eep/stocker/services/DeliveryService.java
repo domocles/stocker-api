@@ -28,17 +28,17 @@ public class DeliveryService {
     }
 
     public List<Delivery> getAllDeliveriesForSupplier(Supplier supplier) {
-        log.info("GetAllDeliveriesForSuppler - " + supplier.getSupplierName() + " called.");
+        log.info("GetAllDeliveriesForSuppler - {} called", supplier.getSupplierName());
         return deliveryRepository.findAllBySupplier(supplier);
     }
 
     public List<Delivery> getAllDeliveriesBetween(Date from, Date to) {
-        log.info("GetAllDeliveriesForBetween - " + from.toString() + " to " + to.toString() + " called.");
+        log.info("GetAllDeliveriesForBetween - {} to {} called", from,  to);
         return deliveryRepository.findAllByDeliveryDateBetween(from, to);
     }
 
     public Optional<Delivery> getDeliveryById(Long id) {
-        log.info("GetDeliveryById - " + id + " called.");
+        log.info("GetDeliveryById - {} called", id);
         return deliveryRepository.findById(id);
     }
 
