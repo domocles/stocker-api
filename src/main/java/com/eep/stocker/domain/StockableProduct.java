@@ -12,6 +12,7 @@ public class StockableProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "stockable_prdduct_id")
     private Long id;
 
     @NotNull
