@@ -23,6 +23,24 @@ public class StockerExceptionHandler extends ResponseEntityExceptionHandler {
     private String CONFLICT_MPN = "CONFLICTING MPN";
     private String NOT_FOUND = "NOT FOUND";
 
+    @ExceptionHandler(AssemblyLineDoesNotExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public final ResponseEntity<ErrorResponse> handleAssemblyLineDoesNotExist(AssemblyLineDoesNotExistException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(NOT_FOUND, details);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(AssemblyDoesNotExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public final ResponseEntity<ErrorResponse> handleAssemblyDoesNotExist(AssemblyDoesNotExistException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(NOT_FOUND, details);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(DeliveryLineDoesNotExistException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public final ResponseEntity<ErrorResponse> handleDeliveryLineNotFound(DeliveryLineDoesNotExistException ex) {

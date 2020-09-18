@@ -4,6 +4,7 @@ import com.eep.stocker.domain.Delivery;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.services.DeliveryService;
 import com.eep.stocker.services.SupplierService;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -24,7 +25,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;

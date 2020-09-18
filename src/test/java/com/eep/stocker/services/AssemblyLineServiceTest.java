@@ -140,4 +140,13 @@ class AssemblyLineServiceTest {
 
         assertThat(assemblyLine).isNotPresent();
     }
+
+    @Test
+    void saveAssemblyLineTest() {
+        given(assemblyLineRepository.save(any(AssemblyLine.class))).willReturn(assemblyLine1);
+
+        Optional<AssemblyLine> assemblyLine = assemblyLineService.saveAssemblyLine(assemblyLine1);
+
+        assertThat(assemblyLine).contains(assemblyLine1);
+    }
 }

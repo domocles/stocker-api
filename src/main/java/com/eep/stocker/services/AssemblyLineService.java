@@ -42,6 +42,12 @@ public class AssemblyLineService {
         return assemblyLines;
     }
 
+    public Optional<AssemblyLine> saveAssemblyLine(AssemblyLine assemblyLine) {
+        if(assemblyLine == null) return Optional.empty();
+        log.info("save assembly line called: {}", assemblyLine.toString());
+        return Optional.of(assemblyLineRepository.save(assemblyLine));
+    }
+
     public Optional<AssemblyLine> deleteAssemblyLine(AssemblyLine assemblyLine) {
         if(assemblyLine != null) {
             log.info("delete assembly line: {}", assemblyLine);
