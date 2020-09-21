@@ -1,9 +1,13 @@
 package com.eep.stocker.controllers.rest;
 
+import com.eep.stocker.controllers.error.ErrorResponse;
+import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.domain.Assembly;
 import com.eep.stocker.domain.AssemblyLine;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.services.AssemblyService;
+import com.eep.stocker.services.StockableProductService;
+import com.mysql.cj.x.protobuf.Mysqlx;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,10 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +38,9 @@ public class AssemblyControllerIntegrationTest {
 
     @MockBean
     private AssemblyService assemblyService;
+
+    @MockBean
+    private StockableProductService stockableProductService;
 
     private StockableProduct MF220;
     private StockableProduct MF286;
@@ -68,9 +72,9 @@ public class AssemblyControllerIntegrationTest {
                 1.45D,
                 75.D);
 
-        assembly1unsaved = new Assembly(null, "Golf Decat");
-        assembly1 = new Assembly(1L, "Golf Decat");
-        assembly2 = new Assembly(2L, "ST170 Mk2 Decat");
+        assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101");
+        assembly1 = new Assembly(1L, "Golf Decat", "EEP102");
+        assembly2 = new Assembly(2L, "ST170 Mk2 Decat", "EEP103");
 
         assemblyLine1 = new AssemblyLine(1L, MF220, assembly1, 3);
         assemblyLine2 = new AssemblyLine(2L, MF220, assembly1, 3);
@@ -126,6 +130,21 @@ public class AssemblyControllerIntegrationTest {
     }
 
     @Test
+    public void saveAssemblyMpnAlreadyExistsTest() {
+        given(assemblyService.saveAssembly(any(Assembly.class))).willThrow(new MpnNotUniqueException("Assembly with mpn of EEP101 already exists"));
+
+        ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
+                "/api/assembly/create",
+                assembly1unsaved,
+                ErrorResponse.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().getDetails()).isNotNull().contains("Assembly with mpn of EEP101 already exists");
+    }
+
+    @Test
     public void saveNullAssemblyTest() {
         given(assemblyService.saveAssembly(assembly1unsaved)).willReturn(Optional.of(assembly1));
 
@@ -141,7 +160,7 @@ public class AssemblyControllerIntegrationTest {
 
     @Test
     public void updateAssemblyTest() {
-        given(assemblyService.saveAssembly(any(Assembly.class))).willReturn(Optional.of(assembly1));
+        given(assemblyService.updateAssembly(any(Assembly.class))).willReturn(Optional.of(assembly1));
 
         ResponseEntity<Assembly> response = restTemplate.exchange(
           "/api/assembly/update",
@@ -182,5 +201,70 @@ public class AssemblyControllerIntegrationTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).isEqualTo(assembly1);
+    }
+
+    @Test
+    public void getAllAssembliesForComponentTest() {
+        given(stockableProductService.getStockableProductByID(anyLong())).willReturn(Optional.of(MF220));
+        given(assemblyService.getAllAssembliesByComponent(any(StockableProduct.class)))
+                .willReturn(new HashSet<>(Arrays.asList(assembly1, assembly2)));
+
+        ResponseEntity<List<Assembly>> response = restTemplate.exchange(
+                "/api/assembly/component/4",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<Assembly>>() { }
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull().contains(assembly1, assembly2);
+    }
+
+    @Test
+    public void getAllAssembliesForComponentThatDoesntExistTest() {
+        given(stockableProductService.getStockableProductByID(anyLong())).willReturn(Optional.empty());
+        given(assemblyService.getAllAssembliesByComponent(any(StockableProduct.class)))
+                .willReturn(new HashSet<>(Arrays.asList(assembly1, assembly2)));
+
+        ResponseEntity<ErrorResponse> response = restTemplate.exchange(
+                "/api/assembly/component/4",
+                HttpMethod.GET,
+                null,
+                ErrorResponse.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        //assertThat(response.getBody()).isNotNull().contains(assembly1, assembly2);
+    }
+
+    @Test
+    public void getAssemblyByMpnTest() {
+        given(assemblyService.getAssemblyByMpn(any(String.class))).willReturn(Optional.of(assembly1));
+
+        ResponseEntity<Assembly> response = restTemplate.exchange(
+                "/api/assembly/mpn/EEP101",
+                HttpMethod.GET,
+                null,
+                Assembly.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull().isEqualTo(assembly1);
+    }
+
+    @Test
+    public void getAssemblyByMpnNotExistTest() {
+        given(assemblyService.getAssemblyByMpn(any(String.class))).willReturn(Optional.empty());
+
+        ResponseEntity<ErrorResponse> response = restTemplate.exchange(
+                "/api/assembly/mpn/EEP101",
+                HttpMethod.GET,
+                null,
+                ErrorResponse.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody().getDetails()).isNotNull();
+        assertThat(response.getBody().getDetails().get(0)).isEqualTo("Assembly with mpn of EEP101 does not exist");
     }
 }

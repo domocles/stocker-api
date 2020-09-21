@@ -1,14 +1,21 @@
 package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.controllers.error.exceptions.AssemblyDoesNotExistException;
+import com.eep.stocker.controllers.error.exceptions.MpnNotFoundException;
+import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
 import com.eep.stocker.domain.Assembly;
+import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.services.AssemblyService;
+import com.eep.stocker.services.StockableProductService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/assembly")
@@ -16,9 +23,11 @@ public class AssemblyController {
     public static final Logger log = LoggerFactory.getLogger(AssemblyController.class);
 
     private AssemblyService assemblyService;
+    private StockableProductService stockableProductService;
 
-    public AssemblyController(AssemblyService assemblyService) {
+    public AssemblyController(AssemblyService assemblyService, StockableProductService stockableProductService) {
         this.assemblyService = assemblyService;
+        this.stockableProductService = stockableProductService;
     }
 
     @GetMapping("/get")
@@ -34,6 +43,23 @@ public class AssemblyController {
                 .orElseThrow(() -> new AssemblyDoesNotExistException(String.format("Assembly with id of %s does not exist", id)));
     }
 
+    @GetMapping("/component/{id}")
+    public List<Assembly> getAssemblyForComponent(@PathVariable long id) {
+        log.info("get: /api/assembly/component/{} called", id);
+        Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
+
+        return new ArrayList<>(assemblyService.getAllAssembliesByComponent(stockableProduct.orElseThrow(() ->
+                new StockableProductDoesNotExistException(String.format("Component with id of %s does not exist", id)))));
+    }
+
+    @GetMapping("/mpn/{mpn}")
+    public Assembly getAssemblyForMpn(@PathVariable String mpn) {
+        log.info("get: /api/assembly/mpn/{} called", mpn);
+        Optional<Assembly> assembly = assemblyService.getAssemblyByMpn(mpn);
+
+        return assembly.orElseThrow(() -> new MpnNotFoundException(String.format("Assembly with mpn of %s does not exist", mpn)));
+    }
+
     @PostMapping("/create")
     public Assembly createAssembly(@RequestBody @Valid Assembly assembly) {
         log.info("post: /api/assembly/create called");
@@ -43,7 +69,7 @@ public class AssemblyController {
     @PutMapping("/update")
     public Assembly updateAssembly(@RequestBody @Valid Assembly assembly) {
         log.info("put: /api/assembly/put called");
-        return assemblyService.saveAssembly(assembly).get();
+        return assemblyService.updateAssembly(assembly).get();
     }
 
     @DeleteMapping("/delete/{id}")

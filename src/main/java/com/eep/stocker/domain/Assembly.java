@@ -9,18 +9,20 @@ public class Assembly {
 
     private Long id;
     private String name;
+    private String mpn;
     private String description;
 
     public Assembly() {}
 
-    public Assembly(Long id, String name, String description) {
+    public Assembly(Long id, String name, String description, String mpn) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.mpn = mpn;
     }
 
-    public Assembly(Long id, String name) {
-        this(id, name, "");
+    public Assembly(Long id, String name, String mpn) {
+        this(id, name, "", mpn);
     }
 
     @Id
@@ -50,6 +52,14 @@ public class Assembly {
         this.description = description;
     }
 
+    public String getMpn() {
+        return mpn;
+    }
+
+    public void setMpn(String mpn) {
+        this.mpn = mpn;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -57,12 +67,13 @@ public class Assembly {
         Assembly assembly = (Assembly) o;
         return Objects.equals(getId(), assembly.getId()) &&
                 Objects.equals(getName(), assembly.getName()) &&
+                Objects.equals(getMpn(), assembly.getMpn()) &&
                 Objects.equals(getDescription(), assembly.getDescription());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getId(), getName(), getDescription());
+        return Objects.hash(getId(), getName(), getMpn(), getDescription());
     }
 
     @Override
@@ -70,6 +81,7 @@ public class Assembly {
         return "Assembly{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", mpn='" + mpn + '\'' +
                 ", description='" + description + '\'' +
                 '}';
     }

@@ -102,6 +102,14 @@ public class StockerExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(MpnNotFoundException.class)
+    public final ResponseEntity<ErrorResponse> handleMpnNotFound(MpnNotFoundException ex, WebRequest request) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = new ErrorResponse(NOT_FOUND, details);
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(PurchaseOrderLineDoesNotExistException.class)
     public final ResponseEntity<ErrorResponse> handlePurchaseOrderLineDoesNotExistException(PurchaseOrderLineDoesNotExistException ex) {
         List<String> details = new ArrayList<>();

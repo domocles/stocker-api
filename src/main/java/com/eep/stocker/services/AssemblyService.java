@@ -1,5 +1,6 @@
 package com.eep.stocker.services;
 
+import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.domain.Assembly;
 import com.eep.stocker.domain.AssemblyLine;
 import com.eep.stocker.domain.StockableProduct;
@@ -29,6 +30,14 @@ public class AssemblyService {
     }
 
     public Optional<Assembly> saveAssembly(Assembly assembly) {
+        if(assembly == null) return Optional.empty();
+        Optional<Assembly> assemblyExists = assemblyRepository.findAssemblyByMpn(assembly.getMpn());
+        if(assemblyExists.isPresent()) throw new MpnNotUniqueException(String.format("Assembly with mpn of %s already exists", assembly.getMpn()));
+        log.info("saving assembly with name of: {}", assembly.getName());
+        return Optional.of(assemblyRepository.save(assembly));
+    }
+
+    public Optional<Assembly> updateAssembly(Assembly assembly) {
         if(assembly == null) return Optional.empty();
         log.info("saving assembly with name of: {}", assembly.getName());
         return Optional.of(assemblyRepository.save(assembly));
@@ -68,5 +77,10 @@ public class AssemblyService {
 
         log.info("get all assembly lines for assembly: {}", assembly.getName());
         return assemblyLineRepository.getAssemblyLineByAssembly(assembly);
+    }
+
+    public Optional<Assembly> getAssemblyByMpn(String mpn) {
+        log.info("get assembly by mpn: {} called", mpn);
+        return assemblyRepository.findAssemblyByMpn(mpn);
     }
 }

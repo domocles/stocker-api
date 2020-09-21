@@ -5,6 +5,7 @@ import com.eep.stocker.domain.Assembly;
 import com.eep.stocker.domain.AssemblyLine;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.services.AssemblyLineService;
+import com.eep.stocker.services.AssemblyService;
 import com.mysql.cj.x.protobuf.Mysqlx;
 import org.apache.tomcat.jni.Error;
 import org.junit.Before;
@@ -50,6 +51,9 @@ public class AssemblyLineControllerIntegrationTest {
     @MockBean
     private AssemblyLineService assemblyLineService;
 
+    @MockBean
+    private AssemblyService assemblyService;
+
     @Before
     public void setUp() throws Exception {
         MF220 = new StockableProduct(1L, "MF220",
@@ -70,9 +74,9 @@ public class AssemblyLineControllerIntegrationTest {
                 1.45D,
                 75.D);
 
-        assembly1unsaved = new Assembly(null, "Golf Decat");
-        assembly1 = new Assembly(1L, "Golf Decat");
-        assembly2 = new Assembly(2L, "ST170 Mk2 Decat");
+        assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101");
+        assembly1 = new Assembly(1L, "Golf Decat", "EEP102");
+        assembly2 = new Assembly(2L, "ST170 Mk2 Decat", "EEP103");
 
         assemblyLine1 = new AssemblyLine(1L, MF220, assembly1, 3);
         assemblyLine2 = new AssemblyLine(2L, MF220, assembly1, 3);
@@ -206,7 +210,19 @@ public class AssemblyLineControllerIntegrationTest {
     }
 
     @Test
-    public void getAssemblyLinesForComponentTest() {
-        assertThat(false).isTrue();
+    public void getAssemblyLinesForAssemblyTest() {
+        given(assemblyService.getAssemblyById(anyLong())).willReturn(Optional.of(assembly1));
+        given(assemblyLineService.getAllAssemblyLinesForAssembly(assembly1))
+                .willReturn(Arrays.asList(assemblyLine1, assemblyLine2, assemblyLine3));
+
+        ResponseEntity<List<AssemblyLine>> response = restTemplate.exchange(
+                "/api/assembly-line/assembly/5",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<AssemblyLine>>() {  }
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull().contains(assemblyLine1, assemblyLine2, assemblyLine3);
     }
 }
