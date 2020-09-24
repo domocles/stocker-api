@@ -1,7 +1,11 @@
 package com.eep.stocker.domain;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity(name="assembly")
 @Table(name="assembly")
@@ -12,17 +16,32 @@ public class Assembly {
     private String mpn;
     private String description;
 
+    @NotNull
+    private String category;
+
+    @ElementCollection
+    @CollectionTable(name = "assembly_tags", joinColumns = @JoinColumn(name = "assembly_id"))
+    @Column(name = "tags")
+    private Set<String> tags = new HashSet<>();
+
+
     public Assembly() {}
 
-    public Assembly(Long id, String name, String description, String mpn) {
+    public Assembly(Long id, String name, String description, String mpn, String category, Set<String> tags) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.mpn = mpn;
+        this.category = category;
+        this.tags = tags;
     }
 
-    public Assembly(Long id, String name, String mpn) {
-        this(id, name, "", mpn);
+    public Assembly(Long id, String name, String mpn, String category, Set<String> tags) {
+        this(id, name, "", mpn, category, tags);
+    }
+
+    public Assembly(Long id, String name, String mpn, String category) {
+        this(id, name, "", mpn, category, Collections.EMPTY_SET);
     }
 
     @Id
@@ -50,6 +69,8 @@ public class Assembly {
 
     public void setDescription(String description) {
         this.description = description;
+        this.category = category;
+        this.tags = tags;
     }
 
     public String getMpn() {
@@ -58,6 +79,22 @@ public class Assembly {
 
     public void setMpn(String mpn) {
         this.mpn = mpn;
+    }
+
+    public String getCategory() {
+        return this.category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = tags;
+    }
+
+    public Set<String> getTags() {
+        return tags;
     }
 
     @Override

@@ -83,4 +83,9 @@ public class AssemblyService {
         log.info("get assembly by mpn: {} called", mpn);
         return assemblyRepository.findAssemblyByMpn(mpn);
     }
+
+    public List<Assembly> getAssembliesByCategory(String category) {
+        log.info("get assemblies by category: {} called", category);
+        return assemblyRepository.findAssemblyByCategory(category);
+    }
 }

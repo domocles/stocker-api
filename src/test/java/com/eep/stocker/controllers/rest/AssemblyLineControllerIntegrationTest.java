@@ -74,9 +74,9 @@ public class AssemblyLineControllerIntegrationTest {
                 1.45D,
                 75.D);
 
-        assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101");
-        assembly1 = new Assembly(1L, "Golf Decat", "EEP102");
-        assembly2 = new Assembly(2L, "ST170 Mk2 Decat", "EEP103");
+        assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101", "Decat");
+        assembly1 = new Assembly(1L, "Golf Decat", "EEP102", "Decat");
+        assembly2 = new Assembly(2L, "ST170 Mk2 Decat", "EEP103", "Decat");
 
         assemblyLine1 = new AssemblyLine(1L, MF220, assembly1, 3);
         assemblyLine2 = new AssemblyLine(2L, MF220, assembly1, 3);

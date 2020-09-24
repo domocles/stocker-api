@@ -16,8 +16,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 class AssemblyServiceTest {
@@ -61,9 +60,9 @@ class AssemblyServiceTest {
                 1.45D,
                 75.D);
 
-        assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101");
-        assembly1 = new Assembly(Long.valueOf(1), "Golf Decat", "EEP102");
-        assembly2 = new Assembly(Long.valueOf(2), "ST170 Mk2 Decat", "EEP103");
+        assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101", "Decat");
+        assembly1 = new Assembly(Long.valueOf(1), "Golf Decat", "EEP102", "Decat");
+        assembly2 = new Assembly(Long.valueOf(2), "ST170 Mk2 Decat", "EEP103", "Decat");
 
         assemblyLine1 = new AssemblyLine(Long.valueOf(1), MF220, assembly1, 3);
         assemblyLine2 = new AssemblyLine(Long.valueOf(2), MF220, assembly1, 3);
@@ -175,5 +174,14 @@ class AssemblyServiceTest {
         Optional<Assembly> assembly = assemblyService.getAssemblyByMpn("EEP101");
 
         assertThat(assembly).isPresent().contains(assembly1);
+    }
+
+    @Test
+    void getAssembliesByCategoryTest() {
+        given(assemblyRepository.findAssemblyByCategory(anyString())).willReturn(Arrays.asList(assembly1, assembly2));
+
+        List<Assembly> assemblies = assemblyService.getAssembliesByCategory("Decat");
+
+        assertThat(assemblies).isNotNull().contains(assembly1, assembly2);
     }
 }

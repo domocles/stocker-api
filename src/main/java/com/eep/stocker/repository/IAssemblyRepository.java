@@ -10,4 +10,6 @@ public interface IAssemblyRepository extends CrudRepository<Assembly, Long> {
     List<Assembly> findAll();
 
     Optional<Assembly> findAssemblyByMpn(String mpn);
+
+    List<Assembly> findAssemblyByCategory(String category);
 }
