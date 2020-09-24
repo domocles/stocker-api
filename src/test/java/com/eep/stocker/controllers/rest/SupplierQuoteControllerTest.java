@@ -216,7 +216,7 @@ public class SupplierQuoteControllerTest {
         given(supplierQuoteService.saveSupplierQuote(any(SupplierQuote.class))).willReturn(returnedQuote);
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                .post("/api/supplier-quote")
+                .post("/api/supplier-quote/create")
                 .content(asJsonString(quote))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))

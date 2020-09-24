@@ -15,13 +15,7 @@ public class Assembly {
     private String name;
     private String mpn;
     private String description;
-
-    @NotNull
     private String category;
-
-    @ElementCollection
-    @CollectionTable(name = "assembly_tags", joinColumns = @JoinColumn(name = "assembly_id"))
-    @Column(name = "tags")
     private Set<String> tags = new HashSet<>();
 
 
@@ -81,6 +75,7 @@ public class Assembly {
         this.mpn = mpn;
     }
 
+    @NotNull
     public String getCategory() {
         return this.category;
     }
@@ -93,6 +88,9 @@ public class Assembly {
         this.tags = tags;
     }
 
+    @ElementCollection
+    @CollectionTable(name = "assembly_tags", joinColumns = @JoinColumn(name = "assembly_id"))
+    @Column(name = "tags")
     public Set<String> getTags() {
         return tags;
     }
