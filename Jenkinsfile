@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Clone the project') {
       steps {
-        git(url: 'https://domocles.xp-dev.com/git/stocker', branch: 'master', credentialsId: 'domocles')
+        git(url: 'https://domocles.xp-dev.com/git/stocker', branch: 'master', credentialsId: 'stocker')
       }
     }
 
