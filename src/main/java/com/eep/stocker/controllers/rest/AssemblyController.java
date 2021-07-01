@@ -1,6 +1,7 @@
 package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.controllers.error.exceptions.AssemblyDoesNotExistException;
+import com.eep.stocker.controllers.error.exceptions.AssemblyLineDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.MpnNotFoundException;
 import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
 import com.eep.stocker.domain.Assembly;
@@ -15,7 +16,6 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/assembly")
@@ -60,6 +60,13 @@ public class AssemblyController {
         return assembly.orElseThrow(() -> new MpnNotFoundException(String.format("Assembly with mpn of %s does not exist", mpn)));
     }
 
+    @GetMapping("/categories")
+    public List<String> getCategories() {
+        log.info("get: /api/assembly/categories called");
+        List<String> categories = assemblyService.getAllCategories();
+        return categories;
+    }
+
     @PostMapping("/create")
     public Assembly createAssembly(@RequestBody @Valid Assembly assembly) {
         log.info("post: /api/assembly/create called");
@@ -68,21 +75,29 @@ public class AssemblyController {
 
     @PutMapping("/update")
     public Assembly updateAssembly(@RequestBody @Valid Assembly assembly) {
-        log.info("put: /api/assembly/put called");
+        log.info("put: /api/assembly/update called");
         return assemblyService.updateAssembly(assembly).get();
     }
 
+    @PutMapping("/addsubassembly/{assemblyId}/{subassemblyId}")
+    public Assembly addSubAssembly(@PathVariable long assemblyId, @PathVariable long subassemblyId) {
+        log.info("put: /api/assembly/addsubassembly/{}/{} called", assemblyId, subassemblyId);
+        Optional<Assembly> assembly = assemblyService.addSubAssemblyToAssemblyById(assemblyId, subassemblyId);
+
+        return assembly.orElseThrow(() -> new AssemblyLineDoesNotExistException("Either the assembly or subassembly does not exist"));
+    }
+
     @DeleteMapping("/delete/{id}")
-    public Assembly deleteAssemblyById(@PathVariable long id) {
+    public void deleteAssemblyById(@PathVariable long id) {
         log.info("delete: /api/assembly/delete/{} called", id);
-        return assemblyService.deleteAssemblyById(id)
+        assemblyService.deleteAssemblyById(id)
                 .orElseThrow(() -> new AssemblyDoesNotExistException(String.format("Assembly with id of %s does not exist", id)));
     }
 
     @DeleteMapping("/delete")
-    public Assembly deleteAssembly(@RequestBody @Valid  Assembly assembly) {
+    public void deleteAssembly(@RequestBody @Valid  Assembly assembly) {
         log.info("delete: /api/assembly.delete called");
-        return assemblyService.deleteAssembly(assembly)
+        assemblyService.deleteAssembly(assembly)
                 .orElseThrow(() -> new AssemblyDoesNotExistException(String.format("Assembly with id of %s does not exist", assembly.getId())));
     }
 }

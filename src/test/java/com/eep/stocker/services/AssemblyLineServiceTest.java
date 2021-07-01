@@ -149,4 +149,9 @@ class AssemblyLineServiceTest {
 
         assertThat(assemblyLine).contains(assemblyLine1);
     }
+
+    @Test
+    void addSubAssemblyAlreadyASubAssemblyTest() {
+        given(assemblyLineRepository.findById(anyLong())).willReturn(Optional.of(assemblyLine1));
+    }
 }

@@ -43,6 +43,22 @@ public class AssemblyService {
         return Optional.of(assemblyRepository.save(assembly));
     }
 
+    public Optional<Assembly> addSubAssemblyToAssemblyById(long assemblyId, long subAssemblyId) {
+        log.info("adding subassembly to {}", assemblyId);
+        Optional<Assembly> assembly = getAssemblyById(assemblyId);
+        Optional<Assembly> subassembly = getAssemblyById(subAssemblyId);
+
+        if(!assembly.isPresent() || !subassembly.isPresent())
+            return Optional.empty();
+
+        Assembly assy = assembly.get();
+        Assembly subassy = subassembly.get();
+        assy.addSubAssembly(subassy);
+
+        return Optional.of(assemblyRepository.save(assy));
+
+    }
+
     public Optional<Assembly> deleteAssembly(Assembly assembly) {
         if(assembly == null) return Optional.empty();
         log.info("delete assembly with name of: {}", assembly.getName());
@@ -87,5 +103,10 @@ public class AssemblyService {
     public List<Assembly> getAssembliesByCategory(String category) {
         log.info("get assemblies by category: {} called", category);
         return assemblyRepository.findAssemblyByCategory(category);
+    }
+
+    public List<String> getAllCategories() {
+        log.info("get categories for assemblies");
+        return assemblyRepository.findDistinctCategories();
     }
 }

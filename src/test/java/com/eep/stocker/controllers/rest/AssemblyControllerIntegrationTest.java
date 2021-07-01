@@ -184,8 +184,6 @@ public class AssemblyControllerIntegrationTest {
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).isEqualTo(assembly1);
     }
 
     @Test
@@ -199,8 +197,6 @@ public class AssemblyControllerIntegrationTest {
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).isEqualTo(assembly1);
     }
 
     @Test

@@ -40,7 +40,7 @@ public class AssemblyLineController {
                 .orElseThrow(() -> new AssemblyLineDoesNotExistException(String.format("Assembly line with id of %s does not exist", id)));
     }
 
-    @GetMapping("/assembly/{id}")
+    @GetMapping("/get/assembly/{id}")
     public List<AssemblyLine> getAssemblyLinesForAssembly(@PathVariable long id) {
         log.info("get: /api/assembly-line/assembly/{} called", id);
         Optional<Assembly> assembly = this.assemblyService.getAssemblyById(id);

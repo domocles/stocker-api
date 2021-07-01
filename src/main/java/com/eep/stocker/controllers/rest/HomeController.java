@@ -22,17 +22,21 @@ import java.util.Optional;
 public class HomeController {
     private static final Logger log = LoggerFactory.getLogger(HomeController.class);
 
-    @Autowired
-    private StockableProductService stockableProductService;
+    private final StockableProductService stockableProductService;
 
-    @Autowired
-    private StockableProductNoteService stockableProductNoteService;
+    private final StockableProductNoteService stockableProductNoteService;
 
-    @GetMapping("/test")
-    public String test() {
-        return "test";
+    public HomeController(StockableProductService stockableProductService, StockableProductNoteService stockableProductNoteService) {
+        this.stockableProductService = stockableProductService;
+        this.stockableProductNoteService = stockableProductNoteService;
     }
 
+    /***
+     * Retrieve the StockableProduct with the given id
+     * @param id of the stockable product we wish to retrieve
+     * @return the stockable product
+     * @throws RecordNotFoundException if the stockable product does not exist
+     */
     @GetMapping("/api/stockable-products/get/{id}")
     public StockableProduct getById(@PathVariable Long id) {
         log.info("get: /api/stockable-products/get/{} called", id);
@@ -45,21 +49,35 @@ public class HomeController {
         }
     }
 
+    /***
+     * Retrieve all stockable products
+     * @return a list of stockable products
+     */
     @GetMapping("/api/stockable-products/get")
     public List<StockableProduct> getAllStockableProducts() {
         log.info("get: /api/stockable-products/get called");
         return stockableProductService.getAllStockableProducts();
     }
 
+    /***
+     * Retrieve all categories
+     * @return a list of categories
+     */
     @GetMapping("/api/stockable-products/categories")
     public List<String> getAllCategories() {
         log.info("get: /api/stockable-products/categories called");
         return  stockableProductService.getAllCategories();
     }
 
+    /***
+     * Create a new stockable product
+     * @param stockableProduct
+     * @return the persisted stockable product
+     */
     @PostMapping(path = "/api/stockable-products/create", consumes = "application/json", produces = "application/json")
     public StockableProduct createStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) {
         log.info("post: /api/stockable-products/create called");
+        //todo create DTO's for this.
         Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(stockableProduct.getMpn());
         if(sb.isPresent()) {
             log.info("MPN already exists: '{}'", stockableProduct.getMpn());
@@ -68,6 +86,11 @@ public class HomeController {
         return stockableProductService.saveStockableProduct(stockableProduct);
     }
 
+    /***
+     * Update a stockable product
+     * @param stockableProduct
+     * @return the updated stockable product
+     */
     @PutMapping(path = "/api/stockable-products/update", consumes = "application/json", produces = "application/json")
     public StockableProduct updateStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) {
         log.info("put: /api/stockable-products/update called");
@@ -80,6 +103,12 @@ public class HomeController {
         return stockableProductService.updateStockableProduct(stockableProduct);
     }
 
+    /***
+     * Delete a stockable product
+     * @param id - the id of the stockable product to delete
+     * @return a response as to whether the stockable product has been deleted
+     * @throws ResourceNotFoundException - if the id is not found
+     */
     @DeleteMapping(path = "/api/stockable-products/delete/{id}")
     public Response deleteStockableProduct(@PathVariable Long id) throws ResourceNotFoundException {
         log.info("delete: /api/stockable-products/delete/{} called", id);

@@ -1,11 +1,10 @@
 package com.eep.stocker.domain;
 
+import com.eep.stocker.collections.RowTree;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity(name="assembly")
 @Table(name="assembly")
@@ -17,25 +16,32 @@ public class Assembly {
     private String description;
     private String category;
     private Set<String> tags = new HashSet<>();
-
+    private List<Assembly> subAssemblies = new ArrayList<>();
+    private transient RowTree<Assembly> assemblyTree = new RowTree<>(this);
 
     public Assembly() {}
 
-    public Assembly(Long id, String name, String description, String mpn, String category, Set<String> tags) {
+    public Assembly(Long id, String name,
+                    String description,
+                    String mpn,
+                    String category,
+                    Set<String> tags,
+                    List<Assembly> subAssemblies) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.mpn = mpn;
         this.category = category;
         this.tags = tags;
+        this.subAssemblies = subAssemblies;
     }
 
-    public Assembly(Long id, String name, String mpn, String category, Set<String> tags) {
-        this(id, name, "", mpn, category, tags);
+    public Assembly(Long id, String name, String mpn, String category, Set<String> tags, List<Assembly> subAssemblies) {
+        this(id, name, "", mpn, category, tags, subAssemblies);
     }
 
     public Assembly(Long id, String name, String mpn, String category) {
-        this(id, name, "", mpn, category, Collections.EMPTY_SET);
+        this(id, name, "", mpn, category, Collections.EMPTY_SET, Collections.EMPTY_LIST);
     }
 
     @Id
@@ -93,6 +99,23 @@ public class Assembly {
     @Column(name = "tags")
     public Set<String> getTags() {
         return tags;
+    }
+
+    @ManyToMany
+    @JoinTable(name = "Assembly_Subassembly",
+        joinColumns = {@JoinColumn(name = "fk_assembly")},
+        inverseJoinColumns = {@JoinColumn(name = "fk_subassembly")})
+    public List<Assembly> getSubAssemblies() {
+        return this.subAssemblies;
+    }
+
+    public void setSubAssemblies(List<Assembly> subAssemblies) {
+        this.subAssemblies = subAssemblies;
+    }
+
+    public void addSubAssembly(Assembly subAssembly) {
+        this.subAssemblies.add(subAssembly);
+        this.assemblyTree.add(subAssembly, this);
     }
 
     @Override

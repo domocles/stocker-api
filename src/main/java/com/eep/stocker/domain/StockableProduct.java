@@ -1,5 +1,7 @@
 package com.eep.stocker.domain;
 
+import org.hibernate.annotations.NaturalId;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -12,18 +14,25 @@ public class StockableProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "stockable_prdduct_id")
+    @Column(name = "stockable_product_id")
     private Long id;
 
     @NotNull
+    @Column(name = "stockable_product_name")
     private String name;
 
-    @Column(unique = true)
+    @Column(unique = true, name = "stockable_product_mpn")
     private String mpn;
 
+    @NaturalId
+    @Column(name = "stockable_product_uid")
+    private final String uid = UUID.randomUUID().toString();
+
+    @Column(name = "stockable_product_description")
     private String description;
 
     @NotNull
+    @Column(name = "stockable_product_category")
     private String category;
 
     @ElementCollection
@@ -121,6 +130,10 @@ public class StockableProduct {
 
     public void addTag(String tag) {
         this.getTags().add(tag);
+    }
+
+    public String getUid() {
+        return this.uid;
     }
 
     @Override

@@ -216,7 +216,7 @@ public class AssemblyLineControllerIntegrationTest {
                 .willReturn(Arrays.asList(assemblyLine1, assemblyLine2, assemblyLine3));
 
         ResponseEntity<List<AssemblyLine>> response = restTemplate.exchange(
-                "/api/assembly-line/assembly/5",
+                "/api/assembly-line/get/assembly/5",
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<List<AssemblyLine>>() {  }
