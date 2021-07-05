@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'sudo mvnw clean'
+        sh 'whoami'
       }
     }
 
