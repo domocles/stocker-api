@@ -3,7 +3,7 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh './mvnw clean'
+        sh 'sudo mvnw clean'
       }
     }
 
