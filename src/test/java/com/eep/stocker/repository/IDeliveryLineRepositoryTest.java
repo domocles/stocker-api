@@ -67,23 +67,25 @@ class IDeliveryLineRepositoryTest {
         po2.setPurchaseOrderReference("PO-002");
         po2.setPurchaseOrderDate(new Date());
 
-        mf220 = new StockableProduct(null, "MF220",
-                "EEP200919001",
-                "Mild Steel Flange",
-                "Flange",
-                new HashSet<String>(),
-                "Flanges",
-                1.72D,
-                25.0D);
+        mf220 = StockableProduct.builder()
+                .name("MF220")
+                .mpn("EEP200919001")
+                .description("Mild Steel Flange")
+                .category("Flanges")
+                .units("Flanges")
+                .stockPrice(1.72)
+                .inStock(25.0)
+                .build();
 
-        MF286 = new StockableProduct(null, "MF286",
-                "EEP200919002",
-                "Mild Steel Flange",
-                "Flange",
-                new HashSet<String>(),
-                "Flanges",
-                1.45D,
-                75.D);
+        MF286 = StockableProduct.builder()
+                .name("MF286")
+                .mpn("EEP200919002")
+                .description("Mild Steel Flange")
+                .category("Flanges")
+                .units("Flanges")
+                .stockPrice(1.45)
+                .inStock(75.0)
+                .build();
 
         //stock transactions
         transaction1 = new StockTransaction(mf220,

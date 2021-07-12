@@ -51,23 +51,27 @@ class SupplierQuoteServiceTest {
                 "info@fji.dk",
                 "0030 456789");
 
-        MF220 = new StockableProduct(1L, "MF220",
-                "EEP200919001",
-                "Mild Steel Flange",
-                "Flange",
-                new HashSet<String>(),
-                "Flanges",
-                1.72D,
-                25.0D);
+        MF220 = StockableProduct.builder()
+                .id(1L)
+                .name("MF220")
+                .mpn("EEP200919001")
+                .description("Mild Steel Flange")
+                .category("Flanges")
+                .units("Flanges")
+                .stockPrice(1.72)
+                .inStock(25.0)
+                .build();
 
-        MF286 = new StockableProduct(2L, "MF286",
-                "EEP200919002",
-                "Mild Steel Flange",
-                "Flange",
-                new HashSet<String>(),
-                "Flanges",
-                1.45D,
-                75.D);
+        MF286 = StockableProduct.builder()
+                .id(2L)
+                .name("MF286")
+                .mpn("EEP200919002")
+                .description("Mild Steel Flange")
+                .category("Flanges")
+                .units("Flanges")
+                .stockPrice(1.45)
+                .inStock(75.0)
+                .build();
 
         MF286Quote = new SupplierQuote(MF286, shelleys, new Date(), 15.0, 2.76);
         FJIQuote = new SupplierQuote(MF220, fji, new Date(), 100.0, 1.96);
@@ -79,14 +83,16 @@ class SupplierQuoteServiceTest {
                 "jon.horton@shelleyparts.co.uk",
                 "01527 584285");
 
-        StockableProduct stockableProduct = new StockableProduct(1L, "MF220",
-                "EEP200919001",
-                "Mild Steel Flange",
-                "Flange",
-                new HashSet<String>(),
-                "Flanges",
-                1.72D,
-                25.0D);
+        StockableProduct stockableProduct = StockableProduct.builder()
+                .id(1L)
+                .name("MF220")
+                .mpn("EEP200919001")
+                .description("Mild Steel Flange")
+                .category("Flanges")
+                .units(("Flanges"))
+                .stockPrice(1.72)
+                .inStock(25.0)
+                .build();
 
         SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
         return Optional.of(quote);
@@ -98,14 +104,16 @@ class SupplierQuoteServiceTest {
                 "jon.horton@shelleyparts.co.uk",
                 "01527 584285");
 
-        StockableProduct stockableProduct = new StockableProduct(1L, "MF220",
-                "EEP200919001",
-                "Mild Steel Flange",
-                "Flange",
-                new HashSet<String>(),
-                "Flanges",
-                1.72D,
-                25.0D);
+        StockableProduct stockableProduct = StockableProduct.builder()
+                .id(1L)
+                .name("MF220")
+                .mpn("EEP200919001")
+                .description("Mild Steel Flange")
+                .category("Flanges")
+                .units("Flanges")
+                .stockPrice(1.72)
+                .inStock(25.0)
+                .build();
 
         SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
         quote.setId(1L);

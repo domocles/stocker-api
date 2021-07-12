@@ -9,6 +9,7 @@ import java.util.Optional;
 
 public interface IStockableProductRepository extends CrudRepository<StockableProduct, Long> {
     Optional<StockableProduct> findFirstByMpn(String mpn);
+    Optional<StockableProduct> findFirstByUid(String uid);
     List<StockableProduct> findAll();
 
     @Query("SELECT DISTINCT category FROM StockableProduct")

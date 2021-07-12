@@ -56,23 +56,27 @@ public class AssemblyLineControllerIntegrationTest {
 
     @Before
     public void setUp() throws Exception {
-        MF220 = new StockableProduct(1L, "MF220",
-                "EEP200919001",
-                "Mild Steel Flange",
-                "Flange",
-                new HashSet<String>(),
-                "Flanges",
-                1.72D,
-                25.0D);
+        MF220 = StockableProduct.builder()
+                .id(1L)
+                .name("MF220")
+                .mpn("EEP200919001")
+                .description("Mild Steel Flange")
+                .category("Flanges")
+                .units("Flanges")
+                .stockPrice(1.72)
+                .inStock(25.0)
+                .build();
 
-        MF286 = new StockableProduct(2L, "MF286",
-                "EEP200919002",
-                "Mild Steel Flange",
-                "Flange",
-                new HashSet<String>(),
-                "Flanges",
-                1.45D,
-                75.D);
+        MF286 = StockableProduct.builder()
+                .id(2L)
+                .name("MF286")
+                .mpn("EEP200919002")
+                .description("Mild Steel Flange")
+                .category("Flanges")
+                .units("Flanges")
+                .stockPrice(1.45)
+                .inStock(75.0)
+                .build();
 
         assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101", "Decat");
         assembly1 = new Assembly(1L, "Golf Decat", "EEP102", "Decat");

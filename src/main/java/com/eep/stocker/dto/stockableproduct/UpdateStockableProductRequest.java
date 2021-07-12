@@ -9,7 +9,8 @@ import java.util.Set;
 
 @Data
 @Builder
-public class CreateStockableProductRequest implements
+public class UpdateStockableProductRequest implements
+        StockableProductDTO.Id,
         StockableProductDTO.Name,
         StockableProductDTO.Mpn,
         StockableProductDTO.Description,
@@ -18,6 +19,7 @@ public class CreateStockableProductRequest implements
         StockableProductDTO.Tags,
         StockableProductDTO.StockPrice,
         StockableProductDTO.InStock {
+    private String id;
     private String name;
     private String mpn;
     private String description;

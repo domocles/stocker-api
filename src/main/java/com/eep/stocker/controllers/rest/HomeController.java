@@ -2,7 +2,9 @@ package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
+import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.dto.stockableproduct.*;
 import com.eep.stocker.services.StockableProductNoteService;
 import com.eep.stocker.services.StockableProductService;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import javax.validation.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class HomeController {
@@ -26,27 +29,28 @@ public class HomeController {
 
     private final StockableProductNoteService stockableProductNoteService;
 
-    public HomeController(StockableProductService stockableProductService, StockableProductNoteService stockableProductNoteService) {
+    private final StockableProductMapper stockableProductMapper;
+
+    public HomeController(StockableProductService stockableProductService, StockableProductNoteService stockableProductNoteService,
+                          StockableProductMapper stockableProductMapper) {
         this.stockableProductService = stockableProductService;
         this.stockableProductNoteService = stockableProductNoteService;
+        this.stockableProductMapper = stockableProductMapper;
     }
 
     /***
      * Retrieve the StockableProduct with the given id
      * @param id of the stockable product we wish to retrieve
-     * @return the stockable product
+     * @return GetStockableProductResponse
      * @throws RecordNotFoundException if the stockable product does not exist
      */
     @GetMapping("/api/stockable-products/get/{id}")
-    public StockableProduct getById(@PathVariable Long id) {
+    public GetStockableProductResponse getById(@PathVariable String id) {
         log.info("get: /api/stockable-products/get/{} called", id);
-        Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
-        if(stockableProduct.isPresent()) {
-            return stockableProduct.get();
-        } else {
-            log.info("RecordNotFoundException on StockableProduct '{}'", id);
-            throw new RecordNotFoundException("Material ID: '" + id + "' does not exist");
-        }
+        Optional<StockableProduct> stockableProductOpt = stockableProductService.getStockableProductByUid(id);
+        StockableProduct stockableProduct = stockableProductOpt.orElseThrow(()
+                -> new RecordNotFoundException("Material ID: '" + id + "' does not exist"));
+        return stockableProductMapper.stockableProductResponseFromStockableProduct(stockableProduct);
     }
 
     /***
@@ -54,9 +58,14 @@ public class HomeController {
      * @return a list of stockable products
      */
     @GetMapping("/api/stockable-products/get")
-    public List<StockableProduct> getAllStockableProducts() {
+    public GetAllStockableProductResponse getAllStockableProducts() {
         log.info("get: /api/stockable-products/get called");
-        return stockableProductService.getAllStockableProducts();
+        GetAllStockableProductResponse response = new GetAllStockableProductResponse();
+        List<StockableProduct> allProducts = stockableProductService.getAllStockableProducts();
+        allProducts.stream()
+                .map(stockableProductMapper::stockableProductResponseFromStockableProduct)
+                .forEach(response::addGetStockableProductResponse);
+        return response;
     }
 
     /***
@@ -64,43 +73,55 @@ public class HomeController {
      * @return a list of categories
      */
     @GetMapping("/api/stockable-products/categories")
-    public List<String> getAllCategories() {
+    public GetAllCategoriesResponse getAllCategories() {
         log.info("get: /api/stockable-products/categories called");
-        return  stockableProductService.getAllCategories();
+        GetAllCategoriesResponse response = new GetAllCategoriesResponse();
+        stockableProductService.getAllCategories().forEach(response::addCategory);
+        return response;
     }
 
     /***
      * Create a new stockable product
-     * @param stockableProduct
+     * @param createStockableProductRequest
      * @return the persisted stockable product
      */
     @PostMapping(path = "/api/stockable-products/create", consumes = "application/json", produces = "application/json")
-    public StockableProduct createStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) {
+    public CreateStockableProductResponse createStockableProduct(@Valid @RequestBody CreateStockableProductRequest createStockableProductRequest) {
         log.info("post: /api/stockable-products/create called");
-        //todo create DTO's for this.
-        Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(stockableProduct.getMpn());
+        Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(createStockableProductRequest.getMpn());
         if(sb.isPresent()) {
-            log.info("MPN already exists: '{}'", stockableProduct.getMpn());
-            throw new MpnNotUniqueException(stockableProduct.getMpn() + " already exists");
+            log.info("MPN already exists: '{}'", createStockableProductRequest.getMpn());
+            throw new MpnNotUniqueException(createStockableProductRequest.getMpn() + " already exists");
         }
-        return stockableProductService.saveStockableProduct(stockableProduct);
+        StockableProduct stockableProduct = stockableProductMapper.stockableProductFromCreateStockableProductRequest(createStockableProductRequest);
+        stockableProduct = stockableProductService.saveStockableProduct(stockableProduct);
+        return stockableProductMapper.createStockableProductResponseFromStockableProduct(stockableProduct);
     }
 
     /***
      * Update a stockable product
-     * @param stockableProduct
+     * @param request
      * @return the updated stockable product
      */
     @PutMapping(path = "/api/stockable-products/update", consumes = "application/json", produces = "application/json")
-    public StockableProduct updateStockableProduct(@Valid @RequestBody StockableProduct stockableProduct) {
+    public UpdateStockableProductResponse updateStockableProduct(@Valid @RequestBody UpdateStockableProductRequest request) {
         log.info("put: /api/stockable-products/update called");
-        Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(stockableProduct.getMpn());
-        if(sb.isPresent()) {
-            if(sb.get().getId() != stockableProduct.getId()) {
-                throw new MpnNotUniqueException(stockableProduct.getMpn() + " already belongs to another product");
+        Optional<StockableProduct> sbOpt = stockableProductService.getStockableProductByUid(request.getId());
+        if(sbOpt.isPresent()) {
+            StockableProduct sb = sbOpt.get();
+            //if the mpn is changing, make sure it doesn't clash
+            if(!sb.getMpn().equals(request.getMpn())) {
+                Optional<StockableProduct> mpnCheckOpt = stockableProductService.findStockableProductByMpn(request.getMpn());
+                if(mpnCheckOpt.isPresent())
+                    throw new MpnNotUniqueException("You are updating the mpn on the stockable product to one that" +
+                            "already exists");
             }
-        }
-        return stockableProductService.updateStockableProduct(stockableProduct);
+            stockableProductMapper.updateStockableProductFromDto(request, sb);
+            sb = stockableProductService.updateStockableProduct(sb);
+            UpdateStockableProductResponse response = stockableProductMapper.updateStockableResponseFromStockableProduct(sb);
+            return response;
+        } else
+            throw new StockableProductDoesNotExistException("Stockable Product does not exist");
     }
 
     /***
@@ -110,9 +131,9 @@ public class HomeController {
      * @throws ResourceNotFoundException - if the id is not found
      */
     @DeleteMapping(path = "/api/stockable-products/delete/{id}")
-    public Response deleteStockableProduct(@PathVariable Long id) throws ResourceNotFoundException {
+    public Response deleteStockableProduct(@PathVariable String id) throws ResourceNotFoundException {
         log.info("delete: /api/stockable-products/delete/{} called", id);
-        Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByID(id);
+        Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByUid(id);
         if(stockableProduct.isPresent()) {
             stockableProductService.deleteStockableProduct(stockableProduct.get());
             return Response.status(204)

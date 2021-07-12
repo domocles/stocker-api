@@ -1,5 +1,6 @@
 package com.eep.stocker.domain;
 
+import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -8,133 +9,86 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import java.util.*;
 
+/***
+ * The Stockable Product - represents any object which can sit on a shelf
+ */
 @Entity(name="StockableProduct")
 @Table(name="stockable_product")
+@Builder(toBuilder = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class StockableProduct {
 
+    /***
+     * Database ID of the StockableProduct
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "stockable_product_id")
     private Long id;
 
+    /***
+     * The product name of the stockable product e.g. 51mm x 152mm Ilok Flex
+     */
     @NotNull
     @Column(name = "stockable_product_name")
     private String name;
 
+    /***
+     * The manufacturers part number of the stockable product e.g. FX-51-152-I
+     */
     @Column(unique = true, name = "stockable_product_mpn")
     private String mpn;
 
+    /***
+     * The universally unique id of the stockable product
+     */
     @NaturalId
     @Column(name = "stockable_product_uid")
-    private final String uid = UUID.randomUUID().toString();
+    @Builder.Default //lombok
+    private String uid = UUID.randomUUID().toString();
 
+    /***
+     * Description of the stockable products e.g. 'An ilok lined flex with a bore of 51mm and an
+     * overall length of 152mm.  Stainless steel collars.'
+     */
     @Column(name = "stockable_product_description")
     private String description;
 
+    /***
+     * The category of the stockable product e.g. Flex
+     */
     @NotNull
     @Column(name = "stockable_product_category")
     private String category;
 
+    /***
+     * The tags of the stockable product.  A tag is a keyword that can be used to search for the
+     * stockable product e.g. 'ilok, flex, fx, 51mm, 50.8mm, 2 inch, 2", 152mm, 150mm, 6 inch, 6"'
+     */
     @ElementCollection
     @CollectionTable(name = "material_tags", joinColumns = @JoinColumn(name = "material_id"))
     @Column(name = "tags")
+    @Singular //lombok
     private Set<String> tags = new HashSet<>();
 
+    /***
+     * The units of the stockable product e.g. 'meters' or 'flexes'
+     */
     private String units = "Units";
 
+    /***
+     * The stock prices which is used to generate the stock valuation of this stockable product, the
+     * stock valuation is equal to stockPrice * inStock
+     */
     private double stockPrice;
 
+    /***
+     * The amount of stock we have on the shelf.  This may be deprecated when transactions come into play
+     */
     private double inStock;
-
-    public StockableProduct() { }
-
-    public StockableProduct(Long id, String name, String mpn, String description, String category, Set<String> tags, String units, double stockPrice, double inStock) {
-        this.id = id;
-        this.name = name;
-        this.mpn = mpn;
-        this.description = description;
-        this.category = category;
-        this.tags = tags;
-        this.units = units;
-        this.stockPrice = stockPrice;
-        this.inStock = inStock;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getMpn() {
-        return mpn;
-    }
-
-    public void setMpn(String mpn) {
-        this.mpn = mpn;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setTags(Set<String> tags) {
-        this.tags = tags;
-    }
-
-    public Set<String> getTags() {
-        return tags;
-    }
-
-    public String getUnits() { return units; }
-
-    public void setUnits(String units) { this.units = units; }
-
-    public double getStockPrice() {
-        return stockPrice;
-    }
-
-    public void setStockPrice(double stockPrice) {
-        this.stockPrice = stockPrice;
-    }
-
-    public double getInStock() {
-        return inStock;
-    }
-
-    public void setInStock(double inStock) {
-        this.inStock = inStock;
-    }
-
-    public void addTag(String tag) {
-        this.getTags().add(tag);
-    }
-
-    public String getUid() {
-        return this.uid;
-    }
 
     @Override
     public boolean equals(Object o) {

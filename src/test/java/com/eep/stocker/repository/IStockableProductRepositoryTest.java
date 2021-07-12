@@ -9,6 +9,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.persistence.PersistenceException;
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,5 +66,20 @@ class IStockableProductRepositoryTest {
 
         assertThat(ids).size().isEqualTo(2);
         assertThat(ids).contains(mf220.getId(), ov12.getId());
+    }
+
+    @Test
+    void updateStockableProductWithSameMpn() {
+        mf220 = testEntityManager.persistFlushFind(mf220);
+        ov12 = testEntityManager.persistFlushFind(ov12);
+
+        StockableProduct mf264 = StockableProduct.builder()
+                .name("MF264")
+                .mpn("EEP210919001")
+                .category("Flanges")
+                .units("Flange")
+                .build();
+
+        Exception exception = assertThrows(PersistenceException.class, () -> testEntityManager.persistFlushFind(mf264));
     }
 }

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,11 +18,14 @@ import java.util.Optional;
 public class StockableProductService {
     private static final Logger log = LoggerFactory.getLogger(StockableProductService.class);
 
-    @Autowired
-    private IStockableProductRepository stockableProductRepository;
+    private final IStockableProductRepository stockableProductRepository;
 
-    @Autowired
-    private IStockTransactionRepository stockTransactionRepository;
+    private final IStockTransactionRepository stockTransactionRepository;
+
+    public StockableProductService(IStockableProductRepository stockableProductRepository, IStockTransactionRepository stockTransactionRepository) {
+        this.stockableProductRepository = stockableProductRepository;
+        this.stockTransactionRepository = stockTransactionRepository;
+    }
 
     public StockableProduct saveStockableProduct(StockableProduct stockableProduct) {
         log.info("saveStockableProduct called");
@@ -32,20 +36,28 @@ public class StockableProductService {
 
     public StockableProduct updateStockableProduct(StockableProduct stockableProduct) {
         log.info("update stockable product called");
-        return this.stockableProductRepository.save(stockableProduct);
+        try {
+            return this.stockableProductRepository.save(stockableProduct);
+        } catch(PersistenceException e) {
+            throw new MpnNotUniqueException("Mpn not unique");
+        }
     }
 
     public Optional<StockableProduct> findStockableProductByMpn(String mpn) {
-        log.info("findStockableProductByMpn called " + mpn);
+        log.info("findStockableProductByMpn called {}", mpn);
         Optional<StockableProduct> stockableProduct = this.stockableProductRepository.findFirstByMpn(mpn);
-        if(stockableProduct.isPresent())
-            return  updateStockOfStockableProduct(stockableProduct.get());
-        else return Optional.empty();
+        return stockableProduct.flatMap(this::updateStockOfStockableProduct);
     }
 
     public Optional<StockableProduct> getStockableProductByID(Long ID) {
         log.info("getStockableProductByID called");
         return updateStockOfStockableProduct(ID);
+    }
+
+    public Optional<StockableProduct> getStockableProductByUid(String uid) {
+        log.info("getStockableProductByUid called");
+        Optional<StockableProduct> stockableProduct = this.stockableProductRepository.findFirstByUid(uid);
+        return stockableProduct.flatMap(this::updateStockOfStockableProduct);
     }
 
     private Optional<StockableProduct> updateStockOfStockableProduct(Long id) {

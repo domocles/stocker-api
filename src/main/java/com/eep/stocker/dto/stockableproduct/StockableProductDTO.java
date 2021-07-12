@@ -13,5 +13,5 @@ public interface StockableProductDTO {
     interface Tags{ Set<String> getTags(); }
     interface TagString{ String getTagString(); }
     interface StockPrice{ BigDecimal getStockPrice(); }
-    interface InStock{ BigDecimal getInstock(); }
+    interface InStock{ BigDecimal getInStock(); }
 }
