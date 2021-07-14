@@ -5,6 +5,7 @@ import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.services.DeliveryService;
 import com.eep.stocker.services.SupplierService;
 
+import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -31,7 +32,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class DeliveryControllerIntegrationTest {
+class DeliveryControllerIntegrationTest extends SupplierTestData {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -42,17 +43,12 @@ class DeliveryControllerIntegrationTest {
     @MockBean
     private SupplierService supplierService;
 
-    private Supplier supplier;
     private Delivery delivery1;
     private Delivery delivery2;
 
     @BeforeEach
     void setUp() {
-        supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
-
+        
         delivery1 = new Delivery();
         delivery1.setSupplier(supplier);
         delivery1.setReference("12345");

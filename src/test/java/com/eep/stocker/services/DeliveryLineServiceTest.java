@@ -2,6 +2,7 @@ package com.eep.stocker.services;
 
 import com.eep.stocker.domain.*;
 import com.eep.stocker.repository.IDeliveryLineRepository;
+import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -15,13 +16,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-class DeliveryLineServiceTest {
+class DeliveryLineServiceTest extends SupplierTestData {
     @Mock
     private IDeliveryLineRepository deliveryLineRepository;
 
     private DeliveryLineService deliveryLineService;
 
-    private Supplier shelleys;
     private PurchaseOrder po1;
     private PurchaseOrder po2;
     private PurchaseOrderLine poLine1;
@@ -30,7 +30,7 @@ class DeliveryLineServiceTest {
     private StockableProduct mf220;
     private StockableProduct MF286;
 
-    Supplier ukf;
+
     Delivery delivery1;
     Delivery delivery2;
     Delivery delivery3;
@@ -44,11 +44,6 @@ class DeliveryLineServiceTest {
         MockitoAnnotations.initMocks(this);
 
         deliveryLineService = new DeliveryLineService(deliveryLineRepository);
-
-        shelleys = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
 
         po1 = new PurchaseOrder();
         //po1.setId(1L);
@@ -104,12 +99,6 @@ class DeliveryLineServiceTest {
         poLine2.setStockableProduct(MF286);
         poLine2.setQty(100.0D);
         poLine2.setPrice(1.35D);
-
-        ukf = new Supplier();
-        ukf.setSupplierName("UKF Ltd");
-        ukf.setDefaultCurrency("GBP");
-        ukf.setEmailAddress("sales@ukf-group.com");
-        ukf.setTelephoneNumber("01527 578686");
 
         delivery1 = new Delivery();
         delivery1.setSupplier(shelleys);

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class SupplierService {
@@ -36,6 +37,8 @@ public class SupplierService {
     public Optional<Supplier> getSupplierFromId(Long id) {
         return supplierRepository.findById(id);
     }
+
+    public Optional<Supplier> getSupplierFromUid(String uid) { return supplierRepository.findByUid(UUID.fromString(uid)); }
 
     public Optional<Supplier> deleteSupplierById(long id) {
         Optional<Supplier> supplier = supplierRepository.findById(id);

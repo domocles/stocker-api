@@ -74,7 +74,7 @@ public class HomeControllerIntegrationTest {
                 .build();
 
         updateStockableProductRequest = UpdateStockableProductRequest.builder()
-                .id(MF220.getUid())
+                .id(MF220.getUid().toString())
                 .name("MF220")
                 .mpn("EEP200919005")
                 .description("Mild Steel Flange")
@@ -85,7 +85,7 @@ public class HomeControllerIntegrationTest {
                 .build();
 
         updateStockableProductResponse = UpdateStockableProductResponse.builder()
-                .id(MF220.getUid()).id(MF220.getUid())
+                .id(MF220.getUid().toString())
                 .name("MF220")
                 .mpn("EEP200919005")
                 .description("Mild Steel Flange")

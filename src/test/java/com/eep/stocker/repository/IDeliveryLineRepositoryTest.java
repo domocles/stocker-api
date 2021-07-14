@@ -1,6 +1,7 @@
 package com.eep.stocker.repository;
 
 import com.eep.stocker.domain.*;
+import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -19,7 +20,7 @@ import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
 @RunWith(SpringRunner.class)
 @DataJpaTest
-class IDeliveryLineRepositoryTest {
+class IDeliveryLineRepositoryTest extends SupplierTestData {
 
     @Autowired
     private IDeliveryLineRepository repository;
@@ -27,7 +28,6 @@ class IDeliveryLineRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
-    private Supplier shelleys;
     private PurchaseOrder po1;
     private PurchaseOrder po2;
     private PurchaseOrderLine poLine1;
@@ -50,10 +50,6 @@ class IDeliveryLineRepositoryTest {
 
     @BeforeEach
     private void setUp() {
-        shelleys = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
 
         po1 = new PurchaseOrder();
         //po1.setId(1L);

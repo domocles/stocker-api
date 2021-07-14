@@ -48,7 +48,7 @@ public class StockableProduct {
     @NaturalId
     @Column(name = "stockable_product_uid")
     @Builder.Default //lombok
-    private String uid = UUID.randomUUID().toString();
+    private UUID uid = UUID.randomUUID();
 
     /***
      * Description of the stockable products e.g. 'An ilok lined flex with a bore of 51mm and an

@@ -3,6 +3,7 @@ package com.eep.stocker.services;
 import com.eep.stocker.domain.PurchaseOrder;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.repository.IPurchaseOrderRepository;
+import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-class PurchaseOrderServiceTest {
+class PurchaseOrderServiceTest extends SupplierTestData {
 
     @Mock
     private IPurchaseOrderRepository purchaseOrderRepository;
@@ -31,7 +32,6 @@ class PurchaseOrderServiceTest {
 
     private PurchaseOrder po1;
     private PurchaseOrder po2;
-    private Supplier shelleys;
     private Date now;
 
     @BeforeEach
@@ -41,10 +41,6 @@ class PurchaseOrderServiceTest {
 
          now = new Date();
 
-        shelleys = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
         po1 = new PurchaseOrder();
         po1.setPurchaseOrderDate(now);
         po1.setPurchaseOrderReference("PO1");

@@ -7,6 +7,7 @@ import com.eep.stocker.domain.SupplierQuote;
 import com.eep.stocker.services.StockableProductService;
 import com.eep.stocker.services.SupplierQuoteService;
 import com.eep.stocker.services.SupplierService;
+import com.eep.stocker.testdata.SupplierTestData;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(SupplierQuoteController.class)
-public class SupplierQuoteControllerTest {
+public class SupplierQuoteControllerTest extends SupplierTestData {
 
     @MockBean
     private SupplierQuoteService supplierQuoteService;
@@ -50,10 +51,6 @@ public class SupplierQuoteControllerTest {
     private MockMvc mockMvc;
 
     private SupplierQuote getSupplierQuote() {
-        Supplier supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
 
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
@@ -72,11 +69,6 @@ public class SupplierQuoteControllerTest {
 
     @Test
     public void getAllSuppliersTest() throws Exception {
-        Supplier supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
-
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
                 .name("MF220")
@@ -119,10 +111,6 @@ public class SupplierQuoteControllerTest {
 
     @Test
     public void getSupplierQuotesForSupplierTest() throws Exception {
-        Supplier supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
 
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
@@ -149,11 +137,6 @@ public class SupplierQuoteControllerTest {
 
     @Test
     public void getSupplierQuotesForStockableProductTest() throws Exception {
-        Supplier supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
-
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
                 .name("MF220")
@@ -181,11 +164,6 @@ public class SupplierQuoteControllerTest {
 
     @Test
     public void updateSupplierQuoteTest() throws Exception {
-        Supplier supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
-
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
                 .name("MF220")
@@ -204,11 +182,6 @@ public class SupplierQuoteControllerTest {
 
     @Test
     public void createSupplierQuoteTest() throws Exception {
-        Supplier supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
-
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
                 .name("MF220")

@@ -4,6 +4,7 @@ import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.domain.SupplierQuote;
 import com.eep.stocker.repository.ISupplierQuoteRepository;
+import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +19,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-class SupplierQuoteServiceTest {
+class SupplierQuoteServiceTest extends SupplierTestData {
 
     @Mock
     private ISupplierQuoteRepository supplierQuoteRepository;
@@ -28,8 +29,6 @@ class SupplierQuoteServiceTest {
     private SupplierQuote savedSupplierQuote;
     private SupplierQuote MF286Quote;
     private SupplierQuote FJIQuote;
-    private Supplier shelleys;
-    private Supplier fji;
     private StockableProduct MF220;
     private StockableProduct MF286;
 
@@ -40,16 +39,6 @@ class SupplierQuoteServiceTest {
         newSupplierQuote = getNewSupplierQuote().get();
         savedSupplierQuote = getSavedSupplierQuote().get();
 
-
-        shelleys = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
-
-        fji = new Supplier("FJI Industries",
-                "EU",
-                "info@fji.dk",
-                "0030 456789");
 
         MF220 = StockableProduct.builder()
                 .id(1L)
@@ -78,10 +67,12 @@ class SupplierQuoteServiceTest {
     }
 
     private static Optional<SupplierQuote> getNewSupplierQuote() {
-        Supplier supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
+        Supplier supplier = Supplier.builder()
+                .supplierName("Shelley Parts Ltd")
+                .defaultCurrency("GBP")
+                .emailAddress("jon.horton@shelleyparts.co.uk")
+                .telephoneNumber("01527 584285")
+                .build();
 
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
@@ -99,10 +90,12 @@ class SupplierQuoteServiceTest {
     }
 
     private static Optional<SupplierQuote> getSavedSupplierQuote() {
-        Supplier supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
+        Supplier supplier = Supplier.builder()
+                .supplierName("Shelley Parts Ltd")
+                .defaultCurrency("GBP")
+                .emailAddress("jon.horton@shelleyparts.co.uk")
+                .telephoneNumber("01527 584285")
+                .build();
 
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)

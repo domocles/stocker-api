@@ -6,6 +6,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.UUID;
+
 @Mapper(componentModel = "spring", uses = MapperUtils.class)
 public interface StockableProductMapper {
 

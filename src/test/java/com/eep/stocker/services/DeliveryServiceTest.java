@@ -3,6 +3,7 @@ package com.eep.stocker.services;
 import com.eep.stocker.domain.Delivery;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.repository.IDeliveryRepository;
+import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -17,14 +18,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-class DeliveryServiceTest {
+class DeliveryServiceTest extends SupplierTestData {
     @Mock
     private IDeliveryRepository deliveryRepository;
 
     private DeliveryService deliveryService;
 
-    private Supplier shelleys;
-    private Supplier ukf;
     private Delivery delivery1;
     private Delivery delivery2;
     private Delivery delivery3;
@@ -33,16 +32,6 @@ class DeliveryServiceTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         this.deliveryService = new DeliveryService(deliveryRepository);
-
-        shelleys = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
-
-        ukf = new Supplier("UKF Group Ltd",
-                "GBP",
-                "sales@ukf.com",
-                "01527 578686");
 
         delivery1 = new Delivery();
         delivery1.setSupplier(shelleys);

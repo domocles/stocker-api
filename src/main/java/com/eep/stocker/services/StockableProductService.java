@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.PersistenceException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class StockableProductService {
@@ -56,7 +57,7 @@ public class StockableProductService {
 
     public Optional<StockableProduct> getStockableProductByUid(String uid) {
         log.info("getStockableProductByUid called");
-        Optional<StockableProduct> stockableProduct = this.stockableProductRepository.findFirstByUid(uid);
+        Optional<StockableProduct> stockableProduct = this.stockableProductRepository.findFirstByUid(UUID.fromString(uid));
         return stockableProduct.flatMap(this::updateStockOfStockableProduct);
     }
 

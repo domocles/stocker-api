@@ -12,6 +12,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.persistence.PersistenceException;
 import javax.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -50,6 +52,15 @@ class IStockableProductRepositoryTest {
         ov12.setDescription("Aluminized Olive");
         ov12.setCategory("Olive");
         ov12.setMpn("EEP210919002");
+    }
+
+    @Test
+    void findStockableProductByUidTest() {
+        mf220 = testEntityManager.persistFlushFind(mf220);
+
+        Optional<StockableProduct> entity = repository.findFirstByUid(mf220.getUid());
+
+        assertThat(entity).isPresent();
     }
 
     @Test

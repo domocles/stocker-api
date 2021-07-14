@@ -4,6 +4,7 @@ import com.eep.stocker.domain.StockableProduct;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -11,9 +12,11 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class StockableProductMapperTest {
 
-    StockableProductMapper stockableProductMapper = Mappers.getMapper(StockableProductMapper.class);
+    @Autowired
+    StockableProductMapper stockableProductMapper;
 
     private StockableProduct stockableProduct = StockableProduct.builder()
             .id(1L)
@@ -82,7 +85,7 @@ class StockableProductMapperTest {
     void stockableProductFromCreateStockableProductRequest() {
         StockableProduct stockableProduct = stockableProductMapper.stockableProductFromCreateStockableProductRequest(request);
         assertThat(stockableProduct.getName()).isEqualTo("51mm x 152mm Ilok Flex");
-        assertThat(stockableProduct.getUid()).isNotEmpty();
+        assertThat(stockableProduct.getUid().toString()).isNotEmpty();
         assertThat(stockableProduct.getMpn()).isEqualTo("FX-51-152-I");
         assertThat(stockableProduct.getDescription()).isEqualTo("An ilok lined flex with a bore of 51mm and an overall length of 152mm.  " +
                 "Stainless steel collars.");

@@ -6,6 +6,7 @@ import com.eep.stocker.domain.PurchaseOrder;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.services.PurchaseOrderService;
 import com.eep.stocker.services.SupplierService;
+import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +32,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class PurchaseOrderControllerIntegrationTest {
+class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -41,16 +42,12 @@ class PurchaseOrderControllerIntegrationTest {
     @MockBean
     private SupplierService supplierService;
 
-    private Supplier supplier;
     private PurchaseOrder po1;
     private PurchaseOrder po2;
 
     @BeforeEach
     void setUp() {
-         supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
+
 
          po1 = new PurchaseOrder();
          po1.setId(1L);

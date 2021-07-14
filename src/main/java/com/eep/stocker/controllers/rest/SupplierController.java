@@ -2,7 +2,10 @@ package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.controllers.error.exceptions.DomainObjectAlreadyExistsException;
 import com.eep.stocker.controllers.error.exceptions.DomainObjectDoesNotExistException;
+import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
 import com.eep.stocker.domain.Supplier;
+import com.eep.stocker.dto.supplier.GetSupplierResponse;
+import com.eep.stocker.dto.supplier.SupplierMapper;
 import com.eep.stocker.services.SupplierService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,15 +20,19 @@ public class SupplierController {
     private static final Logger log = LoggerFactory.getLogger(SupplierController.class);
 
     private SupplierService supplierService;
+    private SupplierMapper supplierMapper;
 
-    public SupplierController(SupplierService supplierService) {
+    public SupplierController(SupplierService supplierService, SupplierMapper supplierMapper) {
         this.supplierService = supplierService;
+        this.supplierMapper = supplierMapper;
     }
 
     @GetMapping("/api/suppliers/get/{id}")
-    public Supplier getAllSuppliers(@PathVariable long id) {
+    public GetSupplierResponse getAllSuppliers(@PathVariable String id) {
         log.info("get: /api/suppliers/get/{} called", id);
-        return supplierService.getSupplierFromId(id).get();
+        Supplier supplier = supplierService.getSupplierFromUid(id).orElseThrow(()
+                -> new SupplierDoesNotExistException(String.format("Supplier with id of %s does not exist", id)));
+        return supplierMapper.getSupplierResponseFromSupplier(supplier);
     }
 
     @GetMapping("/api/suppliers/get")

@@ -8,6 +8,7 @@ import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.services.PurchaseOrderLineService;
 import com.eep.stocker.services.PurchaseOrderService;
 import com.eep.stocker.services.StockableProductService;
+import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.Test;
@@ -33,7 +34,7 @@ import static org.mockito.BDDMockito.given;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PurchaseOrderLineControllerIntegrationTest {
+public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -47,7 +48,6 @@ public class PurchaseOrderLineControllerIntegrationTest {
     @MockBean
     private StockableProductService stockableProductService;
 
-    private Supplier supplier;
     private PurchaseOrder po1;
     private PurchaseOrder po2;
     private PurchaseOrderLine poLine1;
@@ -58,11 +58,6 @@ public class PurchaseOrderLineControllerIntegrationTest {
 
     @Before
     public void setup() {
-        supplier = new Supplier("Shelley Parts Ltd",
-                "GBP",
-                "jon.horton@shelleyparts.co.uk",
-                "01527 584285");
-
         po1 = new PurchaseOrder();
         po1.setId(1L);
         po1.setSupplier(supplier);

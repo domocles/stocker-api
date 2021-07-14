@@ -6,10 +6,11 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface IStockableProductRepository extends CrudRepository<StockableProduct, Long> {
     Optional<StockableProduct> findFirstByMpn(String mpn);
-    Optional<StockableProduct> findFirstByUid(String uid);
+    Optional<StockableProduct> findFirstByUid(UUID uid);
     List<StockableProduct> findAll();
 
     @Query("SELECT DISTINCT category FROM StockableProduct")
