@@ -4,12 +4,11 @@ import com.eep.stocker.controllers.error.exceptions.DomainObjectAlreadyExistsExc
 import com.eep.stocker.controllers.error.exceptions.DomainObjectDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
 import com.eep.stocker.domain.Supplier;
-import com.eep.stocker.dto.supplier.GetAllSuppliersResponse;
-import com.eep.stocker.dto.supplier.GetSupplierResponse;
-import com.eep.stocker.dto.supplier.SupplierMapper;
+import com.eep.stocker.dto.supplier.*;
 import com.eep.stocker.services.SupplierService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -56,31 +55,68 @@ public class SupplierController {
         return supplierMapper.getAllSupplierResponseFromList(supplierService.getAllSuppliers());
     }
 
+    /***
+     * Creates a new supplier
+     * @param supplierRequest - CreateSupplierRequest
+     * @return CreateSupplierResponse - including id
+     */
     @PostMapping(path = "/api/suppliers/create", produces = "application/json", consumes = "application/json")
-    public Supplier createSupplier(@RequestBody Supplier supplier) {
+    public CreateSupplierResponse createSupplier(@RequestBody CreateSupplierRequest supplierRequest) {
         log.info("post: /api/suppliers/create called");
-        if(supplierService.supplierExists(supplier.getSupplierName()))
-            throw new DomainObjectAlreadyExistsException("Supplier " + supplier.getSupplierName() + " already exists");
-        return supplierService.saveSupplier(supplier);
+        if(supplierService.supplierExists(supplierRequest.getSupplierName()))
+            throw new DomainObjectAlreadyExistsException("Supplier " + supplierRequest.getSupplierName() + " already exists");
+        var supplier = supplierMapper.createSupplierFromCreateSupplierRequest(supplierRequest);
+        supplier = supplierService.saveSupplier(supplier);
+        return supplierMapper.createSupplierResponseFromSupplier(supplier);
     }
 
+    /***
+     * Updates the supplier from an UpdateSupplierRequest.  If the request has an id then the domain object with that
+     * id is updated.  If no id is present then a new domain object is created and returned.  If a supplier is updated
+     * with a name that exists for another supplier then a DomainObjectAlreadyExistsException is thrown.
+     * @param request - the supplier we are updating
+     * @return - the updated supplier
+     * @throws DomainObjectAlreadyExistsException
+     */
     @PutMapping(path = "/api/suppliers/update")
-    public Supplier updateSupplier(@RequestBody Supplier supplier) {
+    public UpdateSupplierResponse updateSupplier(@RequestBody UpdateSupplierRequest request) {
         log.info("put: /api/suppliers/put called");
-        if(supplier.getId() == 0) {
-            //this is not an update operation
-            throw new DomainObjectDoesNotExistException("Supplier " + supplier.getId() + " does not exist.  Please supply a valid id");
+        //does this supplier exist
+        if(request.getId() == null || request.getId().isEmpty()) {
+            var newReq = supplierMapper.createSupplierRequestFromUpdateSupplierRequest(request);
+            return supplierMapper.updateSupplierResponseFromCreateSupplierResponse(createSupplier(newReq));
+        }
+        var supplierOpt = supplierService.getSupplierFromUid(request.getId());
+        if(supplierOpt.isPresent()) {
+            var supplier = supplierOpt.get();
+            //check that the supplier doesn't already exist
+            if(!supplier.getSupplierName().equals(request.getSupplierName())) {
+                if(supplierService.supplierExists(request.getSupplierName()))
+                    throw new DomainObjectAlreadyExistsException("Supplier " + request.getSupplierName() + " already exists");
+            }
+            supplier = supplierMapper.mapFromUpdateSupplierRequest(request);
+            supplier = supplierService.saveSupplier(supplier);
+            return supplierMapper.updateSupplierResponseFromSupplier(supplier);
         } else
-            return supplierService.saveSupplier(supplier);
+            throw new DomainObjectDoesNotExistException(String.format("Supplier with id of %s does not exist", request.getId()));
+
     }
 
+    /***
+     * Delete a supplier
+     * @param id - uid of the supplier
+     * @return a copy of the deleted supplier
+     */
     @DeleteMapping(path = "/api/suppliers/delete/{id}")
-    public Supplier deleteSupplier(@PathVariable long id) {
+    public DeletedSupplierResponse deleteSupplier(@PathVariable String id) {
         log.info("delete: /api/suppliers/delete/{} called", id);
-        Optional<Supplier> supplier = supplierService.deleteSupplierById(id);
-        if(supplier.isPresent())
-            return supplier.get();
-        else throw new DomainObjectDoesNotExistException("Supplier with id of " + id + " does not exist");
+        var supplierOpt = supplierService.getSupplierFromUid(id);
+        if(supplierOpt.isPresent()) {
+            var supplier = supplierOpt.get();
+            var deletedSupplier = supplierService.deleteSupplierById(supplier.getId());
+            return supplierMapper.deletedSupplierResponseFromSupplier(deletedSupplier.get());
+        }
+        else throw new ResourceNotFoundException("Supplier with id of " + id + " does not exist");
     }
 
     @PostConstruct

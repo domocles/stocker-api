@@ -147,7 +147,10 @@ class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
         given(purchaseOrderService.savePurchaseOrder(po3unsaved)).willReturn(po3saved);
 
         //act
-        ResponseEntity<PurchaseOrder> response = restTemplate.postForEntity("/api/purchase-order/create", po3unsaved, PurchaseOrder.class);
+        ResponseEntity<PurchaseOrder> response = restTemplate.postForEntity(
+                "/api/purchase-order/create",
+                po3unsaved,
+                PurchaseOrder.class);
 
         //assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
