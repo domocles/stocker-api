@@ -7,11 +7,9 @@ import com.eep.stocker.domain.AssemblyLine;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.services.AssemblyService;
 import com.eep.stocker.services.StockableProductService;
-import com.mysql.cj.x.protobuf.Mysqlx;
-import org.junit.Before;
-import org.junit.Test;
+import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,7 +28,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AssemblyControllerIntegrationTest {
     @Autowired
@@ -52,7 +49,7 @@ public class AssemblyControllerIntegrationTest {
     private AssemblyLine assemblyLine2;
     private AssemblyLine assemblyLine3;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MF220 = StockableProduct.builder()
                 .id(1L)

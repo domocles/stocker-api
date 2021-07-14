@@ -2,20 +2,19 @@ package com.eep.stocker.repository;
 
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.testdata.SupplierTestData;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @DataJpaTest
 public class ISupplierRepositoryTest extends SupplierTestData {
     @Autowired
@@ -28,7 +27,7 @@ public class ISupplierRepositoryTest extends SupplierTestData {
     private Supplier persistedShelleys;
     private Supplier persistedUkf;
 
-    @Before
+    @BeforeEach
     public void setup() {
         persistedSupplier = entityManager.persistFlushFind(supplier);
         persistedShelleys = entityManager.persistFlushFind(shelleys);

@@ -4,16 +4,12 @@ import com.eep.stocker.controllers.error.ErrorResponse;
 import com.eep.stocker.domain.PurchaseOrder;
 import com.eep.stocker.domain.PurchaseOrderLine;
 import com.eep.stocker.domain.StockableProduct;
-import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.services.PurchaseOrderLineService;
 import com.eep.stocker.services.PurchaseOrderService;
 import com.eep.stocker.services.StockableProductService;
 import com.eep.stocker.testdata.SupplierTestData;
-import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -23,7 +19,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 
 import java.util.*;
@@ -32,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
 
@@ -56,7 +50,7 @@ public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData
     private StockableProduct mf220;
     private StockableProduct MF286;
 
-    @Before
+    @BeforeEach
     public void setup() {
         po1 = new PurchaseOrder();
         po1.setId(1L);

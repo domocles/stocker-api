@@ -1,17 +1,13 @@
 package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
-import com.eep.stocker.controllers.error.exceptions.SupplierQuoteErrorException;
 import com.eep.stocker.domain.PurchaseOrder;
-import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.services.PurchaseOrderService;
 import com.eep.stocker.services.SupplierService;
 import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,7 +17,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
 
@@ -30,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
     @Autowired

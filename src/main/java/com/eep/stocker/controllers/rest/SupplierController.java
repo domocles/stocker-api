@@ -4,6 +4,7 @@ import com.eep.stocker.controllers.error.exceptions.DomainObjectAlreadyExistsExc
 import com.eep.stocker.controllers.error.exceptions.DomainObjectDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
 import com.eep.stocker.domain.Supplier;
+import com.eep.stocker.dto.supplier.GetAllSuppliersResponse;
 import com.eep.stocker.dto.supplier.GetSupplierResponse;
 import com.eep.stocker.dto.supplier.SupplierMapper;
 import com.eep.stocker.services.SupplierService;
@@ -19,14 +20,24 @@ import java.util.Optional;
 public class SupplierController {
     private static final Logger log = LoggerFactory.getLogger(SupplierController.class);
 
-    private SupplierService supplierService;
-    private SupplierMapper supplierMapper;
+    private final SupplierService supplierService;
+    private final SupplierMapper supplierMapper;
 
+    /***
+     * All param constructor for SupplierController
+     * @param supplierService
+     * @param supplierMapper
+     */
     public SupplierController(SupplierService supplierService, SupplierMapper supplierMapper) {
         this.supplierService = supplierService;
         this.supplierMapper = supplierMapper;
     }
 
+    /***
+     * Retrieves a specific supplier based on it's uid.
+     * @param id - the uid of the supplier
+     * @return - a GetSellerResponse which represents the supplier
+     */
     @GetMapping("/api/suppliers/get/{id}")
     public GetSupplierResponse getAllSuppliers(@PathVariable String id) {
         log.info("get: /api/suppliers/get/{} called", id);
@@ -35,10 +46,14 @@ public class SupplierController {
         return supplierMapper.getSupplierResponseFromSupplier(supplier);
     }
 
+    /***
+     * Retrieves all suppliers in the system
+     * @return a GetAllSuppliersResponse which contains all the suppliers in the system
+     */
     @GetMapping("/api/suppliers/get")
-    public List<Supplier> getAllSuppliers() {
+    public GetAllSuppliersResponse getAllSuppliers() {
         log.info("get: /api/suppliers/get called");
-        return supplierService.getAllSuppliers();
+        return supplierMapper.getAllSupplierResponseFromList(supplierService.getAllSuppliers());
     }
 
     @PostMapping(path = "/api/suppliers/create", produces = "application/json", consumes = "application/json")

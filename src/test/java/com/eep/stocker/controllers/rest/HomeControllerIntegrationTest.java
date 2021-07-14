@@ -6,9 +6,8 @@ import com.eep.stocker.dto.stockableproduct.UpdateStockableProductRequest;
 import com.eep.stocker.dto.stockableproduct.UpdateStockableProductResponse;
 import com.eep.stocker.services.StockableProductNoteService;
 import com.eep.stocker.services.StockableProductService;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,7 +17,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -28,7 +26,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class HomeControllerIntegrationTest {
 
@@ -49,7 +46,7 @@ public class HomeControllerIntegrationTest {
     private UpdateStockableProductRequest updateStockableProductRequest;
     private UpdateStockableProductResponse updateStockableProductResponse;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         MF220 = StockableProduct.builder()
                 .id(1L)
