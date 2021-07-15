@@ -23,20 +23,18 @@ public class ISupplierRepositoryTest extends SupplierTestData {
     @Autowired
     private TestEntityManager entityManager;
 
-    private Supplier persistedSupplier;
     private Supplier persistedShelleys;
     private Supplier persistedUkf;
 
     @BeforeEach
     public void setup() {
-        persistedSupplier = entityManager.persistFlushFind(supplier);
         persistedShelleys = entityManager.persistFlushFind(shelleys);
         persistedUkf = entityManager.persistFlushFind(ukf);
     }
 
     @Test
     public void findByUidTest() {
-        Optional<Supplier> testSupplier = repository.findByUid(supplier.getUid());
+        Optional<Supplier> testSupplier = repository.findByUid(shelleys.getUid());
         assertThat(testSupplier).isPresent();
     }
 }

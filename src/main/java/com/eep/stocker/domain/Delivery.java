@@ -4,7 +4,7 @@ import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,12 +26,11 @@ public class Delivery {
     @Builder.Default
     private UUID uid = UUID.randomUUID();
 
-    @Column(name = "delivery_supplier")
     @ManyToOne(fetch = FetchType.EAGER)
     private Supplier supplier;
 
     @Column(name = "delivery_date")
-    private Date deliveryDate;
+    private LocalDate deliveryDate;
 
     @Column(name = "delivery_reference")
     private String reference;

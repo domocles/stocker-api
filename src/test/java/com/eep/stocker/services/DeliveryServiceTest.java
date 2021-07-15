@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -83,10 +84,10 @@ class DeliveryServiceTest extends SupplierTestData {
 
     @Test
     void getAllDeliveriesByDatesTest() {
-        given(deliveryRepository.findAllByDeliveryDateBetween(any(Date.class), any(Date.class)))
+        given(deliveryRepository.findAllByDeliveryDateBetween(any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(Arrays.asList(delivery1, delivery2));
 
-        List<Delivery> dateDeliveries = deliveryService.getAllDeliveriesBetween(new Date(), new Date());
+        List<Delivery> dateDeliveries = deliveryService.getAllDeliveriesBetween(LocalDate.now(), LocalDate.now());
 
         assertThat(dateDeliveries.size()).isEqualTo(2);
     }

@@ -10,14 +10,14 @@ import java.util.Set;
 @Data
 @Builder
 public class CreateStockableProductRequest implements
-        StockableProductDTO.Name,
-        StockableProductDTO.Mpn,
-        StockableProductDTO.Description,
-        StockableProductDTO.Category,
-        StockableProductDTO.Units,
-        StockableProductDTO.Tags,
-        StockableProductDTO.StockPrice,
-        StockableProductDTO.InStock {
+        IStockableProductDTO.Name,
+        IStockableProductDTO.Mpn,
+        IStockableProductDTO.Description,
+        IStockableProductDTO.Category,
+        IStockableProductDTO.Units,
+        IStockableProductDTO.Tags,
+        IStockableProductDTO.StockPrice,
+        IStockableProductDTO.InStock {
     private String name;
     private String mpn;
     private String description;

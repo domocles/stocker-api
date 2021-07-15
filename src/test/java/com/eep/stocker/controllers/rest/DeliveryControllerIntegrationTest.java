@@ -18,6 +18,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -90,7 +91,7 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
 
     @Test
     void getDeliveriesBetweenTest() {
-        given(deliveryService.getAllDeliveriesBetween(any(Date.class), any(Date.class)))
+        given(deliveryService.getAllDeliveriesBetween(any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(Arrays.asList(delivery1, delivery2));
 
         ResponseEntity<List<Delivery>> response = restTemplate.exchange("/api/delivery/2017-01-15/2019-09-10",

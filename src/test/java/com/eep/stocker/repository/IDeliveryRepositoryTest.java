@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -107,15 +108,11 @@ class IDeliveryRepositoryTest {
 
     @Test
     void findAllDeliveriesByDate() {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        cal.add(Calendar.DATE, -14);
-        Date twoWeeksAgo = cal.getTime();
-        cal.add(Calendar.DATE, 7);
-        Date oneWeekAgo = cal.getTime();
+        LocalDate twoWeeksAgo = LocalDate.now().minusWeeks(2);
+        LocalDate oneWeekAgo = LocalDate.now().minusWeeks(1);
 
-        delivery1.setDeliveryDate(twoWeeksAgo);
-        delivery2.setDeliveryDate(oneWeekAgo);
+        delivery1.setDeliveryDate(LocalDate.now().minusDays(14));
+        delivery2.setDeliveryDate(LocalDate.now().minusDays(7));
 
         shelleys = entityManager.persistFlushFind(shelleys);
         ukf = entityManager.persistAndFlush(ukf);

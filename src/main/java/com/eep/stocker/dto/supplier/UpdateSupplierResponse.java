@@ -5,11 +5,11 @@ import lombok.Data;
 
 @Data
 @Builder
-public class UpdateSupplierResponse implements SupplierDTO.Id,
-        SupplierDTO.SupplierName,
-        SupplierDTO.DefaultCurrency,
-        SupplierDTO.EmailAddress,
-        SupplierDTO.TelephoneNumber {
+public class UpdateSupplierResponse implements ISupplierDTO.Id,
+        ISupplierDTO.SupplierName,
+        ISupplierDTO.DefaultCurrency,
+        ISupplierDTO.EmailAddress,
+        ISupplierDTO.TelephoneNumber {
     private String id;
     private String supplierName;
     private String defaultCurrency;

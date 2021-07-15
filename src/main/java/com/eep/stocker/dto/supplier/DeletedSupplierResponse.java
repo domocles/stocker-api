@@ -5,10 +5,10 @@ import lombok.Data;
 
 @Data
 @Builder
-public class DeletedSupplierResponse implements SupplierDTO.SupplierName,
-        SupplierDTO.DefaultCurrency,
-        SupplierDTO.EmailAddress,
-        SupplierDTO.TelephoneNumber {
+public class DeletedSupplierResponse implements ISupplierDTO.SupplierName,
+        ISupplierDTO.DefaultCurrency,
+        ISupplierDTO.EmailAddress,
+        ISupplierDTO.TelephoneNumber {
     private String supplierName;
     private String defaultCurrency;
     private String emailAddress;

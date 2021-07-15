@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,7 @@ public class DeliveryService {
         return deliveryRepository.findAllBySupplier(supplier);
     }
 
-    public List<Delivery> getAllDeliveriesBetween(Date from, Date to) {
+    public List<Delivery> getAllDeliveriesBetween(LocalDate from, LocalDate to) {
         log.info("GetAllDeliveriesForBetween - {} to {} called", from,  to);
         return deliveryRepository.findAllByDeliveryDateBetween(from, to);
     }

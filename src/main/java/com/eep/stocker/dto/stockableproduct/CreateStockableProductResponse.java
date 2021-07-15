@@ -9,15 +9,15 @@ import java.util.Set;
 
 @Data
 @Builder
-public class CreateStockableProductResponse implements StockableProductDTO.Id,
-        StockableProductDTO.Name,
-        StockableProductDTO.Mpn,
-        StockableProductDTO.Description,
-        StockableProductDTO.Category,
-        StockableProductDTO.Units,
-        StockableProductDTO.Tags,
-        StockableProductDTO.StockPrice,
-        StockableProductDTO.InStock {
+public class CreateStockableProductResponse implements IStockableProductDTO.Id,
+        IStockableProductDTO.Name,
+        IStockableProductDTO.Mpn,
+        IStockableProductDTO.Description,
+        IStockableProductDTO.Category,
+        IStockableProductDTO.Units,
+        IStockableProductDTO.Tags,
+        IStockableProductDTO.StockPrice,
+        IStockableProductDTO.InStock {
     private String id;
     private String name;
     private String mpn;

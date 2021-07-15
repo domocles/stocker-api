@@ -3,7 +3,7 @@ package com.eep.stocker.dto.stockableproduct;
 import java.math.BigDecimal;
 import java.util.Set;
 
-public interface StockableProductDTO {
+public interface IStockableProductDTO {
     interface Name{ String getName(); }
     interface Mpn{ String getMpn(); }
     interface Id{ String getId(); }

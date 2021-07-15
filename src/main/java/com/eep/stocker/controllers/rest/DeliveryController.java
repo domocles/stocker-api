@@ -12,7 +12,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,8 +48,8 @@ public class DeliveryController {
     }
 
     @GetMapping("/api/delivery/{fromDate}/{toDate}")
-    public List<Delivery> getAllDeliveriesBetween(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date fromDate,
-                                                  @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date toDate) {
+    public List<Delivery> getAllDeliveriesBetween(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                                                  @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         log.info("get: /api/delivery/{}/{} called", fromDate, toDate);
         return deliveryService.getAllDeliveriesBetween(fromDate, toDate);
     }

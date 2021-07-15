@@ -79,7 +79,7 @@ public class StockerExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(SupplierDoesNotExistException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public final ResponseEntity<ErrorResponse> handleSupplierNotFound(RecordNotFoundException ex) {
+    public final ResponseEntity<ErrorResponse> handleSupplierNotFound(SupplierDoesNotExistException ex) {
         List<String> details = new ArrayList<>();
         details.add(ex.getLocalizedMessage());
         ErrorResponse error = new ErrorResponse(BAD_REQUEST, details);

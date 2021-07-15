@@ -36,11 +36,11 @@ abstract public class SupplierTestData {
                 .build();
 
         ukf = Supplier.builder()
-            .supplierName("UKF Ltd")
-            .defaultCurrency("GBP")
-            .emailAddress("sales@ukf-group.com")
-            .telephoneNumber("01527 578686")
-            .build();
+                .supplierName("UKF Ltd")
+                .defaultCurrency("GBP")
+                .emailAddress("sales@ukf-group.com")
+                .telephoneNumber("01527 578686")
+                .build();
 
         getSupplierResponse = GetSupplierResponse.builder()
                 .id(supplier.getUid().toString())
