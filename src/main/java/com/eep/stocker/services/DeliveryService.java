@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DeliveryService {
@@ -43,6 +44,11 @@ public class DeliveryService {
         return deliveryRepository.findById(id);
     }
 
+    public Optional<Delivery> getDeliveryByUid(String uid) {
+        log.info("GetDeliveryByUid - {} called", uid);
+        return deliveryRepository.findByUid(UUID.fromString(uid));
+    }
+
     public Delivery saveDelivery(Delivery delivery) {
         log.info("SaveDelivery called");
         return deliveryRepository.save(delivery);
@@ -52,4 +58,6 @@ public class DeliveryService {
         log.info("DeleteDelivery called");
         deliveryRepository.delete(delivery);
     }
+
+
 }

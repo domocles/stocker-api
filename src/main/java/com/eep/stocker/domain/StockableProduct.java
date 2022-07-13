@@ -1,6 +1,7 @@
 package com.eep.stocker.domain;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -14,20 +15,12 @@ import java.util.*;
  */
 @Entity(name="StockableProduct")
 @Table(name="stockable_product")
-@Builder(toBuilder = true)
-@Getter
-@Setter
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class StockableProduct {
-
-    /***
-     * Database ID of the StockableProduct
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "stockable_product_id")
-    private Long id;
+@Getter
+@Setter
+public class StockableProduct extends AbstractEntity {
 
     /***
      * The product name of the stockable product e.g. 51mm x 152mm Ilok Flex
@@ -41,14 +34,6 @@ public class StockableProduct {
      */
     @Column(unique = true, name = "stockable_product_mpn")
     private String mpn;
-
-    /***
-     * The universally unique id of the stockable product
-     */
-    @NaturalId
-    @Column(name = "stockable_product_uid")
-    @Builder.Default //lombok
-    private UUID uid = UUID.randomUUID();
 
     /***
      * Description of the stockable products e.g. 'An ilok lined flex with a bore of 51mm and an

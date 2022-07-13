@@ -16,6 +16,15 @@ class DeliveryMapperTest {
     void deliveryToDeliveryDTO() {
         var dto = mapper.deliveryToDeliveryDTO(delivery1);
 
-        assertThat(dto.getSupplier().getSupplierName()).isEqualTo(delivery1.getSupplier().getSupplierName());
+        assertThat(dto).isEqualTo(deliveryDTO);
+        assertThat(dto.getSupplier()).isEqualTo(supplierDTO);
+    }
+
+    @Test
+    void deliveryToGetDeliveryResponse() {
+        var dto = mapper.deliveryToGetDeliveryResponse(delivery1);
+
+        assertThat(dto).isEqualTo(getDeliveryResponse);
+        assertThat(dto.getSupplier()).isEqualTo(supplierDTO);
     }
 }

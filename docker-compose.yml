@@ -12,7 +12,7 @@ services:
       - MYSQL_USER=eep
       - MYSQL_PASSWORD=YzB3UC1t1XrF
     ports:
-      - 3306:3306
+      - 33061:3306
     networks:
       - stocker-network
   stocker:

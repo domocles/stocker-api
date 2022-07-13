@@ -2,6 +2,8 @@ package com.eep.stocker.repository;
 
 import com.eep.stocker.domain.Delivery;
 import com.eep.stocker.domain.Supplier;
+
+import com.eep.stocker.testdata.DeliveryTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,11 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,42 +28,49 @@ class IDeliveryRepositoryTest {
     @Autowired
     private TestEntityManager entityManager;
 
-    Supplier shelleys;
-    Supplier ukf;
-    Delivery delivery1;
-    Delivery delivery2;
-    Delivery delivery3;
+    private Supplier shelleys;
+    private Supplier ukf;
+    private Delivery delivery1;
+    private Delivery delivery2;
+    private Delivery delivery3;
 
     @BeforeEach
-    private void initialize(){
-        shelleys = new Supplier();
-        //shelleys.setId(1L);
-        shelleys.setSupplierName("Shelley Parts Ltd");
-        shelleys.setDefaultCurrency("GBP");
-        shelleys.setEmailAddress("jon.horton@shelleyparts.co.uk");
-        shelleys.setTelephoneNumber("01384 956541");
-
-        ukf = new Supplier();
-        ukf.setSupplierName("UKF Ltd");
-        ukf.setDefaultCurrency("GBP");
-        ukf.setEmailAddress("sales@ukf-group.com");
-        ukf.setTelephoneNumber("01527 578686");
-
-        delivery1 = new Delivery();
-        delivery1.setSupplier(shelleys);
-        delivery1.setReference("12345");
-        delivery1.setNote("Last minute delivery");
-
-        delivery2 = new Delivery();
-        delivery2.setSupplier(ukf);
-        delivery2.setReference("12345");
-        delivery2.setNote("Last minute delivery 2");
-
-        delivery3 = new Delivery();
-        delivery3.setSupplier(shelleys);
-        delivery3.setReference("12345");
-        delivery3.setNote("Last minute delivery 3");
-
+    void setup() {
+        shelleys = Supplier.builder()
+                //.id(1L)
+                .supplierName("Shelley Parts Ltd")
+                .defaultCurrency("GBP")
+                .emailAddress("jon.horton@shelleyparts.co.uk")
+                .telephoneNumber("01527 584285")
+                .build();
+        ukf = Supplier.builder()
+                //.id(2L)
+                .supplierName("UKF Ltd")
+                .defaultCurrency("GBP")
+                .emailAddress("sales@ukf-group.com")
+                .telephoneNumber("01527 578686")
+                .build();
+        delivery1 = Delivery.builder()
+                //.id(1L)
+                .deliveryDate(LocalDate.of(2021, 07, 15))
+                .reference("testdelivery")
+                .note("A test delivery")
+                .supplier(shelleys)
+                .build();
+        delivery2 = Delivery.builder()
+                //.id(2L)
+                .deliveryDate(LocalDate.of(2021, 05, 15))
+                .reference("testdelivery2")
+                .note("A second test delivery")
+                .supplier(ukf)
+                .build();
+        delivery3 = Delivery.builder()
+                //.id(3L)
+                .deliveryDate(LocalDate.of(2021, 8, 15))
+                .reference("testdelivery3")
+                .note("A third test delivery")
+                .supplier(ukf)
+                .build();
     }
 
     @Test
@@ -74,6 +80,18 @@ class IDeliveryRepositoryTest {
         delivery1 = entityManager.persistAndFlush(delivery1);
 
         Optional<Delivery> testDelivery = repository.findById(delivery1.getId());
+
+        assertThat(testDelivery.isPresent()).isTrue();
+        assertThat(shelleys.getId()).isGreaterThan(0);
+    }
+
+    @Test
+    void getDeliveryByUidTest() {
+        shelleys = entityManager.persistFlushFind(shelleys);
+        ukf = entityManager.persistAndFlush(ukf);
+        delivery1 = entityManager.persistAndFlush(delivery1);
+
+        Optional<Delivery> testDelivery = repository.findByUid(delivery1.getUid());
 
         assertThat(testDelivery.isPresent()).isTrue();
         assertThat(shelleys.getId()).isGreaterThan(0);
@@ -95,12 +113,12 @@ class IDeliveryRepositoryTest {
 
     @Test
     void findAllBySupplierTest() {
-        shelleys = entityManager.persistFlushFind(shelleys);
-        ukf = entityManager.persistAndFlush(ukf);
-        delivery1 = entityManager.persistAndFlush(delivery1);
-        delivery2 = entityManager.persistAndFlush(delivery2);
+        Supplier persistedShelleys = entityManager.persistFlushFind(shelleys);
+        Supplier persistedUkf = entityManager.persistAndFlush(ukf);
+        Delivery persistedDelivery1 = entityManager.persistAndFlush(delivery1);
+        Delivery persistedDelivery2 = entityManager.persistAndFlush(delivery2);
 
-        List<Delivery> allDeliveries = repository.findAllBySupplier(shelleys);
+        List<Delivery> allDeliveries = repository.findAllBySupplier(persistedShelleys);
 
         assertThat(allDeliveries.size()).isEqualTo(1);
         assertThat(allDeliveries).contains(delivery1);

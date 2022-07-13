@@ -49,7 +49,7 @@ public class HomeController {
         log.info("get: /api/stockable-products/get/{} called", id);
         Optional<StockableProduct> stockableProductOpt = stockableProductService.getStockableProductByUid(id);
         StockableProduct stockableProduct = stockableProductOpt.orElseThrow(()
-                -> new RecordNotFoundException("Material ID: '" + id + "' does not exist"));
+                -> new RecordNotFoundException("Stockable Product ID: '" + id + "' does not exist"));
         return stockableProductMapper.stockableProductResponseFromStockableProduct(stockableProduct);
     }
 
