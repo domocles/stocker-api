@@ -3,6 +3,7 @@ package com.eep.stocker.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,7 +13,7 @@ class PurchaseOrderTest {
     Supplier shelleys;
     Supplier ukf;
     PurchaseOrder purchaseOrder;
-    Date theDate;
+    LocalDate theDate;
 
     @BeforeEach
     void setup() {
@@ -30,9 +31,9 @@ class PurchaseOrderTest {
         ukf.setDefaultCurrency("GBP");
         ukf.setSupplierName("UKF Tube Ltd");
 
-        theDate = new Date();
+        theDate = LocalDate.now();
 
-        purchaseOrder = new PurchaseOrder("REF1", shelleys, theDate, Status.OPEN);
+        purchaseOrder = new PurchaseOrder("REF1", "SUPPLIERREF", shelleys, theDate, Status.OPEN);
         purchaseOrder.setId(12L);
     }
 
@@ -79,7 +80,7 @@ class PurchaseOrderTest {
 
     @Test
     void setPurchaseOrderDate() {
-        Date newDate = new Date();
+        LocalDate newDate = LocalDate.now();
         assertThat(purchaseOrder.getPurchaseOrderDate()).isEqualTo(theDate);
         purchaseOrder.setPurchaseOrderDate(newDate);
         assertThat(purchaseOrder.getPurchaseOrderDate()).isEqualTo(newDate);

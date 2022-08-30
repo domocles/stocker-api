@@ -70,13 +70,13 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         po1.setId(1L);
         po1.setSupplier(shelleys);
         po1.setPurchaseOrderReference("PO-001");
-        po1.setPurchaseOrderDate(new Date());
+        po1.setPurchaseOrderDate(LocalDate.now());
 
         po2 = new PurchaseOrder();
         po2.setId(2L);
         po2.setSupplier(shelleys);
         po2.setPurchaseOrderReference("PO-002");
-        po2.setPurchaseOrderDate(new Date());
+        po2.setPurchaseOrderDate(LocalDate.now());
 
         mf220 = StockableProduct.builder()
                 .id(1L)
@@ -206,7 +206,8 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         ResponseEntity<List<DeliveryLine>> response = restTemplate.exchange("/api/delivery-line/get",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<DeliveryLine>>() { });
+                new ParameterizedTypeReference<>() {
+                });
 
         //assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -222,7 +223,8 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         ResponseEntity<List<DeliveryLine>> response = restTemplate.exchange("/api/delivery-line/get/supplier/1",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<DeliveryLine>>() { });
+                new ParameterizedTypeReference<>() {
+                });
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains(deliveryLine1, deliveryLine2);
@@ -237,7 +239,8 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         ResponseEntity<List<DeliveryLine>> response = restTemplate.exchange("/api/delivery-line/get/stockable-product/4",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<DeliveryLine>>() {});
+                new ParameterizedTypeReference<>() {
+                });
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains(deliveryLine1, deliveryLine3);
@@ -252,7 +255,8 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         ResponseEntity<List<DeliveryLine>> response = restTemplate.exchange("/api/delivery-line/get/purchase-order/3",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<DeliveryLine>>() {});
+                new ParameterizedTypeReference<>() {
+                });
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).contains(deliveryLine1, deliveryLine3);

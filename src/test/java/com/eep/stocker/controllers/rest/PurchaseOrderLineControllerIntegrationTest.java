@@ -21,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,13 +57,13 @@ public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData
         po1.setId(1L);
         po1.setSupplier(supplier);
         po1.setPurchaseOrderReference("PO-001");
-        po1.setPurchaseOrderDate(new Date());
+        po1.setPurchaseOrderDate(LocalDate.now());
 
         po2 = new PurchaseOrder();
         po2.setId(2L);
         po2.setSupplier(supplier);
         po2.setPurchaseOrderReference("PO-002");
-        po2.setPurchaseOrderDate(new Date());
+        po2.setPurchaseOrderDate(LocalDate.now());
 
         mf220 = StockableProduct.builder()
                 .id(1L)
@@ -120,7 +121,8 @@ public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData
         ResponseEntity<List<PurchaseOrderLine>> response = restTemplate.exchange("/api/purchase-order-line/get",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<PurchaseOrderLine>>(){});
+                new ParameterizedTypeReference<>() {
+                });
 
         //assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -142,7 +144,8 @@ public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData
         ResponseEntity<List<PurchaseOrderLine>> response = restTemplate.exchange("/api/purchase-order-line/get/product/1",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<PurchaseOrderLine>>() { });
+                new ParameterizedTypeReference<>() {
+                });
 
         //assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -177,7 +180,8 @@ public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData
         ResponseEntity<List<PurchaseOrderLine>> response = restTemplate.exchange("/api/purchase-order-line/get/purchase-order/1",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<PurchaseOrderLine>>() { });
+                new ParameterizedTypeReference<>() {
+                });
 
         //assert
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -207,7 +211,7 @@ public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData
                 unsavedPoLine1, PurchaseOrderLine.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getId()).isNotNull();
+        assertThat(Objects.requireNonNull(response.getBody()).getId()).isNotNull();
         assertThat(response.getBody()).isEqualTo(poLine1);
     }
 

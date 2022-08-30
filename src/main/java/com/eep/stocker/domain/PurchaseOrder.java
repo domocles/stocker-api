@@ -1,76 +1,55 @@
 package com.eep.stocker.domain;
 
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.NaturalId;
+
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
+/***
+ * The Purchase Order - represents an order for several products which can be purchased
+ */
 @Entity(name = "purchaseorder")
 @Table(name = "purchase_order")
-public class PurchaseOrder {
+@SuperBuilder(toBuilder = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PurchaseOrder extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "purchase_order_id")
-    private Long id;
-
+    /***
+     * The purchase order reference of the purchase order e.g. PO00001
+     */
+    @NaturalId
     private String purchaseOrderReference;
 
+    /***
+     * The supplier order reference for the purchase order which will be different to our purchase order reference
+     */
+    private String supplierOrderReference;
+
+    /***
+     * Supplier of the purchase order e.g. UKF
+     */
     @ManyToOne(fetch = FetchType.EAGER)
     private Supplier supplier;
 
-    private Date purchaseOrderDate;
+    /***
+     * The date the purchase order was made
+     */
+    private LocalDate purchaseOrderDate;
 
+    /***
+     * The status of the purchase order
+     */
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Status status = Status.OPEN;
 
-    public PurchaseOrder() {}
-
-    public PurchaseOrder(String purchaseOrderReference, Supplier supplier, Date purchaseOrderDate, Status status) {
-        this.purchaseOrderReference = purchaseOrderReference;
-        this.supplier = supplier;
-        this.purchaseOrderDate = purchaseOrderDate;
-        this.status = status;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getPurchaseOrderReference() {
-        return purchaseOrderReference;
-    }
-
-    public void setPurchaseOrderReference(String purchaseOrderReference) {
-        this.purchaseOrderReference = purchaseOrderReference;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
-    }
-
-    public Date getPurchaseOrderDate() {
-        return purchaseOrderDate;
-    }
-
-    public void setPurchaseOrderDate(Date purchaseOrderDate) {
-        this.purchaseOrderDate = purchaseOrderDate;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
 
     @Override
     public boolean equals(Object o) {

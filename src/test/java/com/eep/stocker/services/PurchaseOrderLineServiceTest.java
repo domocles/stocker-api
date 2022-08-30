@@ -3,11 +3,8 @@ package com.eep.stocker.services;
 import com.eep.stocker.domain.PurchaseOrder;
 import com.eep.stocker.domain.PurchaseOrderLine;
 import com.eep.stocker.domain.StockableProduct;
-import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.repository.IDeliveryLineRepository;
 import com.eep.stocker.repository.IPurchaseOrderLineRepository;
-import com.eep.stocker.repository.IStockTransactionRepository;
-import com.eep.stocker.repository.IStockableProductRepository;
 import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,13 +12,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -44,20 +38,20 @@ class PurchaseOrderLineServiceTest extends SupplierTestData {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         purchaseOrderLineService = new PurchaseOrderLineService(purchaseOrderLineRepository, deliveryLineRepository);
 
         po1 = new PurchaseOrder();
         po1.setId(1L);
         po1.setSupplier(supplier);
         po1.setPurchaseOrderReference("PO-001");
-        po1.setPurchaseOrderDate(new Date());
+        po1.setPurchaseOrderDate(LocalDate.now());
 
         po2 = new PurchaseOrder();
         po2.setId(2L);
         po2.setSupplier(supplier);
         po2.setPurchaseOrderReference("PO-002");
-        po2.setPurchaseOrderDate(new Date());
+        po2.setPurchaseOrderDate(LocalDate.now());
 
         mf220 = StockableProduct.builder()
                 .id(1L)

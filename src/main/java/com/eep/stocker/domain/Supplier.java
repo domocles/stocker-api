@@ -5,6 +5,7 @@ import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Supplier {
+public class Supplier implements Serializable {
     /***
      * Database ID of the supplier
      */

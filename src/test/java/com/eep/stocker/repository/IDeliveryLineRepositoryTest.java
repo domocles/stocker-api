@@ -52,13 +52,13 @@ class IDeliveryLineRepositoryTest extends SupplierTestData {
         //po1.setId(1L);
         po1.setSupplier(shelleys);
         po1.setPurchaseOrderReference("PO-001");
-        po1.setPurchaseOrderDate(new Date());
+        po1.setPurchaseOrderDate(LocalDate.now());
 
         po2 = new PurchaseOrder();
         //po2.setId(2L);
         po2.setSupplier(shelleys);
         po2.setPurchaseOrderReference("PO-002");
-        po2.setPurchaseOrderDate(new Date());
+        po2.setPurchaseOrderDate(LocalDate.now());
 
         mf220 = StockableProduct.builder()
                 .name("MF220")
