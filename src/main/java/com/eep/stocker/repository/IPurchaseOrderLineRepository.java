@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface IPurchaseOrderLineRepository extends CrudRepository<PurchaseOrderLine, Long> {
     List<PurchaseOrderLine> findAll();
     List<PurchaseOrderLine> findAllByStockableProduct(StockableProduct stockableProduct);
-
     List<PurchaseOrderLine> findAllByPurchaseOrder(PurchaseOrder purchaseOrder);
+
+    Optional<PurchaseOrderLine> findByUid(String uid);
 }

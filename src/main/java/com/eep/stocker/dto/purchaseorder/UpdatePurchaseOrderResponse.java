@@ -1,4 +1,4 @@
 package com.eep.stocker.dto.purchaseorder;
 
-public class UpdatePurchaseOrderResponse extends GetPurchaseOrderResponse{
+public class UpdatePurchaseOrderResponse extends GetPurchaseOrderHighDetailResponse {
 }

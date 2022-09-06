@@ -14,9 +14,12 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 class PurchaseOrderLineServiceTest extends SupplierTestData {
@@ -99,6 +102,17 @@ class PurchaseOrderLineServiceTest extends SupplierTestData {
 
     @AfterEach
     void tearDown() {
+    }
+
+    @Test
+    void getPurchaseOrderLineByUidTest() {
+        given(purchaseOrderLineRepository.findByUid(anyString())).willReturn(Optional.of(poLine1));
+
+        var orderLine = purchaseOrderLineService.getPurchaseOrderLineByUid(poLine1.getUid().toString());
+
+        assertAll(
+                () -> assertThat(orderLine).contains(poLine1)
+        );
     }
 
     @Test

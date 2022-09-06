@@ -1,112 +1,70 @@
 package com.eep.stocker.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.Objects;
 
+/***
+ * The purchase order line - represents an order line e.g. what product is it for and how much will it cost
+ *
+ * @author Sam Burns
+ * @version 1.0
+ * 30/08/2022
+ */
 @Entity(name ="purchaseorderline")
 @Table(name ="purchase_order_line")
-public class PurchaseOrderLine {
+@SuperBuilder(toBuilder = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class PurchaseOrderLine extends AbstractEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "purchase_order_line_id")
-    private Long id;
-
+    /***
+     * The purchase order that this belongs to
+     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "purchase_order_id")
     private PurchaseOrder purchaseOrder;
 
+    /***
+     * The stockable product that this order line is for
+     */
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "stockable_product_id")
     private StockableProduct stockableProduct;
 
+    /***
+     * Is this order line still active, should be set to closed once the final delivery has been made
+     */
     @Enumerated(EnumType.STRING)
     private Status status = Status.OPEN;
 
+    /***
+     * The amount of stockable product on order
+     */
     private Double qty;
+
+    /***
+     * The balance of product that is due to be delivered
+     */
     private Double balance;
+
+    /***
+     * The price of the stockable product
+     */
     private Double price;
+
+    /***
+     * A note for the line, any extra information that is required for the order
+     */
     private String note;
 
-    public PurchaseOrderLine() {}
-
-    public PurchaseOrderLine(Long id, PurchaseOrder purchaseOrder, StockableProduct stockableProduct, Double qty, Double price,
-                             String note, Status status) {
-        this.id = id;
-        this.purchaseOrder = purchaseOrder;
-        this.stockableProduct = stockableProduct;
-        this.qty = qty;
-        this.price = price;
-        this.note = note;
-        this.status = status;
-        this.balance = qty;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public PurchaseOrder getPurchaseOrder() {
-        return purchaseOrder;
-    }
-
-    public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
-        this.purchaseOrder = purchaseOrder;
-    }
-
-    public StockableProduct getStockableProduct() {
-        return stockableProduct;
-    }
-
-    public void setStockableProduct(StockableProduct stockableProduct) {
-        this.stockableProduct = stockableProduct;
-    }
-
-    public Double getQty() {
-        return qty;
-    }
-
-    public void setQty(Double qty) {
-        this.qty = qty;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    public Double getBalance() {
-        return balance;
-    }
-
-    public void setBalance(Double balance) {
-        this.balance = balance;
-    }
 
     @Override
     public boolean equals(Object o) {

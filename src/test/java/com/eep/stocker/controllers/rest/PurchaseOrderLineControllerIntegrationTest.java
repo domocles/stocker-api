@@ -4,9 +4,9 @@ import com.eep.stocker.controllers.error.ErrorResponse;
 import com.eep.stocker.domain.PurchaseOrder;
 import com.eep.stocker.domain.PurchaseOrderLine;
 import com.eep.stocker.domain.StockableProduct;
-import com.eep.stocker.services.PurchaseOrderLineService;
-import com.eep.stocker.services.PurchaseOrderService;
-import com.eep.stocker.services.StockableProductService;
+import com.eep.stocker.domain.Supplier;
+import com.eep.stocker.dto.purchaseorderline.*;
+import com.eep.stocker.services.*;
 import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,14 +25,19 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
+class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
 
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private PurchaseOrderLineMapper mapper;
 
     @MockBean
     private PurchaseOrderLineService purchaseOrderLineService;
@@ -42,6 +47,12 @@ public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData
 
     @MockBean
     private StockableProductService stockableProductService;
+
+    @MockBean
+    private DeliveryLineService deliveryLineService;
+
+    @MockBean
+    private SupplierService supplierService;
 
     private PurchaseOrder po1;
     private PurchaseOrder po2;
@@ -112,89 +123,119 @@ public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData
     }
 
     @Test
-    public void getAllPurchaseOrderLinesTest() {
-        //ammend
+    void getPurchaseOrderLineByUidTest() {
+        given(purchaseOrderLineService.getPurchaseOrderLineByUid(anyString())).willReturn(Optional.of(poLine1));
+
+        ResponseEntity<GetPurchaseOrderLineResponse> response = restTemplate.exchange(
+                "/api/purchase-order-line/" + poLine1.getUid().toString(),
+                HttpMethod.GET,
+                null,
+                GetPurchaseOrderLineResponse.class
+        );
+
+        var res = mapper.mapToGetResponse(poLine1);
+
+        assertAll(
+                () -> assertThat(response.getBody()).isEqualTo(res)
+        );
+    }
+
+    @Test
+    void getAllPurchaseOrderLinesTest() {
+        //amend
         given(purchaseOrderLineService.getAllPurchaseOrderLines()).willReturn(Arrays.asList(poLine1, poLine2));
 
 
         //act
-        ResponseEntity<List<PurchaseOrderLine>> response = restTemplate.exchange("/api/purchase-order-line/get",
+        ResponseEntity<GetAllPurchaseOrderLinesResponse> response = restTemplate.exchange("/api/purchase-order-line/",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<>() {
-                });
+                GetAllPurchaseOrderLinesResponse.class);
+
+        var testLine1 = mapper.mapToGetLowDetailResponse(poLine1);
+        var testLine2 = mapper.mapToGetLowDetailResponse(poLine2);
 
         //assert
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).contains(poLine1);
-        assertThat(response.getBody()).contains(poLine2);
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull(),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getAllPurchaseOrderLines()).contains(testLine1, testLine2)
+        );
     }
 
     @Test
-    public void getAllPurchaseOrderLinesForProductTest() {
+    void getAllPurchaseOrderLinesForProductTest() {
         //ammend
         Optional<StockableProduct> product = Optional.of(MF286);
-        given(stockableProductService.getStockableProductByID(any(Long.class))).willReturn(product);
+        given(stockableProductService.getStockableProductByUid(anyString())).willReturn(product);
         List<PurchaseOrderLine> lines = Arrays.asList(poLine1, poLine2);
         given(purchaseOrderLineService.getAllPurchaseOrderLinesForProduct(any(StockableProduct.class)))
                 .willReturn(lines);
 
         //act
-        ResponseEntity<List<PurchaseOrderLine>> response = restTemplate.exchange("/api/purchase-order-line/get/product/1",
+        ResponseEntity<GetPurchaseOrderLinesByProductResponse> response = restTemplate.exchange("/api/purchase-order-line/product/" + MF286.getUid(),
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<>() {
-                });
+                GetPurchaseOrderLinesByProductResponse.class);
+
+        var testOrderLine1 = mapper.mapToGetLowDetailResponse(poLine1);
+        var testOrderLine2 = mapper.mapToGetLowDetailResponse(poLine2);
 
         //assert
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains(poLine1);
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getAllPurchaseOrderLines()).contains(testOrderLine1, testOrderLine2)
+        );
     }
 
     @Test
-    public void getAllPurchaseOrderLinesForNonexistantProductThrowsNonexistantProductExceptionTest() {
+    void getAllPurchaseOrderLinesForNonexistantProductThrowsNonexistantProductExceptionTest() {
         //ammend
         given(stockableProductService.getStockableProductByID(any(Long.class))).willReturn(Optional.empty());
 
         //act
-        ResponseEntity<ErrorResponse> response = restTemplate.exchange("/api/purchase-order-line/get/product/1",
+        ResponseEntity<ErrorResponse> response = restTemplate.exchange("/api/purchase-order-line/product/" + MF286.getUid(),
                 HttpMethod.GET,
                 null,
                 ErrorResponse.class);
 
         //assert
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getDetails().get(0)).isEqualTo("Stockable product with ID of 1 does not exist");
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody()).isNotNull(),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getDetails().get(0)).isEqualTo(String.format("Stockable product with id of %s, does not exist", MF286.getUid()))
+        );
     }
 
     @Test
-    public void getAllPurchaseOrderLinesForPurchaseOrderTest() {
+    void getAllPurchaseOrderLinesForPurchaseOrderTest() {
         //ammend
-        given(purchaseOrderService.getPurchaseOrderFromId(any(Long.class))).willReturn(Optional.of(po1));
+        given(purchaseOrderService.getPurchaseOrderFromUid(any(UUID.class))).willReturn(Optional.of(po1));
         given(purchaseOrderLineService.getAllPurchaseOrderLinesForPurchaseOrder(any(PurchaseOrder.class)))
                 .willReturn(Arrays.asList(poLine1, poLine2));
 
         //act
-        ResponseEntity<List<PurchaseOrderLine>> response = restTemplate.exchange("/api/purchase-order-line/get/purchase-order/1",
+        ResponseEntity<GetPurchaseOrderLinesByPurchaseOrderResponse> response = restTemplate.exchange("/api/purchase-order-line/purchase-order/" + po1.getUid(),
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<>() {
-                });
+                GetPurchaseOrderLinesByPurchaseOrderResponse.class);
+
+        var testLine = mapper.mapToGetLowDetailResponse(poLine1);
 
         //assert
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).contains(poLine1);
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getAllPurchaseOrderLines()).contains(testLine)
+        );
     }
 
     @Test
-    public void getAllPurchaseOrderLinesForPurchaseOrderThrowsNonExistantPurchaseOrderTest() {
+    void getAllPurchaseOrderLinesForPurchaseOrderThrowsNonExistantPurchaseOrderTest() {
         //ammend
-        given(purchaseOrderService.getPurchaseOrderFromId(any(Long.class))).willReturn(Optional.empty());
+        given(purchaseOrderService.getPurchaseOrderFromUid(any(UUID.class))).willReturn(Optional.empty());
 
         //act
-        ResponseEntity<ErrorResponse> response = restTemplate.exchange("/api/purchase-order-line/get/purchase-order/1",
+        ResponseEntity<ErrorResponse> response = restTemplate.exchange("/api/purchase-order-line/purchase-order/"+po1.getUid(),
                 HttpMethod.GET,
                 null,
                 ErrorResponse.class);
@@ -204,36 +245,101 @@ public class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData
     }
 
     @Test
-    public void savePurchaseOrderLineTest() {
-        given(purchaseOrderLineService.savePurchaseOrderLine(any(PurchaseOrderLine.class))).willReturn(poLine1);
+    void getBalanceOfPurchaseOrderLineTest() {
+        given(purchaseOrderLineService.getPurchaseOrderLineByUid(anyString())).willReturn(Optional.of(poLine1));
+        given(deliveryLineService.getSumDeliveredForOrderLine(any(PurchaseOrderLine.class))).willReturn(Optional.of(10D));
 
-        ResponseEntity<PurchaseOrderLine> response = restTemplate.postForEntity("/api/purchase-order-line/save",
-                unsavedPoLine1, PurchaseOrderLine.class);
+        ResponseEntity<Double> response = restTemplate.exchange(
+                "/api/purchase-order-line/balance/" + poLine1.getUid().toString(),
+                HttpMethod.GET,
+                null,
+                Double.class
+        );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(Objects.requireNonNull(response.getBody()).getId()).isNotNull();
-        assertThat(response.getBody()).isEqualTo(poLine1);
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isEqualTo(poLine1.getQty() - 10D)
+        );
     }
 
     @Test
-    public void updatePurchaseOrderLineTest() {
-        given(purchaseOrderLineService.savePurchaseOrderLine(any(PurchaseOrderLine.class))).willReturn(poLine1);
+    void getAllPurchaseOrderLinesForSupplierTest() {
+        given(supplierService.getSupplierFromUid(anyString())).willReturn(Optional.of(shelleys));
+        given(purchaseOrderService.getAllPurchaseOrdersForSupplier(any(Supplier.class))).willReturn(List.of(po1, po2));
+        given(purchaseOrderLineService.getAllPurchaseOrderLinesForPurchaseOrder(po1)).willReturn(List.of(poLine1));
+        given(purchaseOrderLineService.getAllPurchaseOrderLinesForPurchaseOrder(po2)).willReturn(List.of(poLine2));
 
-        ResponseEntity<PurchaseOrderLine> response = restTemplate.exchange("/api/purchase-order-line/update",
-                HttpMethod.PUT, new HttpEntity<>(poLine2), PurchaseOrderLine.class);
+        var response = restTemplate.exchange("/api/purchase-order-line/supplier/" + shelleys.getUid(),
+                HttpMethod.GET,
+                null,
+                GetPurchaseOrderLinesBySupplierResponse.class);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(poLine1);
+        var testResponse1 = mapper.mapToGetLowDetailResponse(poLine1);
+        var testResponse2 = mapper.mapToGetLowDetailResponse(poLine2);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).allPurchaseOrderLines).contains(testResponse1, testResponse2)
+        );
     }
 
     @Test
-    public void deletePurchaseOrderLine() {
-        given(purchaseOrderLineService.getPurchaseOrderLineById(any(Long.class))).willReturn(Optional.of(poLine1));
+    void savePurchaseOrderLineTest() {
+        given(purchaseOrderService.getPurchaseOrderFromUid(any(UUID.class))).willReturn(Optional.of(po1));
+        given(stockableProductService.getStockableProductByUid(anyString())).willReturn(Optional.of(MF286));
+        given(purchaseOrderLineService.savePurchaseOrderLine(any(PurchaseOrderLine.class))).willReturn(poLine1);
 
-        ResponseEntity<String> response = restTemplate.exchange("/api/purchase-order-line/delete/1",
+        var request = new CreatePurchaseOrderLineRequest();
+        request.setPurchaseOrderId(poLine1.getUid().toString());
+        request.setStockableProductId(poLine1.getStockableProduct().getUid().toString());
+        request.setQty(poLine1.getQty());
+        request.setNote(poLine1.getNote());
+
+        ResponseEntity<CreatePurchaseOrderLineResponse> response = restTemplate.postForEntity("/api/purchase-order-line/",
+                request, CreatePurchaseOrderLineResponse.class);
+
+        var testResponse = mapper.mapToCreateResponse(poLine1);
+
+        assertAll(
+                ()-> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getId()).isNotNull(),
+                () -> assertThat(response.getBody()).isEqualTo(testResponse)
+        );
+    }
+
+    @Test
+    void updatePurchaseOrderLineTest() {
+        given(purchaseOrderLineService.getPurchaseOrderLineByUid(anyString())).willReturn(Optional.of(poLine2));
+        given(purchaseOrderService.getPurchaseOrderFromUid(any(UUID.class))).willReturn(Optional.of(po1));
+        given(stockableProductService.getStockableProductByUid(anyString())).willReturn(Optional.of(MF286));
+        given(purchaseOrderLineService.savePurchaseOrderLine(any(PurchaseOrderLine.class))).willReturn(poLine1);
+
+        var request = new UpdatePurchaseOrderLineRequest();
+        request.setNote(poLine1.getNote());
+        request.setPrice(poLine1.getPrice());
+        request.setQty(poLine1.getQty());
+        request.setPurchaseOrderId(poLine1.getPurchaseOrder().getUid().toString());
+        request.setStockableProductId(poLine1.getStockableProduct().getUid().toString());
+
+        var response = restTemplate.exchange("/api/purchase-order-line/" + poLine1.getUid().toString(),
+                HttpMethod.PUT, new HttpEntity<>(request), UpdatePurchaseOrderLineResponse.class);
+
+        var testResponse = mapper.mapToUpdateResponse(poLine1);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isEqualTo(testResponse)
+        );
+    }
+
+    @Test
+    void deletePurchaseOrderLine() {
+        given(purchaseOrderLineService.getPurchaseOrderLineByUid(anyString())).willReturn(Optional.of(poLine1));
+
+        ResponseEntity<String> response = restTemplate.exchange("/api/purchase-order-line/" + poLine1.getUid(),
                 HttpMethod.DELETE, null, String.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo("Purchase Order Line with ID 1 has been deleted");
+        assertThat(response.getBody()).isEqualTo(String.format("Purchase Order Line with ID %s has been deleted", poLine1.getUid()));
     }
 }

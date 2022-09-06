@@ -54,4 +54,8 @@ public class PurchaseOrderLineService {
     public void deletePurchaseOrderLine(PurchaseOrderLine purchaseOrderLine) {
         purchaseOrderLineRepository.delete(purchaseOrderLine);
     }
+
+    public Optional<PurchaseOrderLine> getPurchaseOrderLineByUid(String uid) {
+        return purchaseOrderLineRepository.findByUid(uid);
+    }
 }
