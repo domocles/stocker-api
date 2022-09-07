@@ -11,15 +11,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 class StockTransactionServiceTest {
@@ -43,7 +39,7 @@ class StockTransactionServiceTest {
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.initMocks(this);
+        MockitoAnnotations.openMocks(this);
         this.stockTransactionService = new StockTransactionService(stockTransactionRepository, stockableProductRepository, deliveryLineRepository);
 
         mf220 = new StockableProduct();
@@ -104,6 +100,18 @@ class StockTransactionServiceTest {
 
         assertThat(stockTransaction).isPresent();
         assertThat(stockTransaction).get().isEqualTo(stockTransaction2);
+    }
+
+    @Test
+    public void getStockTransactionByUidTest() {
+        given(stockTransactionRepository.findByUid(any(UUID.class))).willReturn(Optional.of(stockTransaction2));
+
+        Optional<StockTransaction> stockTransaction = stockTransactionService.getStockTransactionByUid(stockTransaction2.getUid().toString());
+
+        assertAll(
+                () -> assertThat(stockTransaction).isPresent(),
+                () -> assertThat(stockTransaction).get().isEqualTo(stockTransaction2)
+        );
     }
 
     @Test

@@ -152,7 +152,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         deliveryLine1.setQuantityDelivered(15.0D);
         StockTransaction transaction1 = new StockTransaction(poLine1.getStockableProduct(),
                 deliveryLine1.getQuantityDelivered(), "Delivery No. " + delivery1.getReference(),
-                "Test stock transaction", LocalDate.now());
+                "Test stock transaction");
         transaction1.setId(1L);
         deliveryLine1.setStockTransaction(transaction1);
 
@@ -164,7 +164,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         deliveryLine2.setQuantityDelivered(10.0D);
         StockTransaction transaction2 = new StockTransaction(poLine1.getStockableProduct(),
                 deliveryLine2.getQuantityDelivered(), "Delivery No. " + delivery2.getReference(),
-                "Test stock transaction", LocalDate.now());
+                "Test stock transaction");
         transaction2.setId(2L);
         deliveryLine2.setStockTransaction(transaction2);
 
@@ -176,7 +176,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         deliveryLine3.setQuantityDelivered(100.0D);
         StockTransaction transaction3 = new StockTransaction(poLine2.getStockableProduct(),
                 deliveryLine3.getQuantityDelivered(), "Delivery No. " + delivery3.getReference(),
-                "Test stock transaction", LocalDate.now());
+                "Test stock transaction");
         transaction3.setId(3L);
         deliveryLine3.setStockTransaction(transaction3);
     }
@@ -283,7 +283,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         unsavedDeliveryLine.setDelivery(delivery2);
         StockTransaction transaction = new StockTransaction(poLine1.getStockableProduct(),
                 unsavedDeliveryLine.getQuantityDelivered(), "Delivery No. " + delivery2.getReference(),
-                "Test stock transaction", LocalDate.now());
+                "Test stock transaction");
         unsavedDeliveryLine.setStockTransaction(transaction);
 
         DeliveryLine savedDeliveryLine = new DeliveryLine();
@@ -294,7 +294,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         savedDeliveryLine.setDelivery(delivery2);
         StockTransaction stockTransaction = new StockTransaction(poLine1.getStockableProduct(),
                 unsavedDeliveryLine.getQuantityDelivered(), "Delivery No. " + delivery2.getReference(),
-                "Test stock transaction", LocalDate.now());
+                "Test stock transaction");
         savedDeliveryLine.setStockTransaction(stockTransaction);
 
         given(deliveryLineService.save(unsavedDeliveryLine)).willReturn(savedDeliveryLine);

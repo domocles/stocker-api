@@ -83,15 +83,15 @@ class IDeliveryLineRepositoryTest extends SupplierTestData {
         //stock transactions
         transaction1 = new StockTransaction(mf220,
                 15.0D, "Delivery No. " + "12345",
-                "Test stock transaction", LocalDate.now());
+                "Test stock transaction");
 
         transaction2 = new StockTransaction(mf220,
                 10.D, "Delivery No. " + "12345",
-                "Test stock transaction", LocalDate.now());
+                "Test stock transaction");
 
         transaction3 = new StockTransaction(MF286,
                 100.0D, "Delivery No. " + "12345",
-                "Test stock transaction", LocalDate.now());
+                "Test stock transaction");
 
         unsavedPoLine1 = new PurchaseOrderLine();
         unsavedPoLine1.setNote("First purchase order line");

@@ -1,85 +1,50 @@
 package com.eep.stocker.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Objects;
 
+/***
+ * @author Sam Burns
+ * @version 1.0
+ * 07/09/2022
+ *
+ * StockTransaction domain object which represents a movement of stock
+ */
 @Entity(name = "StockTransaction")
-@Table(name = "post_comment")
-public class StockTransaction {
-    private long id;
-    private StockableProduct stockableProduct;
-    private double quantity;
-    private String reference;
-    private String note;
-    private LocalDate dateCreated;
-
-    public StockTransaction() {
-        this.stockableProduct = new StockableProduct();
-        this.quantity = 0.0;
-        this.reference = "";
-        this.note = "";
-        this.dateCreated = LocalDate.now();
-    }
-
-    public StockTransaction(StockableProduct stockableProduct, double quantity, String reference, String note, LocalDate dateCreated) {
-        this.stockableProduct = stockableProduct;
-        this.quantity = quantity;
-        this.reference = reference;
-        this.note = note;
-        this.dateCreated = dateCreated;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
+@Table(name = "stock_transaction")
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class StockTransaction extends AbstractEntity {
+    /***
+     *  The stockable product that this stock transaction refers to
+     */
     @ManyToOne(fetch = FetchType.EAGER)
-    public StockableProduct getStockableProduct() {
-        return stockableProduct;
-    }
+    private StockableProduct stockableProduct;
 
-    public void setStockableProduct(StockableProduct stockableProduct) {
-        this.stockableProduct = stockableProduct;
-    }
+    /***
+     * The amount of the transaction
+     */
+    private double quantity;
 
-    public double getQuantity() {
-        return quantity;
-    }
+    /***
+     * A reference for the transaction
+     */
+    private String reference;
 
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getReference() {
-        return reference;
-    }
-
-    public void setReference(String reference) {
-        this.reference = reference;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public LocalDate getDateCreated() {
-        return dateCreated;
-    }
-
-    public void setDateCreated(LocalDate dateCreated) {
-        this.dateCreated = dateCreated;
-    }
+    /***
+     * A note for the transaction
+     */
+    private String note;
 
     @Override
     public boolean equals(Object o) {
@@ -90,12 +55,12 @@ public class StockTransaction {
                 getStockableProduct().equals(that.getStockableProduct()) &&
                 Objects.equals(getReference(), that.getReference()) &&
                 Objects.equals(getNote(), that.getNote()) &&
-                Objects.equals(getDateCreated(), that.getDateCreated());
+                Objects.equals(getCreatedAt(), that.getCreatedAt());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getStockableProduct(), getQuantity(), getReference(), getNote(), getDateCreated());
+        return Objects.hash(getStockableProduct(), getQuantity(), getReference(), getNote(), getCreatedAt());
     }
 
     @Override
@@ -106,7 +71,7 @@ public class StockTransaction {
                 ", quantity=" + quantity +
                 ", reference='" + reference + '\'' +
                 ", note='" + note + '\'' +
-                ", dateCreated=" + dateCreated +
+                ", createdAt=" + createdAt +
                 '}';
     }
 }

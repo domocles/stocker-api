@@ -6,6 +6,7 @@ import com.eep.stocker.repository.IPurchaseOrderRepository;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import java.util.*;
 @Service
 @AllArgsConstructor
 @NoArgsConstructor
-@Log
+@Slf4j
 public class PurchaseOrderService {
     /***
      * Repository for retrieving Purchase Orders from the data source
