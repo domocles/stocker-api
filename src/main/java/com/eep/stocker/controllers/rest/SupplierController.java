@@ -6,6 +6,8 @@ import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistExceptio
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.dto.supplier.*;
 import com.eep.stocker.services.SupplierService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -16,21 +18,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+@Slf4j
+@RequiredArgsConstructor
 public class SupplierController {
-    private static final Logger log = LoggerFactory.getLogger(SupplierController.class);
-
     private final SupplierService supplierService;
     private final SupplierMapper supplierMapper;
 
-    /***
-     * All param constructor for SupplierController
-     * @param supplierService
-     * @param supplierMapper
-     */
-    public SupplierController(SupplierService supplierService, SupplierMapper supplierMapper) {
-        this.supplierService = supplierService;
-        this.supplierMapper = supplierMapper;
-    }
 
     /***
      * Retrieves a specific supplier based on it's uid.

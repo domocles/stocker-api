@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class SupplierQuoteService {
@@ -49,9 +50,31 @@ public class SupplierQuoteService {
         return supplierQuoteRepository.save(supplierQuote);
     }
 
+    @Deprecated
     public Optional<SupplierQuote> deleteSupplierQuoteById(Long id) {
         Optional<SupplierQuote> quote = getSupplierQuoteById(id);
         quote.ifPresent(q -> supplierQuoteRepository.delete(q));
+        return quote;
+    }
+
+    /***
+     * Find a supplier quote by its unique id
+     * @param uid - the unique id of the supplier quote
+     * @return an Optional containing the supplier quote else Optional.empty()
+     */
+    public Optional<SupplierQuote> getSupplierQuoteByUid(String uid) {
+        var uidVal = UUID.fromString(uid);
+        return supplierQuoteRepository.findByUid(uidVal);
+    }
+
+    /***
+     * Delete a supplier quote by its unique id number
+     * @param uid - the unqiue id of the supplier quote
+     * @return an Optional containing the supplier quote or else Optional.empty()
+     */
+    public Optional<SupplierQuote> deleteSupplierQuoteByUid(String uid) {
+        var quote = getSupplierQuoteByUid(uid);
+        quote.ifPresent(supplierQuoteRepository::delete);
         return quote;
     }
 }

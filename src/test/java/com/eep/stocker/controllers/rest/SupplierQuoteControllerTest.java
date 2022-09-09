@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -56,7 +57,7 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
                 .inStock(25.0)
                 .build();
 
-        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
+        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
         return quote;
     }
 
@@ -73,7 +74,7 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
                 .inStock(25.0)
                 .build();
 
-        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
+        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
         given(supplierQuoteService.getAllSupplierQuotes())
                 .willReturn(Arrays.asList(quote));
 
@@ -116,7 +117,7 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
                 .inStock(25.0)
                 .build();
 
-        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
+        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
 
         given(supplierQuoteService.getAllSupplierQuotesForSupplier(any(Supplier.class)))
                 .willReturn(Arrays.asList(quote));
@@ -141,7 +142,7 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
                 .inStock(25.0)
                 .build();
 
-        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
+        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
 
         given(stockableProductService.getStockableProductByID(anyLong()))
                 .willReturn(java.util.Optional.of(stockableProduct));
@@ -168,7 +169,7 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
                 .inStock(25.0)
                 .build();
 
-        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
+        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
 
         given(supplierQuoteService.updateSupplierQuote(any(SupplierQuote.class))).willReturn(quote);
     }
@@ -186,7 +187,7 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
                 .inStock(25.0)
                 .build();
 
-        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
+        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
         SupplierQuote returnedQuote = new SupplierQuote(stockableProduct, quote.getSupplier(), quote.getQuotationDate(), 15.0, 1.72D);
         returnedQuote.setId(1L);
 

@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,8 +63,8 @@ class SupplierQuoteServiceTest extends SupplierTestData {
                 .inStock(75.0)
                 .build();
 
-        MF286Quote = new SupplierQuote(MF286, shelleys, new Date(), 15.0, 2.76);
-        FJIQuote = new SupplierQuote(MF220, fji, new Date(), 100.0, 1.96);
+        MF286Quote = new SupplierQuote(MF286, shelleys, LocalDate.now(), 15.0, 2.76);
+        FJIQuote = new SupplierQuote(MF220, fji, LocalDate.now(), 100.0, 1.96);
     }
 
     private static Optional<SupplierQuote> getNewSupplierQuote() {
@@ -85,7 +86,7 @@ class SupplierQuoteServiceTest extends SupplierTestData {
                 .inStock(25.0)
                 .build();
 
-        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
+        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
         return Optional.of(quote);
     }
 
@@ -108,7 +109,7 @@ class SupplierQuoteServiceTest extends SupplierTestData {
                 .inStock(25.0)
                 .build();
 
-        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, new Date(), 15.0, 1.72D);
+        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
         quote.setId(1L);
         return Optional.of(quote);
     }

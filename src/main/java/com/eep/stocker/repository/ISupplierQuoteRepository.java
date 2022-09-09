@@ -7,8 +7,11 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ISupplierQuoteRepository extends CrudRepository<SupplierQuote, Long> {
+    Optional<SupplierQuote> findByUid(UUID uid);
+
     List<SupplierQuote> findAll();
     List<SupplierQuote> findBySupplier(Supplier supplier);
     List<SupplierQuote> findByStockableProduct(StockableProduct stockableProduct);

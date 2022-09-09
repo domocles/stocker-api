@@ -1,15 +1,24 @@
 package com.eep.stocker.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.SuperBuilder;
+
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Objects;
 
 @Entity(name = "supplier_quote")
 @Table(name = "supplier_quote")
-public class SupplierQuote {
-    @Id
-    @GeneratedValue
-    private Long Id;
+@SuperBuilder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class SupplierQuote extends AbstractEntity {
 
     @ManyToOne
     @JoinColumn(name = "stockable_product_id")
@@ -19,67 +28,10 @@ public class SupplierQuote {
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
 
-    private Date quotationDate;
+    private LocalDate quotationDate;
     private Double qty;
     private Double price;
 
-    public SupplierQuote() {}
-
-    public SupplierQuote(StockableProduct stockableProduct, Supplier supplier, Date quotationDate, Double qty, Double price) {
-        this.stockableProduct = stockableProduct;
-        this.supplier = supplier;
-        this.quotationDate = quotationDate;
-        this.qty = qty;
-        this.price = price;
-    }
-
-    public Long getId() {
-        return Id;
-    }
-
-    public void setId(Long id) {
-        Id = id;
-    }
-
-    public StockableProduct getStockableProduct() {
-        return stockableProduct;
-    }
-
-    public void setStockableProduct(StockableProduct stockableProduct) {
-        this.stockableProduct = stockableProduct;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(Supplier supplier) {
-        this.supplier = supplier;
-    }
-
-    public Date getQuotationDate() {
-        return quotationDate;
-    }
-
-    public void setQuotationDate(Date quotationDate) {
-        this.quotationDate = quotationDate;
-    }
-
-    public Double getQty() {
-        return qty;
-    }
-
-    public void setQty(Double qty) {
-        this.qty = qty;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
-    }
 
     @Override
     public boolean equals(Object o) {

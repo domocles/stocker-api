@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
@@ -77,21 +78,21 @@ class ISupplierQuoteRepositoryTest {
         mf220Quote.setStockableProduct(mf220);
         mf220Quote.setQty(15.0D);
         mf220Quote.setPrice(1.27D);
-        mf220Quote.setQuotationDate(new Date(2019, 9, 20));
+        mf220Quote.setQuotationDate(LocalDate.of(2019, 9, 20));
 
         mf220Quote2 = new SupplierQuote();
         mf220Quote2.setSupplier(cls);
         mf220Quote2.setStockableProduct(mf220);
         mf220Quote2.setQty(15.0D);
         mf220Quote2.setPrice(1.15D);
-        mf220Quote2.setQuotationDate(new Date(2019, 8, 22));
+        mf220Quote2.setQuotationDate(LocalDate.of(2019, 8, 22));
 
         mf220Quote3 = new SupplierQuote();
         mf220Quote3.setSupplier(shelleys);
         mf220Quote3.setStockableProduct(mf220);
         mf220Quote3.setQty(15.0D);
         mf220Quote3.setPrice(1.27D);
-        mf220Quote3.setQuotationDate(new Date(2019, 9, 22));
+        mf220Quote3.setQuotationDate(LocalDate.of(2019, 9, 22));
 
         ov12Quote = new SupplierQuote();
         ov12Quote.setSupplier(shelleys);

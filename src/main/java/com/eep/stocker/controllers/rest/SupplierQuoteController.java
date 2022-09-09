@@ -1,97 +1,170 @@
 package com.eep.stocker.controllers.rest;
 
+import com.eep.stocker.annotations.validators.ValidUUID;
 import com.eep.stocker.controllers.error.exceptions.*;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.domain.SupplierQuote;
+import com.eep.stocker.dto.supplierquote.*;
 import com.eep.stocker.services.StockableProductService;
 import com.eep.stocker.services.SupplierQuoteService;
 import com.eep.stocker.services.SupplierService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Date;
 
+/***
+ * @author Sam Burns
+ * @version 1.0
+ * 07/09/2022
+ *
+ * Supplier Quote rest controller
+ */
 @RestController
+@RequiredArgsConstructor
+@Slf4j
+@Validated
+@RequestMapping("/api/supplier-quote")
 public class SupplierQuoteController {
-    private static Logger log = LoggerFactory.getLogger(SupplierQuoteController.class);
+    private final SupplierQuoteService supplierQuoteService;
+    private final SupplierService supplierService;
+    private final StockableProductService stockableProductService;
 
-    private SupplierQuoteService supplierQuoteService;
-    private SupplierService supplierService;
-    private StockableProductService stockableProductService;
+    private final SupplierQuoteMapper mapper;
 
-    public SupplierQuoteController(SupplierQuoteService supplierQuoteService, SupplierService supplierService,
-                                   StockableProductService stockableProductService) {
-        this.supplierQuoteService = supplierQuoteService;
-        this.supplierService = supplierService;
-        this.stockableProductService = stockableProductService;
+    /***
+     * Get All Supplier Quotes
+     * @return a {@code GetAllSupplierQuotesResponse} that contains all supplier quotes
+     */
+    @GetMapping("/")
+    public GetAllSupplierQuotesResponse getAllSupplierQuotes() {
+        log.info("get: /api/supplier-quote/ called");
+        var response = new GetAllSupplierQuotesResponse();
+        supplierQuoteService.getAllSupplierQuotes().stream()
+                .map(mapper::mapToLowDetailResponse)
+                .forEach(response::addSupplierQuote);
+        return response;
     }
 
-    @GetMapping("/api/supplier-quote/get")
-    public List<SupplierQuote> getAllSupplierQuotes() {
-        log.info("get: /api/supplier-quote/get called");
-        return supplierQuoteService.getAllSupplierQuotes();
+    /***
+     * Get all supplier quotes for a supplier
+     * @param uid - the uniqie identifier of the supplier
+     * @return a {@code GetSupplierQuotesForSupplierResponse} containing all the supplier quotes for the specified supplier
+     */
+    @GetMapping("/supplier/{uid}/")
+    public GetSupplierQuotesForSupplierResponse getSupplierQuotesForSupplier(@PathVariable @ValidUUID String uid) {
+        log.info("get: /api/supplier-quote/supplier/" + uid + "/ called");
+        var response = new GetSupplierQuotesForSupplierResponse();
+        var supplier = supplierService.getSupplierFromUid(uid).orElseThrow(() -> new SupplierDoesNotExistException("Supplier does not exist"));
+        supplierQuoteService.getAllSupplierQuotesForSupplier(supplier).stream()
+                .map(mapper::mapToLowDetailResponse)
+                .forEach(response::addSupplierQuote);
+        return response;
     }
 
-    @GetMapping("/api/supplier-quote/supplier/get/{id}")
-    public List<SupplierQuote> getSupplierQuotesForSupplier(@PathVariable Long id) {
-        log.info("get: /api/supplier-quote/supplier/get/" + id + " called");
-        Optional<Supplier> supplier = supplierService.getSupplierFromId(id);
-        if(supplier.isPresent()) {
-            return supplierQuoteService.getAllSupplierQuotesForSupplier(supplier.get());
-        } else {
-            throw new SupplierDoesNotExistException("Supplier with ID " + id + " does not exist");
+    /***
+     * Get all supplier quotes for a stockable product
+     * @param uid - the unique identifier of the stockable product
+     * @return a {@code GetSupplerQuotesForStockableProductResponse} containing all the supplier quotes for the specified stockable product
+     */
+    @GetMapping("/stockable-product/{uid}/")
+    public GetSupplierQuotesForStockableProductResponse getSupplierQuotesForStockableProduct(@PathVariable @ValidUUID String uid) {
+        log.info("get: /api/supplier-quote/stockable-product/" + uid + "/ called");
+        var stockableProduct =  stockableProductService.getStockableProductByUid(uid)
+                .orElseThrow(() -> new StockableProductDoesNotExistException("Stockable Product Does Not Exist"));
+        var response = new GetSupplierQuotesForStockableProductResponse();
+        supplierQuoteService.getAllSupplierQuotesForStockableProduct(stockableProduct).stream()
+                .map(mapper::mapToLowDetailResponse)
+                .forEach(response::addSupplierQuote);
+        return response;
+    }
+
+    /***
+     * Find supplier quote by its unique identifier
+     * @param uid the unique identifier
+     * @return a {@code GetSupplierQuoteResponse} containing the supplier quote
+     */
+    @GetMapping("/{uid}")
+    public GetSupplierQuoteResponse getSupplierById(@PathVariable @ValidUUID String uid) {
+        log.info("get: /api/supplier-quote/{} called", uid);
+        var quote = supplierQuoteService.getSupplierQuoteByUid(uid)
+                .orElseThrow(() -> new SupplierQuoteDoesNotExistException("Supplier Quote Does Not Exist"));
+        return mapper.mapToGetResponse(quote);
+    }
+
+    /***
+     * Delete a supplier quote based on its uniqie identifier
+     * @param uid the unique identifier
+     * @return a {@code DeleteSupplierQuoteResponse} containing the deleted supplier quote
+     */
+    @DeleteMapping("/{uid}")
+    public DeleteSupplierQuoteResponse deleteSupplierQuoteById(@PathVariable @ValidUUID String uid) {
+        log.info("delete: /api/supplier-quote/delete/{}", uid);
+        var quote = supplierQuoteService.deleteSupplierQuoteByUid(uid)
+                .orElseThrow(() -> new SupplierQuoteDoesNotExistException("Supplier quote does not exist"));
+        return mapper.mapToDeleteResponse(quote);
+    }
+
+    /***
+     * Create a new supplier quote based upon a {@code CreateSupplierQuoteRequest} request
+     * @param request - the request
+     * @return a {@code CreateSupplierQuoteResponse} containing the new SupplierQuote
+     */
+    @PostMapping(value = "/")
+    public CreateSupplierQuoteResponse createNewSupplierQuote(@Valid @RequestBody CreateSupplierQuoteRequest request) {
+        log.info("post: /api/supplier-quote/ called");
+        var supplier = supplierService.getSupplierFromUid(request.getSupplierId())
+                .orElseThrow(() -> new SupplierDoesNotExistException("Supplier Does Not Exist"));
+        var stockableProduct = stockableProductService.getStockableProductByUid(request.getStockableProductId())
+                .orElseThrow(() -> new StockableProductDoesNotExistException("Stockable Product Does Not Exist"));
+        var supplierQuote = mapper.mapFromCreateRequest(request, supplier, stockableProduct);
+        supplierQuote = supplierQuoteService.saveSupplierQuote(supplierQuote);
+        return mapper.mapToCreateResponse(supplierQuote);
+    }
+
+    /***
+     * Update a supplier quote
+     * @param uid the unique id of the supplier quote to update
+     * @param request the request
+     * @return a {@code UpdateSupplierQuoteResponse} containing the updated SupplierQuote
+     */
+    @PutMapping(value = "/{uid}")
+    public UpdateSupplierQuoteResponse updateSupplierQuote(@PathVariable @ValidUUID String uid, @RequestBody UpdateSupplierQuoteRequest request) {
+        log.info("put: /api/supplier-quote/{} called", uid);
+        var supplierQuote = supplierQuoteService.getSupplierQuoteByUid(uid)
+                .orElseThrow(() -> new SupplierQuoteDoesNotExistException("Suppler Quote Does Not Exist"));
+        if(!supplierQuote.getSupplier().getUid().toString().equals(request.getSupplierId())) {
+            var supplier = supplierService.getSupplierFromUid(request.getSupplierId()).orElseThrow(() -> new SupplierDoesNotExistException("Supplier Does Not Exist"));
+            supplierQuote.setSupplier(supplier);
         }
-    }
-
-    @GetMapping("/api/supplier-quote/stockable-product/{id}")
-    public List<SupplierQuote> getSupplierQuotesForStockableProduct(@PathVariable Long id) {
-        log.info("get: /api/supplier-quote/stockable-product/" + id + " called");
-        Optional<StockableProduct> stockableProduct =  stockableProductService.getStockableProductByID(id);
-        if(stockableProduct.isPresent()) {
-            return supplierQuoteService.getAllSupplierQuotesForStockableProduct(stockableProduct.get());
-        } else {
-            throw new StockableProductDoesNotExistException("Stockable Product with ID " + id + " doesn not exist");
+        if(!supplierQuote.getStockableProduct().getUid().toString().equals(request.getSupplierId())) {
+            var stockableProduct = stockableProductService.getStockableProductByUid(request.getStockableProductId())
+                    .orElseThrow(() -> new StockableProductDoesNotExistException("Stockable Product Does Not Exist"));
+            supplierQuote.setStockableProduct(stockableProduct);
         }
+        mapper.updateFromUpdateRequest(supplierQuote, request);
+        supplierQuote = supplierQuoteService.saveSupplierQuote(supplierQuote);
+        return mapper.mapToUpdateResponse(supplierQuote);
     }
 
-    @GetMapping("/api/supplier-quote/get/{id}")
-    public SupplierQuote getSupplierById(@PathVariable Long id) {
-        log.info("get: /api/supplier-quote/get/{} called", id);
-        Optional<SupplierQuote> quote = supplierQuoteService.getSupplierQuoteById(id);
-        if(quote.isPresent()) {
-            return quote.get();
-        } else {
-            throw new SupplierQuoteDoesNotExistException("Supplier Quote with id: " + id + " does not exist");
-        }
-    }
-
-    @DeleteMapping("/api/supplier-quote/delete/{id}")
-    public SupplierQuote deleteSupplierQuoteById(@PathVariable Long id) {
-        log.info("delete: /api/supplier-quote/delete/{}", id);
-        Optional<SupplierQuote> quote = supplierQuoteService.deleteSupplierQuoteById(id);
-        return quote.orElseThrow(() -> new SupplierDoesNotExistException(String.format("Supplier quote %s does not exist", id)));
-    }
-
-    @PostMapping(value = "/api/supplier-quote/create")
-    public SupplierQuote createNewSupplierQuote(@Valid @RequestBody SupplierQuote supplierQuote) {
-        log.info("post: /api/supplier-quote/create called");
-        return supplierQuoteService.saveSupplierQuote(supplierQuote);
-    }
-
-    @ExceptionHandler
+    /*@ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     private void supplierNotFoundHandler(SupplierDoesNotExistException ex) {}
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    private void supplierQuoteErrorHandler(SupplierQuoteErrorException ex) {}
+    private void supplierQuoteErrorHandler(SupplierQuoteErrorException ex) {}*/
 
     @PostConstruct
     private void createSomeStockableQuotes() {

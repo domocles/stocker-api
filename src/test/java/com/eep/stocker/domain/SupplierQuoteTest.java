@@ -3,6 +3,7 @@ package com.eep.stocker.domain;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -41,7 +42,7 @@ class SupplierQuoteTest {
         mf220quote.setStockableProduct(mf220);
         mf220quote.setSupplier(shelleys);
         mf220quote.setId(1L);
-        mf220quote.setQuotationDate(new Date());
+        mf220quote.setQuotationDate(LocalDate.now());
     }
 
     @Test
