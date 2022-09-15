@@ -1,97 +1,129 @@
 package com.eep.stocker.controllers.rest;
 
+import com.eep.stocker.annotations.validators.ValidUUID;
 import com.eep.stocker.controllers.error.exceptions.DeliveryDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
-import com.eep.stocker.domain.Delivery;
-import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.dto.delivery.*;
 import com.eep.stocker.services.DeliveryService;
 import com.eep.stocker.services.SupplierService;
-import lombok.AllArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
+/***
+ * @author Sam Burns
+ * @version 1.0
+ * 12/09/2022
+ *
+ * Rest controller for deliveries
+ */
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
+@Slf4j
+@RequestMapping("/api/delivery")
 public class DeliveryController {
-    public static final Logger log = LoggerFactory.getLogger(DeliveryController.class);
-
     private final DeliveryService deliveryService;
     private final SupplierService supplierService;
     private final DeliveryMapper deliveryMapper;
 
-    @GetMapping("/api/delivery/get/{id}")
-    public GetDeliveryResponse getDeliveryById(@PathVariable String id) {
-        log.info("get: /api/delivery/get/{} called", id);
-        Optional<Delivery> delivery = deliveryService.getDeliveryByUid(id);
-        if(delivery.isPresent()) {
-            return deliveryMapper.deliveryToGetDeliveryResponse(delivery.get());
-        } else {
-            throw new DeliveryDoesNotExistException(String.format("Delivery with id of %d does not exist", id));
-        }
+    /***
+     * Gets a delivery by its unique id
+     * @param uid - the unique id of the delivery to fetch
+     * @return a {@code GetDeliveryResponse} containing the delivery
+     */
+    @GetMapping("/get/{uid}")
+    public GetDeliveryResponse getDeliveryById(@PathVariable @ValidUUID String uid) {
+        log.info("get: /api/delivery/get/{} called", uid);
+        var delivery = deliveryService.getDeliveryByUid(uid)
+                .orElseThrow(() -> new DeliveryDoesNotExistException(String.format("Delivery with id of %s does not exist", uid)));
+        return deliveryMapper.deliveryToGetDeliveryResponse(delivery);
     }
 
-    @GetMapping("/api/delivery/get")
+    /***
+     * Get all deliveries
+     * @return a {@code GetAllDeliveryResponse} containing all of the deliveries
+     */
+    @GetMapping("/")
     public GetAllDeliveryResponse getAllDeliveries() {
         log.info("get: /api/delivery/get called");
         return deliveryMapper.getAllDeliveryReponseFromDeliveries(deliveryService.getAllDeliveries());
     }
 
-    @GetMapping("/api/delivery/{fromDate}/{toDate}")
+    /***
+     * Get all deliveries between the supplied dates
+     * @param fromDate - the beginning date of the range to fetch
+     * @param toDate - the end date of the range to fetch
+     * @return a {@code GetAllDeliveryResponse} containing all of the deliveries in the range
+     */
+    @GetMapping("/{fromDate}/{toDate}")
     public GetAllDeliveryResponse getAllDeliveriesBetween(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                                   @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         log.info("get: /api/delivery/{}/{} called", fromDate, toDate);
         return deliveryMapper.getAllDeliveryReponseFromDeliveries(deliveryService.getAllDeliveriesBetween(fromDate, toDate));
     }
 
-    @GetMapping("/api/delivery/supplier/{supplierId}")
-    public GetAllDeliveryResponse getAllDeliveriesForSupplier(@PathVariable Long supplierId) {
+    /***
+     * Get all of the deliveries from a supplier
+     * @param supplierId the unique of the supplier
+     * @return a {@code GetAllDeliveryResponse} containing all of the deliveries from the supplier
+     */
+    @GetMapping("/supplier/{supplierId}")
+    public GetAllDeliveryResponse getAllDeliveriesForSupplier(@PathVariable @ValidUUID String supplierId) {
         log.info("get: /api/delivery/supplier/{} called", supplierId);
-        Optional<Supplier> supplier = supplierService.getSupplierFromId(supplierId);
-        if(supplier.isPresent()) {
-            return deliveryMapper.getAllDeliveryReponseFromDeliveries(deliveryService.getAllDeliveriesForSupplier(supplier.get()));
-        } else {
-            throw new SupplierDoesNotExistException("Supplier with id of " + supplierId + " does not exist");
-        }
+        var supplier = supplierService.getSupplierFromUid(supplierId)
+                .orElseThrow(() -> new SupplierDoesNotExistException("Supplier with id of " + supplierId + " does not exist"));
+
+        return deliveryMapper.getAllDeliveryReponseFromDeliveries(deliveryService.getAllDeliveriesForSupplier(supplier));
     }
 
-    @PostMapping("/api/delivery/create")
+    /***
+     * Create a new delivery
+     * @param delivery - the delivery to create
+     * @return a {@code GetDeliveryResponse} containing the new delivery
+     */
+    @PostMapping("/")
     public GetDeliveryResponse createDelivery(@RequestBody @Valid CreateDeliveryRequest delivery) {
-        log.info("create: /api/delivery/create called");
+        log.info("create: /api/delivery called");
         var supplier = supplierService.getSupplierFromUid(delivery.getSupplierId());
         var newDel = deliveryMapper.map(delivery);
         supplier.ifPresent(newDel::setSupplier);
         var savedDelivery = deliveryService.saveDelivery(newDel);
-        var response = deliveryMapper.deliveryToGetDeliveryResponse(savedDelivery);
-        return response;
+        return deliveryMapper.deliveryToGetDeliveryResponse(savedDelivery);
     }
 
-    @PutMapping("/api/delivery/update")
-    public GetDeliveryResponse updateDelivery(@RequestBody @Valid UpdateDeliveryRequest updateDeliveryRequest) {
-        log.info("put: /api/delivery/update called");
-        var deliveryOpt = deliveryService.getDeliveryByUid(updateDeliveryRequest.getId());
+    /***
+     * Update an existing delivery
+     * @param uid - the unique identifier of the delivery to update
+     * @param updateDeliveryRequest - the updated details of the delivery
+     * @return a {@code GetDeliveryResponse} containing the new delivery
+     */
+    @PutMapping("/{uid}")
+    public GetDeliveryResponse updateDelivery(@PathVariable @ValidUUID String uid, @RequestBody @Valid UpdateDeliveryRequest updateDeliveryRequest) {
+        log.info("put: /api/delivery called");
+        var deliveryOpt = deliveryService.getDeliveryByUid(uid);
         var delivery = deliveryOpt.orElseThrow(() -> new DeliveryDoesNotExistException("Delivery Does Not Exist"));
         deliveryMapper.update(updateDeliveryRequest, delivery);
         var res = deliveryService.saveDelivery(delivery);
         return deliveryMapper.deliveryToGetDeliveryResponse(res);
     }
 
-    @DeleteMapping("/api/delivery/delete/{id}")
+    /***
+     * Delete a delivery by its unique identifier
+     * @param id - the id of the delivery to delete
+     * @return - a confirmation message
+     */
+    @DeleteMapping("/delete/{id}")
     public String deleteDelivery(@PathVariable String id) {
         log.info("delete: /api/delivery/delete {} called", id);
-        Optional<Delivery> delivery = deliveryService.getDeliveryByUid(id);
-        if(delivery.isPresent()) {
-            deliveryService.deleteDelivery(delivery.get());
-            return "Delivery with ID of " + delivery.get().getUid().toString() + " deleted";
-        } else {
-            throw new DeliveryDoesNotExistException("Delivery with ID of " + id + " does not exist");
-        }
+        var delivery = deliveryService.getDeliveryByUid(id).orElseThrow(
+                () -> new DeliveryDoesNotExistException("Delivery with ID of " + id + " does not exist")
+        );
+        deliveryService.deleteDelivery(delivery);
+        return "Delivery with ID of " + delivery.getUid().toString() + " deleted";
     }
 }

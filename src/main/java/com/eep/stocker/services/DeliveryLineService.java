@@ -3,24 +3,19 @@ package com.eep.stocker.services;
 import com.eep.stocker.domain.*;
 import com.eep.stocker.repository.IDeliveryLineRepository;
 import com.google.common.primitives.Doubles;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class DeliveryLineService {
-    private static final Logger log = LoggerFactory.getLogger(DeliveryLineService.class);
-
-    private IDeliveryLineRepository deliveryLineRepository;
-
-    @Autowired
-    public DeliveryLineService(IDeliveryLineRepository deliveryLineRepository) {
-        this.deliveryLineRepository = deliveryLineRepository;
-    }
+    private final IDeliveryLineRepository deliveryLineRepository;
 
     public Optional<DeliveryLine> getDeliveryLineById(Long id) {
         log.info("GetDeliveryLineById {} called", id);
@@ -57,9 +52,15 @@ public class DeliveryLineService {
         deliveryLineRepository.delete(deliveryLine);
     }
 
+    @Deprecated
     public List<DeliveryLine> getAllDeliveryLinesForDelivery(Long id) {
         log.info("GetAllDeliveryLinesForDelivery called");
         return deliveryLineRepository.findAllByDelivery_Id(id);
+    }
+
+    public List<DeliveryLine> getAllDeliveryLinesForDelivery(UUID uid) {
+        log.info("GetAllDeliveryLinesForDelivery called");
+        return deliveryLineRepository.findAllByDelivery_Uid(uid);
     }
 
     public Optional<Double> getSumDeliveredForOrderLine(PurchaseOrderLine orderLine) {
@@ -70,5 +71,21 @@ public class DeliveryLineService {
             return Optional.of(totalDelivered);
         }
         return totalDeliveredOptional;
+    }
+
+    /***
+     * Finds a delivery line by its unique identifier, if it doesn't exist returns Optional.empty().  Assumes the
+     * uid is valid, wrapping in a try-catch block is potentially expensive
+     * @param uid - unique identifier of the delivery line
+     * @return an {@code Optional} containing the delivery line
+     */
+    public Optional<DeliveryLine> getDeliveryLineByUid(String uid) {
+        log.info("Get Delivery Line by UID called");
+        try {
+            var uuid = UUID.fromString(uid);
+            return deliveryLineRepository.findByUid(uuid);
+        } catch(IllegalArgumentException ex) {
+            return Optional.empty();
+        }
     }
 }

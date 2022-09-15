@@ -1,115 +1,203 @@
 package com.eep.stocker.controllers.rest;
 
+import com.eep.stocker.annotations.validators.ValidUUID;
 import com.eep.stocker.controllers.error.exceptions.*;
-import com.eep.stocker.domain.*;
-import com.eep.stocker.services.DeliveryLineService;
-import com.eep.stocker.services.PurchaseOrderService;
-import com.eep.stocker.services.StockableProductService;
-import com.eep.stocker.services.SupplierService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.eep.stocker.dto.deliveryline.*;
+import com.eep.stocker.services.*;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
+import java.util.UUID;
 
+/***
+ * @author Sam Burns
+ * @version 1.0
+ * 12/09/2022
+ *
+ * Rest controller for delivery lines
+ */
+@RequiredArgsConstructor
 @RestController
+@Slf4j
+@RequestMapping("/api/delivery-line")
+@Validated
 public class DeliveryLineController {
-    public static final Logger log = LoggerFactory.getLogger(DeliveryLineController.class);
+    private final DeliveryLineService deliveryLineService;
+    private final DeliveryService deliveryService;
+    private final SupplierService supplierService;
+    private final StockableProductService stockableProductService;
+    private final StockTransactionService stockTransactionService;
+    private final PurchaseOrderService purchaseOrderService;
+    private final PurchaseOrderLineService purchaseOrderLineService;
+    private final DeliveryLineMapper mapper;
 
-    private DeliveryLineService deliveryLineService;
-    private SupplierService supplierService;
-    private StockableProductService stockableProductService;
-    private PurchaseOrderService purchaseOrderService;
-
-    public DeliveryLineController(DeliveryLineService deliveryLineService, SupplierService supplierService,
-                                  StockableProductService stockableProductService, PurchaseOrderService purchaseOrderService) {
-        this.deliveryLineService = deliveryLineService;
-        this.supplierService = supplierService;
-        this.stockableProductService = stockableProductService;
-        this.purchaseOrderService = purchaseOrderService;
+    /***
+     * Get a delivery line by its unique identifier
+     * @param uid - the unique identifier of the delivery line to get
+     * @return a {@code GetDeliveryLineResponse} containing the delivery line
+     */
+    @GetMapping("/{uid}")
+    public GetDeliveryLineResponse getDeliveryLineById(@PathVariable @ValidUUID String uid) {
+        log.info("get: /api/delivery-line/{} called", uid);
+        var deliveryLine = deliveryLineService.getDeliveryLineByUid(uid)
+                .orElseThrow(() -> new DeliveryLineDoesNotExistException(String.format("DeliveryLine with ID of %s does not exist", uid)));
+        return mapper.mapToGetResponse(deliveryLine);
     }
 
-    @GetMapping("/api/delivery-line/get/{id}")
-    public DeliveryLine getDeliveryLineById(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/{} called", id);
-        Optional<DeliveryLine> deliveryLine = deliveryLineService.getDeliveryLineById(id);
-        if(deliveryLine.isPresent()) {
-            return  deliveryLine.get();
-        } else {
-            throw new DeliveryDoesNotExistException(String.format("DeliveryLine with ID of %s does not exist", id));
-        }
+    /***
+     * Get all delivery lines for a delivery
+     * @param uid - the unique identifier of the delivery
+     * @return a {@code GetAllDeliveryResponse} containing the delivery lines
+     */
+    @GetMapping("/delivery/{uid}")
+    public GetAllByDeliveryResponse getDeliveryLineByDelivery(@PathVariable @ValidUUID String uid) {
+        log.info("get: /api/delivery-line/get/delivery/{} called", uid);
+        var response = new GetAllByDeliveryResponse();
+        deliveryLineService.getAllDeliveryLinesForDelivery(UUID.fromString(uid)).stream()
+                .map(mapper::mapToLowDetailResponse)
+                .forEach(response::addDeliveryLine);
+        return response;
     }
 
-    @GetMapping("/api/delivery-line/get/delivery/{id}")
-    public List<DeliveryLine> getDeliveryLineByDelivery(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/delivery/{} called", id);
-       return deliveryLineService.getAllDeliveryLinesForDelivery(id);
+    /***
+     * Get all delivery lines
+     * @return a {@code GetAllDeliveryLinesResponse} containing all the delivery lines
+     */
+    @GetMapping("/")
+    public GetAllDeliveryLinesResponse getAllDeliveryLines() {
+        log.info("get: /api/delivery-line/");
+        var response = new GetAllDeliveryLinesResponse();
+        deliveryLineService.getAllDeliveryLines()
+                .stream()
+                .map(mapper::mapToLowDetailResponse)
+                .forEach(response::addDeliveryLine);
+        return response;
     }
 
-    @GetMapping("/api/delivery-line/get")
-    public List<DeliveryLine> getAllDeliveryLines() {
-        log.info("get: /api/delivery-line/get");
-        return deliveryLineService.getAllDeliveryLines();
+    /***
+     * Get all delivery lines for a supplier
+     * @param uid - the unique identifier of the supplier
+     * @return a {@code GetDeliveryLinesBySupplierResponse} containing the delivery lines
+     */
+    @GetMapping("/supplier/{uid}")
+    public GetDeliveryLinesBySupplierResponse getAllDeliveryLinesForSupplier(@PathVariable @ValidUUID String uid) {
+        log.info("get: /api/delivery-line/supplier/{} called", uid);
+        var supplier = supplierService.getSupplierFromUid(uid)
+                .orElseThrow(() -> new SupplierDoesNotExistException(String.format("Supplier with ID of %s does not exist", uid)));
+        var response = new GetDeliveryLinesBySupplierResponse();
+        deliveryLineService.getAllDeliveryLinesForSupplier(supplier)
+                .stream()
+                .map(mapper::mapToLowDetailResponse)
+                .forEach(response::addDeliveryLine);
+        return response;
+
     }
 
-    @GetMapping("/api/delivery-line/get/supplier/{id}")
-    public List<DeliveryLine> getAllDeliveryLinesForSupplier(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/supplier/{} called", id);
-        Optional<Supplier> supplier = supplierService.getSupplierFromId(id);
-        if(supplier.isPresent()) {
-            return deliveryLineService.getAllDeliveryLinesForSupplier(supplier.get());
-        } else {
-            throw new SupplierDoesNotExistException(String.format("Supplier with ID of %s does not exist", id));
-        }
+    /***
+     * Get all delivery lines for a stockable product
+     * @param uid - the unique identifier of the stockable product
+     * @return a {@code GetDeliveryLinesByProductResponse} containing the delivery lines for the product
+     */
+    @GetMapping("/stockable-product/{uid}")
+    public GetDeliveryLinesByProductResponse getAllDeliveryLinesForStockableProduct(@PathVariable @ValidUUID String uid) {
+        log.info("get: /api/delivery-line/supplier/{} called", uid );
+        var product = stockableProductService.getStockableProductByUid(uid)
+                .orElseThrow(() -> new StockableProductDoesNotExistException(String.format("Stockable Product with ID of %s does not exist", uid)));
+        var response = new GetDeliveryLinesByProductResponse();
+        deliveryLineService.getAllDeliveryLinesForStockableProduct(product).stream()
+                .map(mapper::mapToLowDetailResponse)
+                .forEach(response::addDeliveryLine);
+        return response;
+
     }
 
-    @GetMapping("/api/delivery-line/get/stockable-product/{id}")
-    public List<DeliveryLine> getAllDeliveryLinesForStockableProduct(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/supplier/{} called", id );
-        Optional<StockableProduct> product = stockableProductService.getStockableProductByID(id);
-        if(product.isPresent()) {
-            return deliveryLineService.getAllDeliveryLinesForStockableProduct(product.get());
-        } else {
-            throw new StockableProductDoesNotExistException(String.format("Stockable Product with ID of %s does not exist", id));
-        }
+    /***
+     * Get all delivery lines for a purchase order
+     * @param uid - the unique identifier of the purchase order
+     * @return a {@code GetDeliveryLinesByPurchaseOrderResponse} containing the delivery lines for a purchase order
+     */
+    @GetMapping("/purchase-order/{uid}")
+    public GetDeliveryLinesByPurchaseOrderResponse getAllDeliveryLinesForPurchaseOrder(@PathVariable @ValidUUID String uid) {
+        log.info("get: /api/delivery-line/get/purchase-order/{} called", uid);
+        var purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(uid))
+                .orElseThrow(() -> new PurchaseOrderDoesNotExistException("Purchase Order with ID of " + uid + " does not exist"));
+
+        var response = new GetDeliveryLinesByPurchaseOrderResponse();
+        deliveryLineService.getAllDeliveryLinesForPurchaseOrder(purchaseOrder).stream()
+                .map(mapper::mapToLowDetailResponse)
+                .forEach(response::addDeliveryLine);
+
+        return response;
+
     }
 
-    @GetMapping("/api/delivery-line/get/purchase-order/{id}")
-    public List<DeliveryLine> getAllDeliveryLinesForPurchaseOrder(@PathVariable Long id) {
-        log.info("get: /api/delivery-line/get/purchase-order/{} called", id);
-        Optional<PurchaseOrder> purchaseOrder = purchaseOrderService.getPurchaseOrderFromId(id);
-        if(purchaseOrder.isPresent()) {
-            return deliveryLineService.getAllDeliveryLinesForPurchaseOrder(purchaseOrder.get());
-        } else {
-            throw new PurchaseOrderDoesNotExistException("Purchase Order with ID of " + id + " does not exist");
-        }
+    /***
+     * Delete a delivery line based on its unique id
+     * @param uid - unique identifier of the delivery line
+     * @return a {@code String} confirming the operation was completed
+     */
+    @DeleteMapping("/{uid}")
+    public String deleteDeliveryLine(@PathVariable String uid) {
+        log.info("delete: /api/delivery-line/delete/{}", uid);
+        var deliveryLine = deliveryLineService.getDeliveryLineByUid(uid)
+                .orElseThrow(() -> new DeliveryLineDoesNotExistException("Delivery Line with ID of " + uid + " does not exist"));
+        deliveryLineService.deleteDeliveryLine(deliveryLine);
+        return "Delivery Line with ID of " + uid + " deleted";
     }
 
-    @DeleteMapping("/api/delivery-line/delete/{id}")
-    public String deleteDeliveryLine(@PathVariable Long id) {
-        log.info("delete: /api/delivery-line/delete/{}", id);
-        Optional<DeliveryLine> deliveryLine = deliveryLineService.getDeliveryLineById(id);
-        if(deliveryLine.isPresent()) {
-            deliveryLineService.deleteDeliveryLine(deliveryLine.get());
-            return "Delivery Line with ID of " + id + " deleted";
-        } else {
-            throw new DeliveryLineDoesNotExistException("Delivery Line with ID of " + id + " does not exist");
-        }
-    }
+    /***
+     * Create a new delivery line
+     * @param request - the details of the delivery line
+     * @return - a {@code CreateDeliveryLineResponse} containing the new delivery line
+     */
+    @PostMapping("/")
+    public CreateDeliveryLineResponse createDeliveryLine(@RequestBody @Valid CreateDeliveryLineRequest request) {
+        log.info("post: /api/delivery-line/ called");
+        var orderLine = purchaseOrderLineService.getPurchaseOrderLineByUid(request.getPurchaseOrderLineId())
+                .orElseThrow(() -> new PurchaseOrderLineDoesNotExistException("Purchase Order Line does not exist"));
+        var delivery = deliveryService.getDeliveryByUid(request.getDeliveryId())
+                .orElseThrow(() -> new DeliveryDoesNotExistException("Delivery does not exist"));
+        var stockTransaction = stockTransactionService.getStockTransactionByUid(request.getStockTransactionId())
+                .orElseThrow(() -> new StockTransactionDoesNotExistException("Stock Transaction does not exist"));
 
-    @PostMapping("/api/delivery-line/create")
-    public DeliveryLine createDeliveryLine(@RequestBody @Valid DeliveryLine deliveryLine) {
-        log.info("post: /api/delivery-line/create called");
+        var deliveryLine = mapper.mapFromCreateRequest(request, orderLine, delivery, stockTransaction);
         deliveryLine = deliveryLineService.save(deliveryLine);
-        return deliveryLine;
+
+        return mapper.mapToCreateResponse(deliveryLine);
     }
 
-    @PutMapping("/api/delivery-line/update")
-    public DeliveryLine updateDeliveryLine(@RequestBody @Valid DeliveryLine deliveryLine) {
-        log.info("post: /api/delivery-line/create called");
+    /***
+     * Update a delivery line
+     * @param uid - the unique identifier of the delivery line to update
+     * @param request - the details of the delivery line to update
+     * @return - a {@code UpdateDeliveryResponse} containg the updated delivery line
+     */
+    @PutMapping("/{uid}")
+    public UpdateDeliveryLineResponse updateDeliveryLine(@PathVariable @ValidUUID String uid, @RequestBody @Valid UpdateDeliveryLineRequest request) {
+        log.info("post: /api/delivery-line/{} called", uid);
+        var deliveryLine = deliveryLineService.getDeliveryLineByUid(uid)
+                .orElseThrow(() -> new DeliveryLineDoesNotExistException("Delivery Line Does not exist"));
+        mapper.updateFromUpdateRequest(deliveryLine, request);
+        if(!deliveryLine.getPurchaseOrderLine().getUid().toString().equals(request.getPurchaseOrderLineId())) {
+            var orderLine = purchaseOrderLineService.getPurchaseOrderLineByUid(request.getPurchaseOrderLineId())
+                    .orElseThrow(() -> new PurchaseOrderLineDoesNotExistException("Purchase Order Line does not exist"));
+            deliveryLine.setPurchaseOrderLine(orderLine);
+        }
+        if(!deliveryLine.getDelivery().getUid().toString().equals(request.getDeliveryId())) {
+            var delivery = deliveryService.getDeliveryByUid(request.getDeliveryId())
+                    .orElseThrow(() -> new DeliveryDoesNotExistException("Delivery does not exist"));
+            deliveryLine.setDelivery(delivery);
+        }
+        if(!deliveryLine.getStockTransaction().getUid().toString().equals(request.getStockTransactionId())) {
+            var stockTransaction = stockTransactionService.getStockTransactionByUid(request.getStockTransactionId())
+                    .orElseThrow(() -> new StockTransactionDoesNotExistException("Stock Transaction does not exist"));
+            deliveryLine.setStockTransaction(stockTransaction);
+        }
         deliveryLine = deliveryLineService.save(deliveryLine);
-        return deliveryLine;
+
+        return mapper.mapToUpdateResponse(deliveryLine);
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface IDeliveryLineRepository extends CrudRepository<DeliveryLine, Long> {
     List<DeliveryLine> findAll();
@@ -18,6 +19,10 @@ public interface IDeliveryLineRepository extends CrudRepository<DeliveryLine, Lo
 
     List<DeliveryLine> findAllByDelivery_Id(Long deliveryId);
 
+    List<DeliveryLine> findAllByDelivery_Uid(UUID uid);
+
     @Query("SELECT SUM(s.quantityDelivered) FROM deliveryline s WHERE s.purchaseOrderLine = :poLine")
     Optional<Double> getSumOfDeliveriesForPurchaseOrderLine(PurchaseOrderLine poLine);
+
+    Optional<DeliveryLine> findByUid(UUID uid);
 }

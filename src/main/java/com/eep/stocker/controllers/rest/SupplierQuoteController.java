@@ -158,14 +158,6 @@ public class SupplierQuoteController {
         return mapper.mapToUpdateResponse(supplierQuote);
     }
 
-    /*@ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    private void supplierNotFoundHandler(SupplierDoesNotExistException ex) {}
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    private void supplierQuoteErrorHandler(SupplierQuoteErrorException ex) {}*/
-
     @PostConstruct
     private void createSomeStockableQuotes() {
         /*Supplier tkrypp = new Supplier();

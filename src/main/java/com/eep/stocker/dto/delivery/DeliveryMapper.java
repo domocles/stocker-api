@@ -27,7 +27,6 @@ public interface DeliveryMapper {
 
     @Mapping(target= "supplier", ignore = true)
     @Mapping(target= "id", ignore = true)
-    @Mapping(target="uid", source="id")
     void update(UpdateDeliveryRequest request, @MappingTarget Delivery delivery);
 
     default GetAllDeliveryResponse getAllDeliveryReponseFromDeliveries(List<Delivery> deliveries) {

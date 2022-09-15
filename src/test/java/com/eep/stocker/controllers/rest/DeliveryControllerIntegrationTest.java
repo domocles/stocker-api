@@ -73,7 +73,7 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
     void getAllDeliveriesTest() {
         given(deliveryService.getAllDeliveries()).willReturn(Arrays.asList(delivery1, delivery2));
 
-        ResponseEntity<GetAllDeliveryResponse> response = restTemplate.exchange("/api/delivery/get",
+        ResponseEntity<GetAllDeliveryResponse> response = restTemplate.exchange("/api/delivery/",
                 HttpMethod.GET,
                 null,
                 GetAllDeliveryResponse.class);
@@ -105,10 +105,10 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
 
     @Test
     void getDeliveriesForSupplierTest() {
-        given(supplierService.getSupplierFromId(any(Long.class))).willReturn(Optional.of(supplier));
+        given(supplierService.getSupplierFromUid(anyString())).willReturn(Optional.of(supplier));
         given(deliveryService.getAllDeliveriesForSupplier(any(Supplier.class))).willReturn(Arrays.asList(delivery1, delivery2));
 
-        ResponseEntity<GetAllDeliveryResponse> response = restTemplate.exchange("/api/delivery/supplier/1",
+        ResponseEntity<GetAllDeliveryResponse> response = restTemplate.exchange("/api/delivery/supplier/" + supplier.getUid().toString(),
                 HttpMethod.GET,
                 null,
                 GetAllDeliveryResponse.class);
@@ -140,7 +140,7 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
 
         var request = deliveryMapper.map(unsavedDelivery);
 
-        ResponseEntity<GetDeliveryResponse> response = restTemplate.postForEntity("/api/delivery/create",
+        ResponseEntity<GetDeliveryResponse> response = restTemplate.postForEntity("/api/delivery/",
                 request, GetDeliveryResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -150,14 +150,12 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
     @Test
     void updateDeliveryTest() {
         var updateDeliveryRequest = UpdateDeliveryRequest.builder()
-                .id(delivery1.getUid().toString())
                 .supplierId(supplier.getUid().toString())
                 .reference("123456")
                 .note("A note for the delivery")
                 .build();
 
         Delivery savedDelivery = new Delivery();
-        savedDelivery.setUid(UUID.fromString(updateDeliveryRequest.getId()));
         savedDelivery.setSupplier(supplier);
         savedDelivery.setReference("123456");
         savedDelivery.setNote("A note for the delivery");
@@ -165,10 +163,10 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
 
         var savedDeliveryDto = deliveryMapper.deliveryToGetDeliveryResponse(savedDelivery);
 
-        given(deliveryService.getDeliveryByUid(delivery1.getUid().toString())).willReturn(Optional.of(savedDelivery));
+        given(deliveryService.getDeliveryByUid(anyString())).willReturn(Optional.of(savedDelivery));
         given(deliveryService.saveDelivery(any(Delivery.class))).willReturn(savedDelivery);
 
-        ResponseEntity<GetDeliveryResponse> response = restTemplate.exchange("/api/delivery/update",
+        ResponseEntity<GetDeliveryResponse> response = restTemplate.exchange("/api/delivery/" + savedDelivery.getUid().toString(),
                 HttpMethod.PUT, new HttpEntity<>(updateDeliveryRequest), GetDeliveryResponse.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -179,7 +177,6 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
     @Test
     void updateNonExistantDeliveryThrowsNonExistantDelivery() {
         var updateDeliveryRequest = UpdateDeliveryRequest.builder()
-                .id(delivery1.getUid().toString())
                 .supplierId(supplier.getUid().toString())
                 .reference("123456")
                 .note("A note for the delivery")
@@ -187,17 +184,17 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
 
         given(deliveryService.getDeliveryByUid(anyString())).willReturn(Optional.empty());
 
-        ResponseEntity<Delivery> response = restTemplate.exchange("/api/delivery/update",
+        ResponseEntity<Delivery> response = restTemplate.exchange("/api/delivery/" + delivery1.getUid().toString(),
                 HttpMethod.PUT, new HttpEntity<>(updateDeliveryRequest), Delivery.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
-    public void deleteDeliveryTest() {
+    void deleteDeliveryTest() {
         given(deliveryService.getDeliveryByUid(anyString())).willReturn(Optional.of(delivery1));
 
-        ResponseEntity<String> response =restTemplate.exchange("/api/delivery/delete/1",
+        ResponseEntity<String> response =restTemplate.exchange("/api/delivery/delete/" + delivery1.getUid().toString(),
                 HttpMethod.DELETE,
                 null,
                 String.class);

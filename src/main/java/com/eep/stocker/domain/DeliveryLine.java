@@ -1,16 +1,18 @@
 package com.eep.stocker.domain;
 
+import lombok.*;
+
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity(name = "deliveryline")
 @Table(name = "delivery_line")
-public class DeliveryLine {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "delivery_line_id")
-    private Long id;
+@Builder(toBuilder = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class DeliveryLine extends AbstractEntity{
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "purchase_order_line_id")
@@ -27,70 +29,6 @@ public class DeliveryLine {
     private Double quantityDelivered;
 
     private String note;
-
-    public DeliveryLine() {
-        this.stockTransaction = new StockTransaction();
-    }
-
-    public DeliveryLine(PurchaseOrderLine purchaseOrderLine,
-                        Delivery delivery,
-                        Double quantityDelivered,
-                        String note,
-                        StockTransaction stockTransaction) {
-        this.purchaseOrderLine = purchaseOrderLine;
-        this.delivery = delivery;
-        this.quantityDelivered = quantityDelivered;
-        this.note = note;
-        this.stockTransaction = stockTransaction;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public PurchaseOrderLine getPurchaseOrderLine() {
-        return purchaseOrderLine;
-    }
-
-    public void setPurchaseOrderLine(PurchaseOrderLine purchaseOrderLine) {
-        this.purchaseOrderLine = purchaseOrderLine;
-    }
-
-    public Delivery getDelivery() {
-        return delivery;
-    }
-
-    public void setDelivery(Delivery delivery) {
-        this.delivery = delivery;
-    }
-
-    public Double getQuantityDelivered() {
-        return quantityDelivered;
-    }
-
-    public void setQuantityDelivered(Double quantityDelivered) {
-        this.quantityDelivered = quantityDelivered;
-    }
-
-    public StockTransaction getStockTransaction() {
-        return stockTransaction;
-    }
-
-    public void setStockTransaction(StockTransaction stockTransaction) {
-        this.stockTransaction = stockTransaction;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
 
     @Override
     public boolean equals(Object o) {

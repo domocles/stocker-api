@@ -13,8 +13,7 @@ import java.util.*;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 class DeliveryLineServiceTest extends SupplierTestData {
@@ -143,6 +142,29 @@ class DeliveryLineServiceTest extends SupplierTestData {
 
         assertThat(deliveryLine.isPresent()).isTrue();
         assertThat(deliveryLine.get()).isEqualTo(deliveryLine2);
+    }
+
+    @Test
+    void getDeliveryLineByUidTest() {
+        given(deliveryLineRepository.findByUid(any(UUID.class))).willReturn(Optional.of(deliveryLine2));
+
+        Optional<DeliveryLine> deliveryLine = deliveryLineService.getDeliveryLineByUid(deliveryLine2.getUid().toString());
+
+        assertAll(
+                () -> assertThat(deliveryLine.isPresent()).isTrue(),
+                () -> assertThat(deliveryLine.get()).isEqualTo(deliveryLine2)
+        );
+    }
+
+    @Test
+    void getDeliveryLineByInvalidUidTest() {
+        given(deliveryLineRepository.findByUid(any(UUID.class))).willReturn(Optional.of(deliveryLine2));
+
+        Optional<DeliveryLine> deliveryLine = deliveryLineService.getDeliveryLineByUid("");
+
+        assertAll(
+                () -> assertThat(deliveryLine.isPresent()).isFalse()
+        );
     }
 
     @Test
