@@ -23,8 +23,8 @@ import javax.validation.Valid;
  */
 @RequiredArgsConstructor
 @RestController
-@Slf4j
 @RequestMapping("/api/stockable-product-note")
+@Slf4j
 @Validated
 public class StockableProductNoteController {
     private final StockableProductNoteService stockableProductNoteService;

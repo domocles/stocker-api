@@ -62,9 +62,25 @@ class AssemblyServiceTest {
                 .inStock(75.0)
                 .build();
 
-        assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101", "Decat");
-        assembly1 = new Assembly(Long.valueOf(1), "Golf Decat", "EEP102", "Decat");
-        assembly2 = new Assembly(Long.valueOf(2), "ST170 Mk2 Decat", "EEP103", "Decat");
+        assembly1unsaved = Assembly.builder()
+                .name("Golf Decat")
+                .mpn("EEP101")
+                .category("Decat")
+                .build();
+
+        assembly1 = Assembly.builder()
+                .name("Golf Decat")
+                .mpn("EEP101")
+                .category("Decat")
+                .build();
+        assembly1.setId(1L);
+
+        assembly2 = Assembly.builder()
+                .name("ST170 Mk2 Decat")
+                .mpn("EEP103")
+                .category("Decat")
+                .build();
+        assembly2.setId(2L);
 
         assemblyLine1 = new AssemblyLine(Long.valueOf(1), MF220, assembly1, 3);
         assemblyLine2 = new AssemblyLine(Long.valueOf(2), MF220, assembly1, 3);
@@ -76,6 +92,16 @@ class AssemblyServiceTest {
         given(assemblyRepository.findById(any(Long.class))).willReturn(Optional.of(assembly1));
 
         Optional<Assembly> assembly = assemblyService.getAssemblyById(1);
+
+        assertThat(assembly.isPresent());
+        assertThat(assembly.get()).isEqualTo(assembly1);
+    }
+
+    @Test
+    void getAssemblyByUidTest() {
+        given(assemblyRepository.findByUid(any(UUID.class))).willReturn(Optional.of(assembly1));
+
+        Optional<Assembly> assembly = assemblyService.getAssemblyByUid(assembly1.getUid().toString());
 
         assertThat(assembly.isPresent());
         assertThat(assembly.get()).isEqualTo(assembly1);

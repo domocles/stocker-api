@@ -5,33 +5,34 @@ import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.domain.Assembly;
 import com.eep.stocker.domain.AssemblyLine;
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.dto.assembly.*;
 import com.eep.stocker.services.AssemblyService;
 import com.eep.stocker.services.StockableProductService;
-import org.aspectj.lang.annotation.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AssemblyControllerIntegrationTest {
+class AssemblyControllerIntegrationTest {
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private AssemblyMapper assemblyMapper;
 
     @MockBean
     private AssemblyService assemblyService;
@@ -71,18 +72,27 @@ public class AssemblyControllerIntegrationTest {
                 .inStock(75.0)
                 .build();
 
-                /*(2L, "MF286",
-                "EEP200919002",
-                "Mild Steel Flange",
-                "Flange",
-                new HashSet<String>(),
-                "Flanges",
-                1.45D,
-                75.D);*/
 
-        assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101", "Decat");
-        assembly1 = new Assembly(1L, "Golf Decat", "EEP102", "Decat");
-        assembly2 = new Assembly(2L, "ST170 Mk2 Decat", "EEP103", "Decat");
+
+        assembly1unsaved = Assembly.builder()
+                .name("Golf Decat")
+                .mpn("EEP101")
+                .category("Decat")
+                .build();
+
+        assembly1 = Assembly.builder()
+                .name("Golf Decat")
+                .mpn("EEP101")
+                .category("Decat")
+                .build();
+        assembly1.setId(1L);
+
+        assembly2 = Assembly.builder()
+                .name("ST170 Mk2 Decat")
+                .mpn("EEP103")
+                .category("Decat")
+                .build();
+        assembly2.setId(2L);
 
         assemblyLine1 = new AssemblyLine(1L, MF220, assembly1, 3);
         assemblyLine2 = new AssemblyLine(2L, MF220, assembly1, 3);
@@ -90,59 +100,102 @@ public class AssemblyControllerIntegrationTest {
     }
 
     @Test
-    public void getAllAssembliesTest() {
+    void addSubAssemblyTest() {
+        given(assemblyService.getAssemblyByUid(assembly1.getUid().toString())).willReturn(Optional.of(assembly1));
+        given(assemblyService.getAssemblyByUid(assembly2.getUid().toString())).willReturn(Optional.of(assembly2));
+
+        var testAssy = assembly1.toBuilder().subAssembly(assembly2).build();
+
+        given(assemblyService.addSubAssemblyToAssemblyById(anyLong(),anyLong())).willReturn(Optional.of(testAssy));
+
+        var response = restTemplate.exchange(
+                "/api/assembly/addsubassembly/" + assembly1.getUid().toString() + "/" + assembly2.getUid().toString(),
+                HttpMethod.PUT,
+                null,
+                UpdateAssemblyResponse.class
+        );
+
+        var testResponse = assemblyMapper.mapToUpdateResponse(testAssy);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull().isEqualTo(testResponse)
+        );
+    }
+
+    @Test
+    void getAllAssembliesTest() {
         given(assemblyService.getAllAssemblies()).willReturn(Arrays.asList(assembly1, assembly2));
 
-        ResponseEntity<List<Assembly>> response = restTemplate.exchange(
-                "/api/assembly/get",
+        var response = restTemplate.exchange(
+                "/api/assembly/",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<Assembly>>() { }
+                GetAllAssembliesResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).contains(assembly1, assembly2);
+        var testResponse1 = assemblyMapper.mapToGetLowDetailResponse(assembly1);
+        var testResponse2 = assemblyMapper.mapToGetLowDetailResponse(assembly2);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull(),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getAssemblies()).contains(testResponse1, testResponse2)
+        );
     }
 
     @Test
-    public void getAssemblyByIdTest() {
+    void getAssemblyByUidTest() {
         Optional<Assembly> assyReturn = Optional.of(assembly1);
-        given(assemblyService.getAssemblyById(anyLong())).willReturn(assyReturn);
+        given(assemblyService.getAssemblyByUid(anyString())).willReturn(assyReturn);
 
-        ResponseEntity<Assembly> response = restTemplate.exchange(
-                "/api/assembly/get/5",
+        var response = restTemplate.exchange(
+                "/api/assembly/" + assembly1.getUid().toString() ,
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<Assembly>() {  }
+                GetAssemblyResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).isEqualTo(assembly1);
+        var testResponse = assemblyMapper.mapToGetResponse(assembly1);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull(),
+                () -> assertThat(response.getBody()).isEqualTo(testResponse)
+        );
     }
 
     @Test
-    public void saveAssemblyTest() {
-        given(assemblyService.saveAssembly(assembly1unsaved)).willReturn(Optional.of(assembly1));
+    void saveAssemblyTest() {
+        given(assemblyService.saveAssembly(any(Assembly.class))).willReturn(Optional.of(assembly1));
 
-        ResponseEntity<Assembly> response = restTemplate.postForEntity(
-                "/api/assembly/create",
-                assembly1unsaved,
-                Assembly.class
+        var request = new CreateAssemblyRequest();
+        request.setName(assembly1.getName());
+        request.setMpn(assembly1.getMpn());
+        request.setDescription(assembly1.getDescription());
+        request.setCategory(assembly1.getCategory());
+        request.getTags().addAll(assembly1.getTags());
+
+        var response = restTemplate.postForEntity(
+                "/api/assembly/",
+                request,
+                CreateAssemblyResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).isEqualTo(assembly1);
+        var testResponse = assemblyMapper.mapTpCreateResponse(assembly1);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull().isEqualTo(testResponse)
+        );
     }
 
     @Test
-    public void saveAssemblyMpnAlreadyExistsTest() {
+    void saveAssemblyMpnAlreadyExistsTest() {
         given(assemblyService.saveAssembly(any(Assembly.class))).willThrow(new MpnNotUniqueException("Assembly with mpn of EEP101 already exists"));
 
         ResponseEntity<ErrorResponse> response = restTemplate.postForEntity(
-                "/api/assembly/create",
+                "/api/assembly/",
                 assembly1unsaved,
                 ErrorResponse.class
         );
@@ -153,11 +206,11 @@ public class AssemblyControllerIntegrationTest {
     }
 
     @Test
-    public void saveNullAssemblyTest() {
+    void saveNullAssemblyTest() {
         given(assemblyService.saveAssembly(assembly1unsaved)).willReturn(Optional.of(assembly1));
 
         ResponseEntity<Assembly> response = restTemplate.postForEntity(
-                "/api/assembly/create",
+                "/api/assembly/",
                 null,
                 Assembly.class
         );
@@ -167,71 +220,77 @@ public class AssemblyControllerIntegrationTest {
     }
 
     @Test
-    public void updateAssemblyTest() {
-        given(assemblyService.updateAssembly(any(Assembly.class))).willReturn(Optional.of(assembly1));
+    void updateAssemblyTest() {
+        given(assemblyService.getAssemblyByUid(anyString())).willReturn(Optional.of(assembly1));
+        given(assemblyService.saveAssembly(any(Assembly.class))).willReturn(Optional.of(assembly2));
 
-        ResponseEntity<Assembly> response = restTemplate.exchange(
-          "/api/assembly/update",
-          HttpMethod.PUT,
-          new HttpEntity<>(assembly2), Assembly.class
+        var request = new UpdateAssemblyRequest();
+        request.setName(assembly2.getName());
+        request.setDescription(assembly2.getDescription());
+        request.setMpn(assembly2.getMpn());
+        request.setCategory(assembly2.getCategory());
+        request.getTags().addAll(assembly2.getTags());
+
+        var response = restTemplate.exchange(
+            "/api/assembly/" + assembly1.getUid(),
+                HttpMethod.PUT,
+                new HttpEntity<>(request),
+                UpdateAssemblyResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).isEqualTo(assembly1);
+        var testResponse = assemblyMapper.mapToUpdateResponse(assembly2);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull(),
+                () -> assertThat(response.getBody()).isEqualTo(testResponse)
+        );
     }
 
     @Test
-    public void deleteAssemblyByIdTest() {
-        given(assemblyService.deleteAssemblyById(anyLong())).willReturn(Optional.of(assembly1));
+    void deleteAssemblyByIdTest() {
+        given(assemblyService.deleteAssemblyByUid(anyString())).willReturn(Optional.of(assembly1));
 
-        ResponseEntity<Assembly> response = restTemplate.exchange(
-                "/api/assembly/delete/5",
+        var response = restTemplate.exchange(
+                "/api/assembly/" + assembly1.getUid().toString(),
                 HttpMethod.DELETE,
-                null, Assembly.class
+                null,
+                Void.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
-    public void deleteAssemblyTest() {
-        given(assemblyService.deleteAssemblyById(anyLong())).willReturn(Optional.of(assembly1));
-
-        ResponseEntity<Assembly> response = restTemplate.exchange(
-                "/api/assembly/delete/5",
-                HttpMethod.DELETE,
-               new HttpEntity<>(assembly1), Assembly.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
-    public void getAllAssembliesForComponentTest() {
-        given(stockableProductService.getStockableProductByID(anyLong())).willReturn(Optional.of(MF220));
+    void getAllAssembliesForComponentTest() {
+        given(stockableProductService.getStockableProductByUid(anyString())).willReturn(Optional.of(MF220));
         given(assemblyService.getAllAssembliesByComponent(any(StockableProduct.class)))
                 .willReturn(new HashSet<>(Arrays.asList(assembly1, assembly2)));
 
-        ResponseEntity<List<Assembly>> response = restTemplate.exchange(
-                "/api/assembly/component/4",
+        var response = restTemplate.exchange(
+                "/api/assembly/component/" + MF220.getUid().toString(),
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<Assembly>>() { }
+                GetAssembliesByComponentResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull().contains(assembly1, assembly2);
+        var testResponse1 = assemblyMapper.mapToGetLowDetailResponse(assembly1);
+        var testResponse2 = assemblyMapper.mapToGetLowDetailResponse(assembly2);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getAssemblies()).isNotNull().contains(testResponse1, testResponse2)
+        );
     }
 
     @Test
-    public void getAllAssembliesForComponentThatDoesntExistTest() {
-        given(stockableProductService.getStockableProductByID(anyLong())).willReturn(Optional.empty());
+    void getAllAssembliesForComponentThatDoesntExistTest() {
+        given(stockableProductService.getStockableProductByUid(anyString())).willReturn(Optional.empty());
         given(assemblyService.getAllAssembliesByComponent(any(StockableProduct.class)))
                 .willReturn(new HashSet<>(Arrays.asList(assembly1, assembly2)));
 
         ResponseEntity<ErrorResponse> response = restTemplate.exchange(
-                "/api/assembly/component/4",
+                "/api/assembly/component/" + UUID.randomUUID(),
                 HttpMethod.GET,
                 null,
                 ErrorResponse.class
@@ -242,22 +301,26 @@ public class AssemblyControllerIntegrationTest {
     }
 
     @Test
-    public void getAssemblyByMpnTest() {
+    void getAssemblyByMpnTest() {
         given(assemblyService.getAssemblyByMpn(any(String.class))).willReturn(Optional.of(assembly1));
 
-        ResponseEntity<Assembly> response = restTemplate.exchange(
+        var response = restTemplate.exchange(
                 "/api/assembly/mpn/EEP101",
                 HttpMethod.GET,
                 null,
-                Assembly.class
+                GetAssemblyByMpnResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull().isEqualTo(assembly1);
+        var testResponse = assemblyMapper.mapToGetByMpnResponse(assembly1);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull().isEqualTo(testResponse)
+        );
     }
 
     @Test
-    public void getAssemblyByMpnNotExistTest() {
+    void getAssemblyByMpnNotExistTest() {
         given(assemblyService.getAssemblyByMpn(any(String.class))).willReturn(Optional.empty());
 
         ResponseEntity<ErrorResponse> response = restTemplate.exchange(
@@ -267,8 +330,10 @@ public class AssemblyControllerIntegrationTest {
                 ErrorResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody().getDetails()).isNotNull();
-        assertThat(response.getBody().getDetails().get(0)).isEqualTo("Assembly with mpn of EEP101 does not exist");
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getDetails()).isNotNull(),
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getDetails().get(0)).isEqualTo("Assembly with mpn of EEP101 does not exist")
+        );
     }
 }

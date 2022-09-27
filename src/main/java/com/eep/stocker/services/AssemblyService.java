@@ -1,5 +1,6 @@
 package com.eep.stocker.services;
 
+import com.eep.stocker.controllers.error.exceptions.AssemblyDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.domain.Assembly;
 import com.eep.stocker.domain.AssemblyLine;
@@ -24,9 +25,26 @@ public class AssemblyService {
         this.assemblyLineRepository = assemblyLineRepository;
     }
 
+    /***
+     * Gets an assembly by its database id.  Deprecated, use getAssemblyByUid
+     * @param id = the unique database id of the assembly
+     * @return an {@code Optional} containing the assembly if it exists, else Optional.empty
+     */
+    @Deprecated
     public Optional<Assembly> getAssemblyById(long id) {
         log.info("retrieving assembly with id of: {}", id);
         return assemblyRepository.findById(id);
+    }
+
+    /***
+     * Gets an assembly by its unique identifier.
+     * @param uid - the unique identifier of the assembly
+     * @return - an {@code Optional} containing the assembly if it exists, else Optional.empty
+     */
+    public Optional<Assembly> getAssemblyByUid(String uid) {
+        log.info("retrieving assembly by uid");
+        var uuid = UUID.fromString(uid);
+        return assemblyRepository.findByUid(uuid);
     }
 
     public Optional<Assembly> saveAssembly(Assembly assembly) {
@@ -53,7 +71,7 @@ public class AssemblyService {
 
         Assembly assy = assembly.get();
         Assembly subassy = subassembly.get();
-        assy.addSubAssembly(subassy);
+        assy.getSubAssemblies().add(subassy);
 
         return Optional.of(assemblyRepository.save(assy));
 
@@ -66,11 +84,19 @@ public class AssemblyService {
         return Optional.of(assembly);
     }
 
+    @Deprecated
     public Optional<Assembly> deleteAssemblyById(long id) {
         log.info("delete assembly with id of: {}", id);
         Optional<Assembly> assy = assemblyRepository.findById(id);
         assy.ifPresent(a ->assemblyRepository.deleteById(id));
         return assy;
+    }
+
+    public Optional<Assembly> deleteAssemblyByUid(String uid) {
+        log.info("delete assembly with id of: {}", uid);
+        var assy = assemblyRepository.findByUid(UUID.fromString(uid)).orElseThrow(() -> new AssemblyDoesNotExistException("Assembly Does Not Exist"));
+        assemblyRepository.deleteById(assy.getId());
+        return Optional.of(assy);
     }
 
     public List<Assembly> getAllAssemblies() {

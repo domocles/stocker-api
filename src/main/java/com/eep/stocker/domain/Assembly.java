@@ -1,122 +1,68 @@
 package com.eep.stocker.domain;
 
-import com.eep.stocker.collections.RowTree;
+import lombok.*;
+import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.util.*;
 
+/***
+ * @author Sam Burns
+ * @version 1.0
+ * 24/09/2022
+ *
+ * The assembly domain object.  An assembly is a collection of assemblies, referred to as subassemblies.
+ */
 @Entity(name="assembly")
 @Table(name="assembly")
-public class Assembly {
-
-    private Long id;
+@Builder(toBuilder = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class Assembly extends AbstractEntity {
+    /***
+     * The name of the assembly e.g. HA236
+     */
     private String name;
+
+    /***
+     * The manufacturer part number of th assembly e.g. EEP236
+     */
+    @NaturalId
     private String mpn;
+
+    /***
+     * A description of the assembly e.g. Honda Accord back box
+     */
     private String description;
-    private String category;
-    private Set<String> tags = new HashSet<>();
-    private List<Assembly> subAssemblies = new ArrayList<>();
-    private transient RowTree<Assembly> assemblyTree = new RowTree<>(this);
 
-    public Assembly() {}
-
-    public Assembly(Long id, String name,
-                    String description,
-                    String mpn,
-                    String category,
-                    Set<String> tags,
-                    List<Assembly> subAssemblies) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.mpn = mpn;
-        this.category = category;
-        this.tags = tags;
-        this.subAssemblies = subAssemblies;
-    }
-
-    public Assembly(Long id, String name, String mpn, String category, Set<String> tags, List<Assembly> subAssemblies) {
-        this(id, name, "", mpn, category, tags, subAssemblies);
-    }
-
-    public Assembly(Long id, String name, String mpn, String category) {
-        this(id, name, "", mpn, category, Collections.EMPTY_SET, Collections.EMPTY_LIST);
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "assembly_id")
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-        this.category = category;
-        this.tags = tags;
-    }
-
-    public String getMpn() {
-        return mpn;
-    }
-
-    public void setMpn(String mpn) {
-        this.mpn = mpn;
-    }
-
+    /***
+     * Category for the assembly, e.g. Exhaust Parts
+     */
     @NotNull
-    public String getCategory() {
-        return this.category;
-    }
+    private String category;
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public void setTags(Set<String> tags) {
-        this.tags = tags;
-    }
-
+    /***
+     * A collection of tags that help identify the part
+     */
     @ElementCollection
     @CollectionTable(name = "assembly_tags", joinColumns = @JoinColumn(name = "assembly_id"))
     @Column(name = "tags")
-    public Set<String> getTags() {
-        return tags;
-    }
+    @Singular
+    private Set<String> tags = new HashSet<>();
 
+    /***
+     * A collection of subassemblies
+     */
     @ManyToMany
     @JoinTable(name = "Assembly_Subassembly",
-        joinColumns = {@JoinColumn(name = "fk_assembly")},
-        inverseJoinColumns = {@JoinColumn(name = "fk_subassembly")})
-    public List<Assembly> getSubAssemblies() {
-        return this.subAssemblies;
-    }
+            joinColumns = {@JoinColumn(name = "fk_assembly")},
+            inverseJoinColumns = {@JoinColumn(name = "fk_subassembly")})
+    @Singular
+    private List<Assembly> subAssemblies = new ArrayList<>();
 
-    public void setSubAssemblies(List<Assembly> subAssemblies) {
-        this.subAssemblies = subAssemblies;
-    }
-
-    public void addSubAssembly(Assembly subAssembly) {
-        this.subAssemblies.add(subAssembly);
-        this.assemblyTree.add(subAssembly, this);
-    }
 
     @Override
     public boolean equals(Object o) {

@@ -63,9 +63,25 @@ class AssemblyLineServiceTest {
                 .inStock(75.0)
                 .build();
 
-        assembly1unsaved = new Assembly(null, "Golf Decat", "EEP101", "Decat");
-        assembly1 = new Assembly(1L, "Golf Decat", "EEP102", "Decat");
-        assembly2 = new Assembly(2L, "ST170 Mk2 Decat", "EEP103", "Decat");
+        assembly1unsaved = Assembly.builder()
+                .name("Golf Decat")
+                .mpn("EEP101")
+                .category("Decat")
+                .build();
+
+        assembly1 = Assembly.builder()
+                .name("Golf Decat")
+                .mpn("EEP101")
+                .category("Decat")
+                .build();
+        assembly1.setId(1L);
+
+        assembly2 = Assembly.builder()
+                .name("ST170 Mk2 Decat")
+                .mpn("EEP103")
+                .category("Decat")
+                .build();
+        assembly2.setId(2L);
 
         assemblyLine1 = new AssemblyLine(1L, MF220, assembly1, 3);
         assemblyLine2 = new AssemblyLine(2L, MF220, assembly1, 3);
