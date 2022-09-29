@@ -82,9 +82,14 @@ class AssemblyServiceTest {
                 .build();
         assembly2.setId(2L);
 
-        assemblyLine1 = new AssemblyLine(Long.valueOf(1), MF220, assembly1, 3);
-        assemblyLine2 = new AssemblyLine(Long.valueOf(2), MF220, assembly1, 3);
-        assemblyLine3 = new AssemblyLine(Long.valueOf(3), MF220, assembly2, 3);
+        assemblyLine1 = AssemblyLine.builder().assembly(assembly1).stockableProduct(MF220).qty(3).build();
+        assemblyLine1.setId(1L);
+
+        assemblyLine2 = AssemblyLine.builder().assembly(assembly1).stockableProduct(MF220).qty(3).build();
+        assemblyLine2.setId(2L);
+
+        assemblyLine3 = AssemblyLine.builder().assembly(assembly2).stockableProduct(MF220).qty(3).build();
+        assemblyLine3.setId(3L);
     }
 
     @Test

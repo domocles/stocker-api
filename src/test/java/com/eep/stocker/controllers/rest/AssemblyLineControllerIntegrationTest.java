@@ -4,8 +4,10 @@ import com.eep.stocker.controllers.error.ErrorResponse;
 import com.eep.stocker.domain.Assembly;
 import com.eep.stocker.domain.AssemblyLine;
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.dto.assemblyline.*;
 import com.eep.stocker.services.AssemblyLineService;
 import com.eep.stocker.services.AssemblyService;
+import com.eep.stocker.services.StockableProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +26,17 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class AssemblyLineControllerIntegrationTest {
+class AssemblyLineControllerIntegrationTest {
     @Autowired
     private TestRestTemplate restTemplate;
+
+    @Autowired
+    private AssemblyLineMapper mapper;
 
     private StockableProduct MF220;
     private StockableProduct MF286;
@@ -48,6 +53,9 @@ public class AssemblyLineControllerIntegrationTest {
 
     @MockBean
     private AssemblyService assemblyService;
+
+    @MockBean
+    private StockableProductService stockableProductService;
 
     @BeforeEach
     public void setUp() throws Exception {
@@ -93,104 +101,180 @@ public class AssemblyLineControllerIntegrationTest {
                 .build();
         assembly2.setId(2L);
 
-        assemblyLine1 = new AssemblyLine(1L, MF220, assembly1, 3);
-        assemblyLine2 = new AssemblyLine(2L, MF220, assembly1, 3);
-        assemblyLine3 = new AssemblyLine(3L, MF220, assembly2, 3);
+        assemblyLine1 = AssemblyLine.builder().assembly(assembly1).stockableProduct(MF220).qty(3).build();
+        assemblyLine1.setId(1L);
+
+        assemblyLine2 = AssemblyLine.builder().assembly(assembly1).stockableProduct(MF220).qty(3).build();
+        assemblyLine2.setId(2L);
+
+        assemblyLine3 = AssemblyLine.builder().assembly(assembly2).stockableProduct(MF286).qty(3).build();
+        assemblyLine3.setId(3L);
     }
 
     @Test
-    public void getAlLAssemblyLinesTest() {
+    void getAlLAssemblyLinesTest() {
         given(assemblyLineService.getAllAssemblyLines())
                 .willReturn(Arrays.asList(assemblyLine1,assemblyLine2,assemblyLine3));
 
-        ResponseEntity<List<AssemblyLine>> response = restTemplate.exchange(
-                "/api/assembly-line/get",
+        var response = restTemplate.exchange(
+                "/api/assembly-line/",
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<AssemblyLine>>() { }
+                GetAllAssemblyLinesResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull().contains(assemblyLine1, assemblyLine2, assemblyLine3);
+        var testRes1 = mapper.mapToLowDetailResponse(assemblyLine1);
+        var testRes2 = mapper.mapToLowDetailResponse(assemblyLine2);
+        var testRes3 = mapper.mapToLowDetailResponse(assemblyLine3);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().getAssemblyLines()).isNotNull().contains(testRes1, testRes2, testRes3)
+        );
     }
 
     @Test
-    public void getAssemblyLineByIdTest() {
-        given(assemblyLineService.getAssemblyLineById(anyLong())).willReturn(Optional.of(assemblyLine1));
+    void getAssemblyLineByIdTest() {
+        given(assemblyLineService.getAssemblyLineByUid(anyString())).willReturn(Optional.of(assemblyLine1));
 
-        ResponseEntity<AssemblyLine> response = restTemplate.exchange(
-                "/api/assembly-line/get/4",
+        var response = restTemplate.exchange(
+                "/api/assembly-line/" + assemblyLine1.getUid().toString(),
                 HttpMethod.GET,
                 null,
-                AssemblyLine.class
+                GetAssemblyLineResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull().isEqualTo(assemblyLine1);
+        var testResponse = mapper.mapToGetResponse(assemblyLine1);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull().isEqualTo(testResponse)
+        );
     }
 
     @Test
     public void getAssemblyLineByIdNotExistTest() {
-        given(assemblyLineService.getAssemblyLineById(anyLong())).willReturn(Optional.empty());
+        given(assemblyLineService.getAssemblyLineByUid(anyString())).willReturn(Optional.empty());
 
         ResponseEntity<ErrorResponse> response = restTemplate.exchange(
-                "/api/assembly-line/get/4",
+                "/api/assembly-line/" + assemblyLine1.getUid().toString(),
                 HttpMethod.GET,
                 null,
                 ErrorResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody()).isNotNull();
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
+                () -> assertThat(response.getBody()).isNotNull()
+        );
     }
 
     @Test
-    public void saveAssemblyLineTest() {
+    void saveAssemblyLineTest() {
+        given(stockableProductService.getStockableProductByUid(anyString())).willReturn(Optional.of(MF220));
+        given(assemblyService.getAssemblyByUid(anyString())).willReturn(Optional.of(assembly1));
         given(assemblyLineService.saveAssemblyLine(any(AssemblyLine.class)))
                 .willReturn(Optional.of(assemblyLine1));
 
-        ResponseEntity<AssemblyLine> response = restTemplate.exchange(
-                "/api/assembly-line/create",
+        var request = new CreateAssemblyLineRequest();
+        request.setAssemblyId(assembly1.getUid().toString());
+        request.setStockableProductId(MF220.getUid().toString());
+        request.setQty(3.0);
+
+
+        var response = restTemplate.exchange(
+                "/api/assembly-line/",
                 HttpMethod.POST,
-                new HttpEntity<>(assemblyLine2),
-                AssemblyLine.class
+                new HttpEntity<>(request),
+                CreateAssemblyLineResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).isEqualTo(assemblyLine1);
+        var testResponse = mapper.mapToCreateResponse(assemblyLine1);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull(),
+                () -> assertThat(response.getBody()).isNotNull().isEqualTo(testResponse)
+        );
     }
 
     @Test
-    public void updateAssemblyLineTest() {
+    void updateAssemblyLineTest() {
+        given(assemblyLineService.getAssemblyLineByUid(anyString())).willReturn(Optional.of(assemblyLine3));
+        given(assemblyService.getAssemblyByUid(anyString())).willReturn(Optional.of(assemblyLine2.getAssembly()));
+        given(stockableProductService.getStockableProductByUid(anyString()))
+                .willReturn(Optional.of(assemblyLine2.getStockableProduct()));
         given(assemblyLineService.saveAssemblyLine(any(AssemblyLine.class)))
                 .willReturn(Optional.of(assemblyLine2));
 
-        ResponseEntity<AssemblyLine> response = restTemplate.exchange(
-                "/api/assembly-line/update",
+
+        var request = new UpdateAssemblyLineRequest();
+        request.setAssemblyId(assemblyLine2.getAssembly().getUid().toString());
+        request.setStockableProductId(assemblyLine2.getStockableProduct().getUid().toString());
+        request.setQty(assemblyLine2.getQty());
+
+        var response = restTemplate.exchange(
+                "/api/assembly-line/" + assemblyLine1.getUid().toString(),
                 HttpMethod.PUT,
-                new HttpEntity<>(assembly1),
-                AssemblyLine.class
+                new HttpEntity<>(request),
+                UpdateAssemblyLineResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()).isEqualTo(assemblyLine2);
+        var testResponse = mapper.mapToUpdateResponse(assemblyLine2);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull(),
+                () -> assertThat(response.getBody()).isNotNull().isEqualTo(testResponse)
+        );
+    }
+
+
+    @Test
+    void updateAssemblyLineWithInvalidAssemblyUidTest() {
+        given(assemblyLineService.getAssemblyLineByUid(anyString())).willReturn(Optional.of(assemblyLine3));
+        given(assemblyService.getAssemblyByUid(anyString())).willReturn(Optional.of(assemblyLine2.getAssembly()));
+        given(stockableProductService.getStockableProductByUid(anyString()))
+                .willReturn(Optional.of(assemblyLine2.getStockableProduct()));
+        given(assemblyLineService.saveAssemblyLine(any(AssemblyLine.class)))
+                .willReturn(Optional.of(assemblyLine2));
+
+
+        var request = new UpdateAssemblyLineRequest();
+        request.setAssemblyId("invalid");
+        request.setStockableProductId("invalid");
+        request.setQty(assemblyLine2.getQty());
+
+        var response = restTemplate.exchange(
+                "/api/assembly-line/" + assemblyLine1.getUid().toString(),
+                HttpMethod.PUT,
+                new HttpEntity<>(request),
+                ErrorResponse.class
+        );
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST)
+        );
     }
 
     @Test
-    public void deleteAssemblyLineByIdTest() {
+    void deleteAssemblyLineByIdTest() {
+        given(assemblyLineService.getAssemblyLineByUid(anyString())).willReturn(Optional.of(assemblyLine2));
         given(assemblyLineService.deleteAssemblyLineById(anyLong())).willReturn(Optional.of(assemblyLine2));
 
-        ResponseEntity<AssemblyLine> response = restTemplate.exchange(
-                "/api/assembly-line/delete/4",
+        var response = restTemplate.exchange(
+                "/api/assembly-line/" + assemblyLine2.getUid().toString(),
                 HttpMethod.DELETE,
                 null,
-                AssemblyLine.class
+                DeleteAssemblyLineResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull().isEqualTo(assemblyLine2);
+        var testResponse = mapper.mapToDeleteResponse(assemblyLine2);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull().isEqualTo(testResponse)
+        );
     }
 
     @Test
@@ -208,36 +292,27 @@ public class AssemblyLineControllerIntegrationTest {
         assertThat(response.getBody()).isNotNull();
     }
 
-    @Test
-    public void deleteAssemblyLineTest() {
-        given(assemblyLineService.deleteAssemblyLine(any(AssemblyLine.class)))
-                .willReturn(Optional.of(assemblyLine2));
-
-        ResponseEntity<AssemblyLine> response = restTemplate.exchange(
-                "/api/assembly-line/delete",
-                HttpMethod.DELETE,
-                new HttpEntity<>(assemblyLine2),
-                AssemblyLine.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull().isEqualTo(assemblyLine2);
-    }
 
     @Test
-    public void getAssemblyLinesForAssemblyTest() {
-        given(assemblyService.getAssemblyById(anyLong())).willReturn(Optional.of(assembly1));
+    void getAssemblyLinesForAssemblyTest() {
+        given(assemblyService.getAssemblyByUid(anyString())).willReturn(Optional.of(assembly1));
         given(assemblyLineService.getAllAssemblyLinesForAssembly(assembly1))
                 .willReturn(Arrays.asList(assemblyLine1, assemblyLine2, assemblyLine3));
 
-        ResponseEntity<List<AssemblyLine>> response = restTemplate.exchange(
-                "/api/assembly-line/get/assembly/5",
+        var response = restTemplate.exchange(
+                "/api/assembly-line/assembly/" + assembly1.getUid().toString(),
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<AssemblyLine>>() {  }
+               GetAllAssemblyLinesResponse.class
         );
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull().contains(assemblyLine1, assemblyLine2, assemblyLine3);
+        var testRes1 = mapper.mapToLowDetailResponse(assemblyLine1);
+        var testRes2 = mapper.mapToLowDetailResponse(assemblyLine2);
+        var testRes3 = mapper.mapToLowDetailResponse(assemblyLine3);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().getAssemblyLines()).isNotNull().contains(testRes1, testRes2, testRes3)
+        );
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AssemblyLineService {
@@ -26,9 +27,16 @@ public class AssemblyLineService {
         return assemblyLineRepository.findAll();
     }
 
+    @Deprecated
     public Optional<AssemblyLine> getAssemblyLineById(long id) {
         log.info("get assembly line with id: {}", id);
         return assemblyLineRepository.findById(id);
+    }
+
+    public Optional<AssemblyLine> getAssemblyLineByUid(String uid) {
+        log.info("get assembly line with uid: {}", uid);
+        var uuid = UUID.fromString(uid);
+        return assemblyLineRepository.findByUid(uuid);
     }
 
     public List<AssemblyLine> getAllAssemblyLinesForAssembly(Assembly assembly) {

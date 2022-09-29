@@ -1,59 +1,34 @@
 package com.eep.stocker.domain;
 
+import lombok.*;
+
 import javax.persistence.*;
 import java.util.Objects;
 
+/***
+ * @author Sam Burns
+ * @version 1.0
+ * 28/09/2022
+ *
+ * Assembly Line domain object
+ */
 @Entity(name="AssemblyLine")
 @Table(name="assembly_line")
-public class AssemblyLine {
-    private Long id;
-    private StockableProduct stockableProduct;
-    private Assembly assembly;
-    private double qty;
-
-    public AssemblyLine() {}
-
-    public AssemblyLine(Long id, StockableProduct stockableProduct, Assembly assembly, double qty) {
-        this.id = id;
-        this.stockableProduct = stockableProduct;
-        this.assembly = assembly;
-        this.qty = qty;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "assembly_line_id")
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
+@Builder(toBuilder = true)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class AssemblyLine extends AbstractEntity {
     @ManyToOne
     @JoinColumn(name = "stockable_product_id")
-    public StockableProduct getStockableProduct() {
-        return stockableProduct;
-    }
-
-    public void setStockableProduct(StockableProduct stockableProduct) {
-        this.stockableProduct = stockableProduct;
-    }
+    private StockableProduct stockableProduct;
 
     @ManyToOne
     @JoinColumn(name = "assembly_id")
-    public Assembly getAssembly() { return assembly; }
+    private Assembly assembly;
 
-    public void setAssembly(Assembly assembly) { this.assembly = assembly; }
-
-    public double getQty() {
-        return qty;
-    }
-
-    public void setQty(double qty) {
-        this.qty = qty;
-    }
+    private double qty;
 
     @Override
     public boolean equals(Object o) {

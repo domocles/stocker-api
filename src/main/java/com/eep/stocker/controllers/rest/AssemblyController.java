@@ -5,7 +5,6 @@ import com.eep.stocker.controllers.error.exceptions.AssemblyDoesNotExistExceptio
 import com.eep.stocker.controllers.error.exceptions.AssemblyLineDoesNotExistException;
 import com.eep.stocker.controllers.error.exceptions.MpnNotFoundException;
 import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
-import com.eep.stocker.domain.Assembly;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.dto.assembly.*;
 import com.eep.stocker.services.AssemblyService;
