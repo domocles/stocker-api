@@ -21,12 +21,12 @@ abstract public class SupplierTestData {
 
     public SupplierTestData() {
         supplier = Supplier.builder()
-                .id(1L)
                 .supplierName("Shelley Parts Ltd")
                 .defaultCurrency("GBP")
                 .emailAddress("jon.horton@shelleyparts.co.uk")
                 .telephoneNumber("01527 584285")
                 .build();
+        supplier.setId(1L);
 
         shelleys = Supplier.builder()
                 .supplierName("Shelley Parts Ltd")
@@ -72,7 +72,6 @@ abstract public class SupplierTestData {
                 .build();
 
         updateSupplierRequest = UpdateSupplierRequest.builder()
-                .id(supplier.getUid().toString())
                 .supplierName(supplier.getSupplierName())
                 .defaultCurrency(supplier.getDefaultCurrency())
                 .emailAddress(supplier.getEmailAddress())

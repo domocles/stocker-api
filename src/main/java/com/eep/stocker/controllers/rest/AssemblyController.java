@@ -55,7 +55,7 @@ public class AssemblyController {
      * @return - a {@code GetAssemblyResponse} containing the assembly
      */
     @GetMapping("/{uid}")
-    public GetAssemblyResponse getAssemblyByUid(@PathVariable @ValidUUID String uid) {
+    public GetAssemblyResponse getAssemblyByUid(@PathVariable @ValidUUID(message = "Assembly Id must be a UUID") String uid) {
         log.info("get: /api/assembly/{} called", uid);
         var assembly = assemblyService.getAssemblyByUid(uid)
                 .orElseThrow(() -> new AssemblyDoesNotExistException(String.format("Assembly with id of %s does not exist", uid)));
@@ -68,7 +68,7 @@ public class AssemblyController {
      * @return - a {@code GetAssembliesByComponentResponse} containing all assemblies that contain a component
      */
     @GetMapping("/component/{uid}")
-    public GetAssembliesByComponentResponse getAssemblyForComponent(@PathVariable @ValidUUID String uid) {
+    public GetAssembliesByComponentResponse getAssemblyForComponent(@PathVariable @ValidUUID(message = "Component Id must be a UUID") String uid) {
         log.info("get: /api/assembly/component/{} called", uid);
         Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByUid(uid);
 
@@ -125,7 +125,7 @@ public class AssemblyController {
      * @return - an {@code UpdateAssemblyResponse} representing the new assembly
      */
     @PutMapping("/{uid}")
-    public UpdateAssemblyResponse updateAssembly(@PathVariable @ValidUUID String uid, @RequestBody @Valid UpdateAssemblyRequest request) {
+    public UpdateAssemblyResponse updateAssembly(@PathVariable @ValidUUID(message = "Assembly Id must be a UUID") String uid, @RequestBody @Valid UpdateAssemblyRequest request) {
         log.info("put: /api/assembly/{} called", uid);
         var assembly = assemblyService.getAssemblyByUid(uid)
                 .orElseThrow(() -> new AssemblyDoesNotExistException("Assembly does not exist"));
@@ -141,7 +141,7 @@ public class AssemblyController {
      * @return an {@code UpdateAssemblyResponse} containing the updated Assembly
      */
     @PutMapping("/addsubassembly/{assemblyId}/{subassemblyId}")
-    public UpdateAssemblyResponse addSubAssembly(@PathVariable @ValidUUID String assemblyId, @PathVariable @ValidUUID String subassemblyId) {
+    public UpdateAssemblyResponse addSubAssembly(@PathVariable @ValidUUID(message = "Assembly Id must be a UUID") String assemblyId, @PathVariable @ValidUUID(message = "Sub-assembly Id must be a UUID") String subassemblyId) {
         log.info("put: /api/assembly/addsubassembly/{}/{} called", assemblyId, subassemblyId);
         var assembly = assemblyService.getAssemblyByUid(assemblyId)
                 .orElseThrow(() -> new AssemblyDoesNotExistException("Assembly does not exist"));
@@ -159,7 +159,7 @@ public class AssemblyController {
      * @param uid - the unique identifier of the assembly
      */
     @DeleteMapping("/{uid}")
-    public void deleteAssemblyById(@PathVariable @ValidUUID String uid) {
+    public void deleteAssemblyById(@PathVariable @ValidUUID(message = "Assembly Id must be a UUID") String uid) {
         log.info("delete: /api/assembly/{} called", uid);
         assemblyService.deleteAssemblyByUid(uid)
                 .orElseThrow(() -> new AssemblyDoesNotExistException(String.format("Assembly with id of %s does not exist", uid)));

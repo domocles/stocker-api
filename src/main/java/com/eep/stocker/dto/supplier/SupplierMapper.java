@@ -4,6 +4,7 @@ import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.dto.MapperUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
@@ -13,20 +14,17 @@ public interface SupplierMapper {
     GetSupplierResponse getSupplierResponseFromSupplier(Supplier supplier);
 
     @Mapping(source = "uid", target = "id")
-    CreateSupplierResponse createSupplierResponseFromSupplier(Supplier supplier);
-    Supplier createSupplierFromCreateSupplierRequest(CreateSupplierRequest request);
+    CreateSupplierResponse mapToCreateResponse(Supplier supplier);
+
+    Supplier mapFromCreateRequest(CreateSupplierRequest request);
 
     @Mapping(source = "uid", target = "id")
-    UpdateSupplierResponse updateSupplierResponseFromSupplier(Supplier supplier);
+    UpdateSupplierResponse mapToUpdateResponse(Supplier supplier);
 
-    CreateSupplierRequest createSupplierRequestFromUpdateSupplierRequest(UpdateSupplierRequest request);
-    UpdateSupplierResponse updateSupplierResponseFromCreateSupplierResponse(CreateSupplierResponse response);
+    DeletedSupplierResponse mapToDeleteResponse(Supplier supplier);
 
-    DeletedSupplierResponse deletedSupplierResponseFromSupplier(Supplier supplier);
+    void updateFromUpdateRequest(@MappingTarget Supplier supplier, UpdateSupplierRequest request);
 
-    @Mapping(source = "id", target = "uid")
-    @Mapping(target = "id", ignore = true)
-    Supplier mapFromUpdateSupplierRequest(UpdateSupplierRequest request);
 
     default GetAllSuppliersResponse getAllSupplierResponseFromList(List<Supplier> suppliers) {
         var response = new GetAllSuppliersResponse();

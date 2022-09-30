@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.Set;
 
@@ -18,9 +19,12 @@ public class CreateStockableProductRequest implements
         IStockableProductDTO.Tags,
         IStockableProductDTO.StockPrice,
         IStockableProductDTO.InStock {
+    @NotBlank(message = "Name must not be blank")
     private String name;
+    @NotBlank(message = "MPN must not be blank")
     private String mpn;
     private String description;
+    @NotBlank(message = "Category must not be blank")
     private String category;
     private String units;
     @Singular

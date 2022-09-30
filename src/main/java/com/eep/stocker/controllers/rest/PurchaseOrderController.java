@@ -10,12 +10,15 @@ import com.eep.stocker.dto.purchaseorder.*;
 import com.eep.stocker.services.PurchaseOrderService;
 import com.eep.stocker.services.SupplierService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,9 +41,8 @@ import java.util.UUID;
 @RestController
 @Validated
 @RequestMapping("/api/purchase-order")
+@Slf4j
 public class PurchaseOrderController {
-    private static final Logger log = LoggerFactory.getLogger(PurchaseOrderController.class);
-
     private final PurchaseOrderService purchaseOrderService;
     private final SupplierService supplierService;
     private final PurchaseOrderMapper mapper;
@@ -51,7 +53,7 @@ public class PurchaseOrderController {
      * @return = {@code GetPurchaseOrderResponse} of the purchase order
      */
     @GetMapping(value = "/{uid}")
-    public GetPurchaseOrderResponse getPurchaseOrderById(@PathVariable @ValidUUID String uid) {
+    public GetPurchaseOrderResponse getPurchaseOrderById(@PathVariable @ValidUUID(message = "Purchase Order Id must be a UUID") String uid) {
         log.info("get: /api/purchase-order/{} called", uid);
         var uuid = UUID.fromString(uid);
         var po = this.purchaseOrderService.getPurchaseOrderFromUid(uuid).orElseThrow(() -> new DomainObjectDoesNotExistException("Purchase Order Does Not Exist"));
@@ -117,7 +119,7 @@ public class PurchaseOrderController {
      * @return {@code GetAllPurchaseOrdersResponse} containing all purchase orders of the supplier
      */
     @GetMapping("/supplier/{supplierId}")
-    public GetAllPurchaseOrdersResponse getAllPurchaseOrdersForSupplier(@PathVariable @ValidUUID String supplierId) {
+    public GetAllPurchaseOrdersResponse getAllPurchaseOrdersForSupplier(@PathVariable @ValidUUID(message = "Supplier Id must be a UUID") String supplierId) {
         log.info("get: /api/purchase-order/supplier/{} called", supplierId);
         Optional<Supplier> supplier = this.supplierService.getSupplierFromUid(supplierId);
         if(supplier.isPresent()) {
@@ -139,7 +141,8 @@ public class PurchaseOrderController {
      * @return {@code GetAllPurchaseOrdersResponse} containing all purchase orders between the supplied date range
      */
     @GetMapping("/{fromDate}/{toDate}")
-    public GetAllPurchaseOrdersResponse getAllPurchaseOrdersBetween(@PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate, @PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+    public GetAllPurchaseOrdersResponse getAllPurchaseOrdersBetween(@PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+                                                                    @PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         log.info("get: /api/purchase-order/{}/{} called", fromDate, toDate);
         var response = new GetAllPurchaseOrdersResponse();
         var purchaseOrders = purchaseOrderService.getAllPurchaseOrdersBetween(fromDate, toDate);
@@ -155,9 +158,10 @@ public class PurchaseOrderController {
      * @return {@code CreatePurchaseOrderResponse} containing the purchase order.
      */
     @PostMapping("/")
-    public CreatePurchaseOrderResponse createPurchaseOrder(@RequestBody CreatePurchaseOrderRequest purchaseOrderRequest) {
+    public CreatePurchaseOrderResponse createPurchaseOrder(@RequestBody @Valid CreatePurchaseOrderRequest purchaseOrderRequest) {
         log.info("post: /api/purchase-order/create called");
-        var supplier = supplierService.getSupplierFromUid(purchaseOrderRequest.getSupplierId()).orElseThrow(() -> new DomainObjectDoesNotExistException("Supplier does not exist"));
+        var supplier = supplierService.getSupplierFromUid(purchaseOrderRequest.getSupplierId())
+                .orElseThrow(() -> new DomainObjectDoesNotExistException("Supplier does not exist"));
         var purchaseOrder = PurchaseOrder.builder()
                 .purchaseOrderDate(LocalDate.now())
                 .purchaseOrderReference(purchaseOrderRequest.getPurchaseOrderReference())
@@ -177,7 +181,8 @@ public class PurchaseOrderController {
      * @return {@code UpdatePurchaseOrderResponse} containing the updated purchase order
      */
     @PutMapping("/{uuid}")
-    public UpdatePurchaseOrderResponse updatePurchaseOrder(@PathVariable @ValidUUID String uuid, @RequestBody UpdatePurchaseOrderRequest request) {
+    public UpdatePurchaseOrderResponse updatePurchaseOrder(@PathVariable @ValidUUID(message = "Purchase Order Id must be a UUID") String uuid,
+                                                           @RequestBody @Valid UpdatePurchaseOrderRequest request) {
         log.info("put: /api/purchase-order/{}", uuid);
         var purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(uuid)).orElseThrow(() -> new DomainObjectDoesNotExistException("Purchase Order does not exists"));
         Supplier supplier = purchaseOrder.getSupplier();
@@ -196,7 +201,7 @@ public class PurchaseOrderController {
      * @return a String detailing that the purchase order that was deleted
      */
     @DeleteMapping("/{uuid}")
-    public String deletePurchaseOrder(@PathVariable @ValidUUID String uuid) {
+    public String deletePurchaseOrder(@PathVariable @ValidUUID(message = "Purchase Order Id must be a UUID") String uuid) {
         log.info("delete: /api/purchase-order/{} called", uuid);
         Optional<PurchaseOrder> purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(uuid));
         if(purchaseOrder.isPresent()) {

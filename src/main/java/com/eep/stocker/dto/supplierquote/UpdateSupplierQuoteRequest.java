@@ -1,5 +1,6 @@
 package com.eep.stocker.dto.supplierquote;
 
+import com.eep.stocker.annotations.validators.ValidUUID;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -23,7 +24,9 @@ public class UpdateSupplierQuoteRequest implements
         ISupplierQuoteDTO.Price,
         ISupplierQuoteDTO.Qty,
         ISupplierQuoteDTO.QuotationDate {
+    @ValidUUID(message = "Supplier ID has to be a UUID")
     private String supplierId;
+    @ValidUUID(message = "Stockable Product ID has to be a UUID")
     private String stockableProductId;
     private Double price;
     private Double qty;

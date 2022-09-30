@@ -196,6 +196,56 @@ class AssemblyControllerIntegrationTest {
     }
 
     @Test
+    void saveAssemblyWithNoMpnTest() {
+        given(assemblyService.saveAssembly(any(Assembly.class))).willReturn(Optional.of(assembly1));
+
+        var request = new CreateAssemblyRequest();
+        request.setName(assembly1.getName());
+        request.setMpn(" ");
+        request.setDescription(assembly1.getDescription());
+        request.setCategory(assembly1.getCategory());
+        request.getTags().addAll(assembly1.getTags());
+
+        var response = restTemplate.postForEntity(
+                "/api/assembly/",
+                request,
+                ErrorResponse.class
+        );
+
+
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
+                () -> assertThat(response.getBody().getDetails()).isNotNull().contains("mpn: MPN must not be blank")
+        );
+    }
+
+    @Test
+    void saveAssemblyWithNoCategoryTest() {
+        given(assemblyService.saveAssembly(any(Assembly.class))).willReturn(Optional.of(assembly1));
+
+        var request = new CreateAssemblyRequest();
+        request.setName(assembly1.getName());
+        request.setMpn(assembly1.getMpn());
+        request.setDescription(assembly1.getDescription());
+        request.setCategory("");
+        request.getTags().addAll(assembly1.getTags());
+
+        var response = restTemplate.postForEntity(
+                "/api/assembly/",
+                request,
+                ErrorResponse.class
+        );
+
+
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
+                () -> assertThat(response.getBody().getDetails()).isNotNull().contains("category: Category must not be blank")
+        );
+    }
+
+    @Test
     void saveAssemblyMpnAlreadyExistsTest() {
         given(assemblyService.saveAssembly(any(Assembly.class))).willThrow(new MpnNotUniqueException("Assembly with mpn of EEP101 already exists"));
 

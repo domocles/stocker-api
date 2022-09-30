@@ -1,5 +1,6 @@
 package com.eep.stocker.dto.purchaseorderline;
 
+import com.eep.stocker.annotations.validators.ValidUUID;
 import lombok.Data;
 
 /***
@@ -15,9 +16,15 @@ public class CreatePurchaseOrderLineRequest implements
         IPurchaseOrderLineDTO.Qty,
         IPurchaseOrderLineDTO.Price,
         IPurchaseOrderLineDTO.Note {
+    @ValidUUID(message = "Purchase Order ID needs to e a UUID")
     String purchaseOrderId;
+
+    @ValidUUID(message = "Stockable Product ID needs to e a UUID")
     String stockableProductId;
+
     Double qty;
+
     Double price;
+
     String note;
 }

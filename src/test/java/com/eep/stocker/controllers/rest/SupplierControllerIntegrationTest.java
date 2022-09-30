@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 
@@ -34,14 +35,16 @@ class SupplierControllerIntegrationTest extends SupplierTestData {
         given(supplierService.getSupplierFromUid(anyString())).willReturn(Optional.of(supplier));
 
         ResponseEntity<GetSupplierResponse> res = restTemplate.exchange(
-                "/api/suppliers/get/5",
+                "/api/suppliers/" + supplier.getUid().toString(),
                 HttpMethod.GET,
                 null,
                 GetSupplierResponse.class);
 
-        assertThat(res).isNotNull();
-        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(res.getBody()).isNotNull().isEqualTo(getSupplierResponse);
+        assertAll(
+                () -> assertThat(res).isNotNull(),
+                () -> assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(res.getBody()).isNotNull().isEqualTo(getSupplierResponse)
+        );
     }
 
     @Test
@@ -49,7 +52,7 @@ class SupplierControllerIntegrationTest extends SupplierTestData {
         given(supplierService.getSupplierFromUid(anyString())).willReturn(Optional.empty());
 
         ResponseEntity<GetSupplierResponse> res = restTemplate.exchange(
-                "/api/suppliers/get/5",
+                "/api/suppliers/get/" + supplier.getUid().toString(),
                 HttpMethod.GET,
                 null,
                 GetSupplierResponse.class);
@@ -62,15 +65,16 @@ class SupplierControllerIntegrationTest extends SupplierTestData {
         given(supplierService.getAllSuppliers()).willReturn(Arrays.asList(supplier, shelleys, ukf, fji));
 
         ResponseEntity<GetAllSuppliersResponse> res = restTemplate.exchange(
-                "/api/suppliers/get",
+                "/api/suppliers/",
                 HttpMethod.GET,
                 null,
                 GetAllSuppliersResponse.class
         );
 
-        assertThat(res).isNotNull();
-        assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(res.getBody().getAllSuppliers()).contains(getSupplierResponse);
+        assertAll(
+                () -> assertThat(res.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(res.getBody().getAllSuppliers()).isNotNull().contains(getSupplierResponse)
+        );
     }
 
     @Test
@@ -116,31 +120,13 @@ class SupplierControllerIntegrationTest extends SupplierTestData {
         var request = updateSupplierRequest;
 
         var response = restTemplate.exchange(
-                "/api/suppliers/update",
+                "/api/suppliers/" + supplier.getUid().toString() ,
                 HttpMethod.PUT,
                 new HttpEntity<>(request),
                 UpdateSupplierResponse.class
         );
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-    }
-
-    @Test
-    void updateNonExistantSupplierCreatesSupplier() {
-        given(supplierService.supplierExists(anyString())).willReturn(false);
-        given(supplierService.saveSupplier(any(Supplier.class))).willReturn(supplier);
-
-        var request = updateSupplierRequestNoId;
-
-        var response = restTemplate.exchange(
-                "/api/suppliers/update",
-                HttpMethod.PUT,
-                new HttpEntity<>(request),
-                UpdateSupplierResponse.class
-        );
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody().getId()).isNotEmpty();
     }
 
     @Test
@@ -150,7 +136,7 @@ class SupplierControllerIntegrationTest extends SupplierTestData {
         var request = updateSupplierRequestNoId;
 
         var response = restTemplate.exchange(
-                "/api/suppliers/update",
+                "/api/suppliers/" + ukf.getUid().toString(),
                 HttpMethod.PUT,
                 new HttpEntity<>(request),
                 UpdateSupplierResponse.class
@@ -165,9 +151,10 @@ class SupplierControllerIntegrationTest extends SupplierTestData {
         given(supplierService.supplierExists(anyString())).willReturn(true);
 
         var request = updateSupplierRequest;
+        request.setSupplierName("shelleys");
 
         var response = restTemplate.exchange(
-                "/api/suppliers/update",
+                "/api/suppliers/" + ukf.getUid().toString(),
                 HttpMethod.PUT,
                 new HttpEntity<>(request),
                 UpdateSupplierResponse.class
@@ -182,7 +169,7 @@ class SupplierControllerIntegrationTest extends SupplierTestData {
         given(supplierService.deleteSupplierById(anyLong())).willReturn(Optional.of(supplier));
 
         var response = restTemplate.exchange(
-                "/api/suppliers/delete/1",
+                "/api/suppliers/" + supplier.getUid().toString(),
                 HttpMethod.DELETE,
                 null,
                 DeletedSupplierResponse.class

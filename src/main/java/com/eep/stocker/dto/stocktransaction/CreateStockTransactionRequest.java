@@ -1,5 +1,6 @@
 package com.eep.stocker.dto.stocktransaction;
 
+import com.eep.stocker.annotations.validators.ValidUUID;
 import lombok.Data;
 
 /***
@@ -12,6 +13,7 @@ public class CreateStockTransactionRequest implements IStockTransactionDTO.Stock
         IStockTransactionDTO.Quantity,
         IStockTransactionDTO.Reference,
         IStockTransactionDTO.Note {
+    @ValidUUID(message = "Stockable Product ID needs to be a UUID")
     private String stockableProductId;
     private Double quantity;
     private String reference;

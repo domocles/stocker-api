@@ -40,7 +40,7 @@ public class DeliveryLineController {
      * @return a {@code GetDeliveryLineResponse} containing the delivery line
      */
     @GetMapping("/{uid}")
-    public GetDeliveryLineResponse getDeliveryLineById(@PathVariable @ValidUUID String uid) {
+    public GetDeliveryLineResponse getDeliveryLineById(@PathVariable @ValidUUID(message = "Delivery Line Id must be a UUID") String uid) {
         log.info("get: /api/delivery-line/{} called", uid);
         var deliveryLine = deliveryLineService.getDeliveryLineByUid(uid)
                 .orElseThrow(() -> new DeliveryLineDoesNotExistException(String.format("DeliveryLine with ID of %s does not exist", uid)));
@@ -53,7 +53,7 @@ public class DeliveryLineController {
      * @return a {@code GetAllDeliveryResponse} containing the delivery lines
      */
     @GetMapping("/delivery/{uid}")
-    public GetAllByDeliveryResponse getDeliveryLineByDelivery(@PathVariable @ValidUUID String uid) {
+    public GetAllByDeliveryResponse getDeliveryLineByDelivery(@PathVariable @ValidUUID(message = "Delivery Id must be a UUID") String uid) {
         log.info("get: /api/delivery-line/get/delivery/{} called", uid);
         var response = new GetAllByDeliveryResponse();
         deliveryLineService.getAllDeliveryLinesForDelivery(UUID.fromString(uid)).stream()
@@ -83,7 +83,7 @@ public class DeliveryLineController {
      * @return a {@code GetDeliveryLinesBySupplierResponse} containing the delivery lines
      */
     @GetMapping("/supplier/{uid}")
-    public GetDeliveryLinesBySupplierResponse getAllDeliveryLinesForSupplier(@PathVariable @ValidUUID String uid) {
+    public GetDeliveryLinesBySupplierResponse getAllDeliveryLinesForSupplier(@PathVariable @ValidUUID(message = "Supplier Id must be a UUID") String uid) {
         log.info("get: /api/delivery-line/supplier/{} called", uid);
         var supplier = supplierService.getSupplierFromUid(uid)
                 .orElseThrow(() -> new SupplierDoesNotExistException(String.format("Supplier with ID of %s does not exist", uid)));
@@ -102,7 +102,7 @@ public class DeliveryLineController {
      * @return a {@code GetDeliveryLinesByProductResponse} containing the delivery lines for the product
      */
     @GetMapping("/stockable-product/{uid}")
-    public GetDeliveryLinesByProductResponse getAllDeliveryLinesForStockableProduct(@PathVariable @ValidUUID String uid) {
+    public GetDeliveryLinesByProductResponse getAllDeliveryLinesForStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product Id must be a UUID") String uid) {
         log.info("get: /api/delivery-line/supplier/{} called", uid );
         var product = stockableProductService.getStockableProductByUid(uid)
                 .orElseThrow(() -> new StockableProductDoesNotExistException(String.format("Stockable Product with ID of %s does not exist", uid)));
@@ -120,7 +120,7 @@ public class DeliveryLineController {
      * @return a {@code GetDeliveryLinesByPurchaseOrderResponse} containing the delivery lines for a purchase order
      */
     @GetMapping("/purchase-order/{uid}")
-    public GetDeliveryLinesByPurchaseOrderResponse getAllDeliveryLinesForPurchaseOrder(@PathVariable @ValidUUID String uid) {
+    public GetDeliveryLinesByPurchaseOrderResponse getAllDeliveryLinesForPurchaseOrder(@PathVariable @ValidUUID(message = "Purchase Order Id must be a UUID") String uid) {
         log.info("get: /api/delivery-line/get/purchase-order/{} called", uid);
         var purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(uid))
                 .orElseThrow(() -> new PurchaseOrderDoesNotExistException("Purchase Order with ID of " + uid + " does not exist"));
@@ -140,7 +140,7 @@ public class DeliveryLineController {
      * @return a {@code String} confirming the operation was completed
      */
     @DeleteMapping("/{uid}")
-    public String deleteDeliveryLine(@PathVariable String uid) {
+    public String deleteDeliveryLine(@PathVariable @ValidUUID(message = "Delivery Line Id must be a UUID") String uid) {
         log.info("delete: /api/delivery-line/delete/{}", uid);
         var deliveryLine = deliveryLineService.getDeliveryLineByUid(uid)
                 .orElseThrow(() -> new DeliveryLineDoesNotExistException("Delivery Line with ID of " + uid + " does not exist"));
@@ -176,7 +176,7 @@ public class DeliveryLineController {
      * @return - a {@code UpdateDeliveryResponse} containg the updated delivery line
      */
     @PutMapping("/{uid}")
-    public UpdateDeliveryLineResponse updateDeliveryLine(@PathVariable @ValidUUID String uid, @RequestBody @Valid UpdateDeliveryLineRequest request) {
+    public UpdateDeliveryLineResponse updateDeliveryLine(@PathVariable @ValidUUID(message = "Delivery Line Id must be a UUID") String uid, @RequestBody @Valid UpdateDeliveryLineRequest request) {
         log.info("post: /api/delivery-line/{} called", uid);
         var deliveryLine = deliveryLineService.getDeliveryLineByUid(uid)
                 .orElseThrow(() -> new DeliveryLineDoesNotExistException("Delivery Line Does not exist"));

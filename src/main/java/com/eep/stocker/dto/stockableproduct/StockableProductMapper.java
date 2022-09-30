@@ -26,7 +26,5 @@ public interface StockableProductMapper {
     @Mapping(target = "id", source = "uid")
     UpdateStockableProductResponse updateStockableResponseFromStockableProduct(StockableProduct product);
 
-    @Mapping(target = "uid", source = "id")
-    @Mapping(target = "id", ignore = true)
     void updateStockableProductFromDto(UpdateStockableProductRequest request, @MappingTarget StockableProduct stockableProduct);
 }

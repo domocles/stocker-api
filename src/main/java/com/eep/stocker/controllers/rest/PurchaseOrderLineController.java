@@ -47,7 +47,7 @@ public class PurchaseOrderLineController {
      * @return a {@code GetPurchaseOrderLineResponse} or {@code HttpStatus.NOT_FOUND}
      */
     @GetMapping("/{uid}")
-    public GetPurchaseOrderLineResponse getPurchaseOrderLineResponseByUid(@PathVariable @ValidUUID String uid) {
+    public GetPurchaseOrderLineResponse getPurchaseOrderLineResponseByUid(@PathVariable @ValidUUID(message = "Purchase Order Line ID needs to e a UUID") String uid) {
         log.info("get: /api/purchase-order-line/{} called", uid);
         var orderLine = orderLineService.getPurchaseOrderLineByUid(uid)
                 .orElseThrow(() -> new PurchaseOrderLineDoesNotExistException(String.format("Purchase Order Line with uid of %s, does not exist", uid)));
@@ -75,7 +75,7 @@ public class PurchaseOrderLineController {
      * @return a {@code GetPurchaseOrderLinesByProductResponse} containing all purchase order lines
      */
     @GetMapping("/product/{productId}")
-    public GetPurchaseOrderLinesByProductResponse getAllPurchaserOrderLinesForProduct(@PathVariable @ValidUUID String productId) {
+    public GetPurchaseOrderLinesByProductResponse getAllPurchaserOrderLinesForProduct(@PathVariable @ValidUUID(message = "Product ID needs to e a UUID") String productId) {
         log.info("get: /purchase-order-line/product/{} called", productId);
         var product = stockableProductService.getStockableProductByUid(productId).orElseThrow(
                 () -> new StockableProductDoesNotExistException(String.format("Stockable product with id of %s, does not exist", productId)));
@@ -94,7 +94,7 @@ public class PurchaseOrderLineController {
      * @return a {@code GetPurchaseOrderLinesByPurchaseOrderResponse} with all lines for a purchase order
      */
     @GetMapping("/purchase-order/{purchaseOrderId}")
-    public GetPurchaseOrderLinesByPurchaseOrderResponse getAllPurchaseOrderLinesForPurchaseOrder(@PathVariable @ValidUUID String purchaseOrderId) {
+    public GetPurchaseOrderLinesByPurchaseOrderResponse getAllPurchaseOrderLinesForPurchaseOrder(@PathVariable @ValidUUID(message = "Purchase Order ID needs to e a UUID") String purchaseOrderId) {
         log.info("get: /api/purchase-order-line/get/purchase-order/{} called", purchaseOrderId);
         var purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(purchaseOrderId)).orElseThrow(
                 () -> new PurchaseOrderDoesNotExistException(String.format("Purchase order with id of %s, does not exist", purchaseOrderId)));
@@ -112,7 +112,7 @@ public class PurchaseOrderLineController {
      * @return - the balance of remaining parts to be delivered
      */
     @GetMapping("/balance/{purchaseOrderLineId}")
-    public Double getBalanceOfPurchaseOrderLine(@PathVariable @ValidUUID String purchaseOrderLineId) {
+    public Double getBalanceOfPurchaseOrderLine(@PathVariable @ValidUUID(message = "Purchase Order Line ID needs to e a UUID") String purchaseOrderLineId) {
         log.info("get: /api/purchase-order-line/balance/{} called", purchaseOrderLineId);
         Optional<PurchaseOrderLine> poLineOptional = orderLineService.getPurchaseOrderLineByUid(purchaseOrderLineId);
         if(poLineOptional.isPresent()) {
@@ -140,7 +140,7 @@ public class PurchaseOrderLineController {
      * @return a {@code GetPurchaseOrderLinesBySupplierResponse} containing the order lines that belong to that supplier
      */
     @GetMapping("/supplier/{supplierId}")
-    public GetPurchaseOrderLinesBySupplierResponse getAllPurchaseOrderLinesForSupplier(@PathVariable @ValidUUID String supplierId) {
+    public GetPurchaseOrderLinesBySupplierResponse getAllPurchaseOrderLinesForSupplier(@PathVariable @ValidUUID(message = "Supplier ID needs to e a UUID") String supplierId) {
         log.info("get: /api/purchase-order-line/get/supplier/{} called", supplierId);
         Optional<Supplier> supplier = supplierService.getSupplierFromUid(supplierId);
 
@@ -185,7 +185,8 @@ public class PurchaseOrderLineController {
      * @return {@code UpdatePurchaseOrderLineResponse} that returns the updated purchase order line
      */
     @PutMapping("/{uid}")
-    public UpdatePurchaseOrderLineResponse updatePurchaseOrder(@PathVariable @ValidUUID String uid, @RequestBody @Valid UpdatePurchaseOrderLineRequest request) {
+    public UpdatePurchaseOrderLineResponse updatePurchaseOrder(@PathVariable @ValidUUID(message = "Purchase Order Line ID needs to e a UUID") String uid,
+                                                               @RequestBody @Valid UpdatePurchaseOrderLineRequest request) {
         log.info("put: /api/purchase-order-line/{} called", uid);
         var purchaseOrderLine = orderLineService.getPurchaseOrderLineByUid(uid)
                 .orElseThrow(() -> new PurchaseOrderLineDoesNotExistException("Purchase Order Line Does Not Exist"));
@@ -210,7 +211,7 @@ public class PurchaseOrderLineController {
      * @return a message confirming the deletion of the purchase order line
      */
     @DeleteMapping("/{orderLineId}")
-    public String deletePurchaseOrder(@PathVariable @ValidUUID String orderLineId) {
+    public String deletePurchaseOrder(@PathVariable @ValidUUID(message = "Purchase Order Line ID needs to e a UUID") String orderLineId) {
         log.info("delete: /api/purchase-order-line/{} called", orderLineId);
 
         var purchaseOrderLine = orderLineService.getPurchaseOrderLineByUid(orderLineId)

@@ -59,7 +59,7 @@ public class AssemblyLineController {
      * @return - a {@code GetAssemblyLineResponse} containing the Assembly Line
      */
     @GetMapping("/{uid}")
-    public GetAssemblyLineResponse getAssemblyLineById(@PathVariable @ValidUUID String uid) {
+    public GetAssemblyLineResponse getAssemblyLineById(@PathVariable @ValidUUID(message = "Assembly Line Id must be a UUID") String uid) {
         log.info("get: /api/assembly-line/{} called", uid);
         var assemblyLine = assemblyLineService.getAssemblyLineByUid(uid)
                 .orElseThrow(() -> new AssemblyLineDoesNotExistException(String.format("Assembly line with id of %s does not exist", uid)));
@@ -72,7 +72,7 @@ public class AssemblyLineController {
      * @return - a {@code GetAllAssemblyLinesResponse} containing all assembly lines for an assembly
      */
     @GetMapping("/assembly/{uid}")
-    public GetAllAssemblyLinesResponse getAssemblyLinesForAssembly(@PathVariable @ValidUUID String uid) {
+    public GetAllAssemblyLinesResponse getAssemblyLinesForAssembly(@PathVariable @ValidUUID(message = "Assembly Id must be a UUID") String uid) {
         log.info("get: /api/assembly-line/assembly/{} called", uid);
         var assembly = this.assemblyService.getAssemblyByUid(uid).
                 orElseThrow(() -> new AssemblyDoesNotExistException(String.format("Assembly with id of %s does not exist", uid)));
@@ -111,7 +111,7 @@ public class AssemblyLineController {
      * @return - a {@code UpdateLineAssemblyResponse} containing the updated assembly line
      */
     @PutMapping("/{uid}")
-    public UpdateAssemblyLineResponse updateAssemblyLine(@PathVariable @ValidUUID @Valid String uid, @RequestBody @Valid UpdateAssemblyLineRequest request) {
+    public UpdateAssemblyLineResponse updateAssemblyLine(@PathVariable @ValidUUID(message = "Assembly Line Id must be a UUID") String uid, @RequestBody @Valid UpdateAssemblyLineRequest request) {
         log.info("put: /api/assembly-line/{} called", uid);
         var assemblyLine = assemblyLineService.getAssemblyLineByUid(uid)
                 .orElseThrow(() -> new AssemblyLineDoesNotExistException("Assembly Line does not exist"));
@@ -141,7 +141,7 @@ public class AssemblyLineController {
      * @return - a {@code DeleteAssemblyLineResponse} containing the deleted assembly line
      */
     @DeleteMapping("/{uid}")
-    public DeleteAssemblyLineResponse deleteAssemblyLine(@PathVariable @ValidUUID String uid) {
+    public DeleteAssemblyLineResponse deleteAssemblyLine(@PathVariable @ValidUUID(message = "Assembly Line Id must be a UUID") String uid) {
         log.info("delete: /api/assembly-line/delete/{} called", uid);
         var assemblyLine = assemblyLineService.getAssemblyLineByUid(uid)
                 .orElseThrow(() -> new AssemblyLineDoesNotExistException(String.format("Assembly line with id of %s does not exist", uid)));

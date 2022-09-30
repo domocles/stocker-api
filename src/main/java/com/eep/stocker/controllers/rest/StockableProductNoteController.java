@@ -51,7 +51,7 @@ public class StockableProductNoteController {
      * @return - a {@code GetStockableProductNoteResponse} containg the stockable product note
      */
     @GetMapping("/{id}")
-    public GetStockableProductNoteResponse getStockableProductNoteById(@PathVariable @ValidUUID String id) {
+    public GetStockableProductNoteResponse getStockableProductNoteById(@PathVariable @ValidUUID(message = "Stockable Product Note ID needs to be a UUID") String id) {
         log.info("get: /api/stockable-product-note/get/{} called", id);
         var note = stockableProductNoteService.getByUid(id)
                 .orElseThrow(() -> new DomainObjectDoesNotExistException("StockableProductNote does not exist"));
@@ -65,7 +65,7 @@ public class StockableProductNoteController {
      * the product
      */
     @GetMapping("/stockable-product/{id}/")
-    public GetAllStockableProductNotesByStockableProductResponse getAllNotesForStockableProduct(@PathVariable @ValidUUID String id) {
+    public GetAllStockableProductNotesByStockableProductResponse getAllNotesForStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product ID needs to be a UUID") String id) {
         log.info("get: /api/stockable-product-note/stockable-product/{} called", id);
         var response = new GetAllStockableProductNotesByStockableProductResponse();
         stockableProductNoteService.getAllNotesForStockableProductUid(id).stream()
@@ -96,7 +96,7 @@ public class StockableProductNoteController {
      * @return an {@code UpdateStockableProductNoteResponse} containing the updated stockable product note
      */
     @PutMapping(path = "/{uid}")
-    public UpdateStockableProductNoteResponse updateNote(@PathVariable @ValidUUID String uid, @Valid @RequestBody UpdateStockableProductNoteRequest request) {
+    public UpdateStockableProductNoteResponse updateNote(@PathVariable @ValidUUID(message = "Stockable Product Note ID needs to be a UUID") String uid, @Valid @RequestBody UpdateStockableProductNoteRequest request) {
         log.info("post: /api/stockable-product-note/{} called", uid);
         var note = stockableProductNoteService.getByUid(uid)
                 .orElseThrow(() -> new DomainObjectDoesNotExistException("Stockable Product Note Does Not Exist"));

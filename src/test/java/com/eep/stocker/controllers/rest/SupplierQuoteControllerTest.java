@@ -1,9 +1,11 @@
 package com.eep.stocker.controllers.rest;
 
+import com.eep.stocker.controllers.error.ErrorResponse;
 import com.eep.stocker.controllers.error.exceptions.SupplierDoesNotExistException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.domain.Supplier;
 import com.eep.stocker.domain.SupplierQuote;
+import com.eep.stocker.dto.supplierquote.*;
 import com.eep.stocker.services.StockableProductService;
 import com.eep.stocker.services.SupplierQuoteService;
 import com.eep.stocker.services.SupplierService;
@@ -12,7 +14,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -24,12 +30,12 @@ import java.util.Arrays;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(SupplierQuoteController.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class SupplierQuoteControllerTest extends SupplierTestData {
 
     @MockBean
@@ -42,7 +48,10 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
     private StockableProductService stockableProductService;
 
     @Autowired
-    private MockMvc mockMvc;
+    private SupplierQuoteMapper supplierQuoteMapper;
+
+    @Autowired
+    private TestRestTemplate restTemplate;
 
     private SupplierQuote getSupplierQuote() {
 
@@ -62,7 +71,7 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
     }
 
     @Test
-    public void getAllSuppliersTest() throws Exception {
+    void getAllSuppliersTest() throws Exception {
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
                 .name("MF220")
@@ -78,33 +87,61 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
         given(supplierQuoteService.getAllSupplierQuotes())
                 .willReturn(Arrays.asList(quote));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/supplier-quote/get"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].supplier.supplierName").value("Shelley Parts Ltd"));
+        var response  = restTemplate.exchange(
+                "/api/supplier-quote/",
+                HttpMethod.GET,
+                null,
+                GetAllSupplierQuotesResponse.class);
+
+        var testRes = supplierQuoteMapper.mapToLowDetailResponse(quote);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().supplierQuotes).contains(testRes)
+        );
+
     }
 
     @Test
-    public void getSupplierQuoteByIdTest() throws Exception {
+     void getSupplierQuoteByIdTest() {
+        var quote = getSupplierQuote();
+        given(supplierQuoteService.getSupplierQuoteByUid(anyString()))
+                .willReturn(java.util.Optional.of(quote));
 
-        given(supplierQuoteService.getSupplierQuoteById(anyLong()))
-                .willReturn(java.util.Optional.of(getSupplierQuote()));
+        var response = restTemplate.exchange(
+                "/api/supplier-quote/" + getSupplierQuote().getUid().toString(),
+                HttpMethod.GET,
+                null,
+                GetSupplierQuoteResponse.class
+        );
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/supplier-quote/get/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("supplier.supplierName").value("Shelley Parts Ltd"));
+        var testRes = supplierQuoteMapper.mapToGetResponse(quote);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isNotNull().isEqualTo(testRes)
+        );
     }
 
     @Test
-    public void getSupplierQuotesForNonExistantSuppliersTest() throws Exception {
+    void getSupplierQuotesForNonExistantSuppliersTest() {
         given(supplierQuoteService.getAllSupplierQuotesForSupplier(any(Supplier.class)))
                 .willThrow(new SupplierDoesNotExistException("Supplier Does Not Exist!"));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/supplier-quote/supplier/get/4"))
-                .andExpect(status().isNotFound());
+        var response = restTemplate.exchange(
+                "/api/supplier-quote/supplier/" + supplier.getUid().toString(),
+                HttpMethod.GET,
+                null,
+                ErrorResponse.class
+        );
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND)
+        );
     }
 
     @Test
-    public void getSupplierQuotesForSupplierTest() throws Exception {
+    void getSupplierQuotesForSupplierTest() throws Exception {
 
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
@@ -121,16 +158,25 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
 
         given(supplierQuoteService.getAllSupplierQuotesForSupplier(any(Supplier.class)))
                 .willReturn(Arrays.asList(quote));
-        given(supplierService.getSupplierFromId(anyLong())).willReturn(java.util.Optional.of(supplier));
+        given(supplierService.getSupplierFromUid(anyString())).willReturn(java.util.Optional.of(supplier));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/supplier-quote/supplier/get/5"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].stockableProduct.name").value("MF220"))
-                .andExpect(jsonPath("$[0].supplier.supplierName").value("Shelley Parts Ltd"));
+        var response = restTemplate.exchange(
+                "/api/supplier-quote/supplier/" + supplier.getUid().toString() + "/",
+                HttpMethod.GET,
+                null,
+                GetSupplierQuotesForSupplierResponse.class
+        );
+
+        var testRes = supplierQuoteMapper.mapToLowDetailResponse(quote);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().supplierQuotes).contains(testRes)
+        );
     }
 
     @Test
-    public void getSupplierQuotesForStockableProductTest() throws Exception {
+    void getSupplierQuotesForStockableProductTest() {
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
                 .name("MF220")
@@ -144,20 +190,29 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
 
         SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
 
-        given(stockableProductService.getStockableProductByID(anyLong()))
+        given(stockableProductService.getStockableProductByUid(anyString()))
                 .willReturn(java.util.Optional.of(stockableProduct));
 
         given(supplierQuoteService.getAllSupplierQuotesForStockableProduct(any(StockableProduct.class)))
                 .willReturn(Arrays.asList(quote));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/supplier-quote/stockable-product/4"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].stockableProduct.name").value("MF220"))
-                .andExpect(jsonPath("$[0].supplier.supplierName").value("Shelley Parts Ltd"));
+        var response = restTemplate.exchange(
+                "/api/supplier-quote/stockable-product/" + stockableProduct.getUid().toString() + "/",
+                HttpMethod.GET,
+                null,
+                GetSupplierQuotesForStockableProductResponse.class
+        );
+
+        var testRes = supplierQuoteMapper.mapToLowDetailResponse(quote);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().supplierQuotes).contains(testRes)
+        );
     }
 
     @Test
-    public void updateSupplierQuoteTest() throws Exception {
+    void updateSupplierQuoteTest() {
         StockableProduct stockableProduct = StockableProduct.builder()
                 .id(1L)
                 .name("MF220")
@@ -172,58 +227,5 @@ public class SupplierQuoteControllerTest extends SupplierTestData {
         SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
 
         given(supplierQuoteService.updateSupplierQuote(any(SupplierQuote.class))).willReturn(quote);
-    }
-
-    @Test
-    public void createSupplierQuoteTest() throws Exception {
-        StockableProduct stockableProduct = StockableProduct.builder()
-                .id(1L)
-                .name("MF220")
-                .mpn("EEP200919001")
-                .description("Mild Steel Flange")
-                .category("Flanges")
-                .units("Flanges")
-                .stockPrice(1.72)
-                .inStock(25.0)
-                .build();
-
-        SupplierQuote quote = new SupplierQuote(stockableProduct, supplier, LocalDate.now(), 15.0, 1.72D);
-        SupplierQuote returnedQuote = new SupplierQuote(stockableProduct, quote.getSupplier(), quote.getQuotationDate(), 15.0, 1.72D);
-        returnedQuote.setId(1L);
-
-
-        given(supplierQuoteService.saveSupplierQuote(any(SupplierQuote.class))).willReturn(returnedQuote);
-
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders
-                .post("/api/supplier-quote/create")
-                .content(asJsonString(quote))
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("stockableProduct.name").value("MF220"))
-                .andExpect(jsonPath("id").value(1L))
-                .andReturn();
-        String res = result.getResponse().getContentAsString();
-        SupplierQuote retval = fromJsonString(res, SupplierQuote.class);
-
-        assertThat(retval).isEqualTo(returnedQuote);
-    }
-
-    public static String asJsonString(final Object obj) {
-        try {
-            String test = new ObjectMapper().writeValueAsString(obj);
-            return test;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static <T> T fromJsonString(String json, Class<T> type) {
-        try {
-            T obj = new ObjectMapper().readValue(json, type);
-            return obj;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

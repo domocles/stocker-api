@@ -1,5 +1,6 @@
 package com.eep.stocker.controllers.rest;
 
+import com.eep.stocker.annotations.validators.ValidUUID;
 import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
 import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
@@ -7,10 +8,13 @@ import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.dto.stockableproduct.*;
 import com.eep.stocker.services.StockableProductNoteService;
 import com.eep.stocker.services.StockableProductService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -21,22 +25,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/***
+ * @author Sam Burns
+ * @version 1.0
+ * 29/09/2022
+ *
+ * Rest controller for stockable products
+ */
+@RequiredArgsConstructor
 @RestController
+@RequestMapping("/api/stockable-products")
+@Slf4j
+@Validated
 public class HomeController {
-    private static final Logger log = LoggerFactory.getLogger(HomeController.class);
-
     private final StockableProductService stockableProductService;
-
-    private final StockableProductNoteService stockableProductNoteService;
-
     private final StockableProductMapper stockableProductMapper;
 
-    public HomeController(StockableProductService stockableProductService, StockableProductNoteService stockableProductNoteService,
-                          StockableProductMapper stockableProductMapper) {
-        this.stockableProductService = stockableProductService;
-        this.stockableProductNoteService = stockableProductNoteService;
-        this.stockableProductMapper = stockableProductMapper;
-    }
 
     /***
      * Retrieve the StockableProduct with the given id
@@ -44,8 +48,8 @@ public class HomeController {
      * @return GetStockableProductResponse
      * @throws RecordNotFoundException if the stockable product does not exist
      */
-    @GetMapping("/api/stockable-products/get/{id}")
-    public GetStockableProductResponse getById(@PathVariable String id) {
+    @GetMapping("/get/{id}")
+    public GetStockableProductResponse getById(@PathVariable @ValidUUID(message = "Stockable Product Id must be a UUID") String id) {
         log.info("get: /api/stockable-products/get/{} called", id);
         Optional<StockableProduct> stockableProductOpt = stockableProductService.getStockableProductByUid(id);
         StockableProduct stockableProduct = stockableProductOpt.orElseThrow(()
@@ -57,7 +61,7 @@ public class HomeController {
      * Retrieve all stockable products
      * @return a list of stockable products
      */
-    @GetMapping("/api/stockable-products/get")
+    @GetMapping("/get")
     public GetAllStockableProductResponse getAllStockableProducts() {
         log.info("get: /api/stockable-products/get called");
         GetAllStockableProductResponse response = new GetAllStockableProductResponse();
@@ -72,7 +76,7 @@ public class HomeController {
      * Retrieve all categories
      * @return a list of categories
      */
-    @GetMapping("/api/stockable-products/categories")
+    @GetMapping("/categories")
     public GetAllCategoriesResponse getAllCategories() {
         log.info("get: /api/stockable-products/categories called");
         GetAllCategoriesResponse response = new GetAllCategoriesResponse();
@@ -85,7 +89,7 @@ public class HomeController {
      * @param createStockableProductRequest
      * @return the persisted stockable product
      */
-    @PostMapping(path = "/api/stockable-products/create", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/create")
     public CreateStockableProductResponse createStockableProduct(@Valid @RequestBody CreateStockableProductRequest createStockableProductRequest) {
         log.info("post: /api/stockable-products/create called");
         Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(createStockableProductRequest.getMpn());
@@ -100,13 +104,14 @@ public class HomeController {
 
     /***
      * Update a stockable product
-     * @param request
-     * @return the updated stockable product
+     * @param uid - uniqye indentifier of the stockable product
+     * @param request - details of the stockable product
+     * @return an {@code UpdateStockableProductResponse} containing the updated stockable product
      */
-    @PutMapping(path = "/api/stockable-products/update", consumes = "application/json", produces = "application/json")
-    public UpdateStockableProductResponse updateStockableProduct(@Valid @RequestBody UpdateStockableProductRequest request) {
+    @PutMapping(path = "/update/{uid}")
+    public UpdateStockableProductResponse updateStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product Id must be a UUID") String uid, @Valid @RequestBody UpdateStockableProductRequest request) {
         log.info("put: /api/stockable-products/update called");
-        Optional<StockableProduct> sbOpt = stockableProductService.getStockableProductByUid(request.getId());
+        Optional<StockableProduct> sbOpt = stockableProductService.getStockableProductByUid(uid);
         if(sbOpt.isPresent()) {
             StockableProduct sb = sbOpt.get();
             //if the mpn is changing, make sure it doesn't clash
@@ -130,8 +135,8 @@ public class HomeController {
      * @return a response as to whether the stockable product has been deleted
      * @throws ResourceNotFoundException - if the id is not found
      */
-    @DeleteMapping(path = "/api/stockable-products/delete/{id}")
-    public Response deleteStockableProduct(@PathVariable String id) throws ResourceNotFoundException {
+    @DeleteMapping(path = "/delete/{id}")
+    public Response deleteStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product Id must be a UUID") String id) throws ResourceNotFoundException {
         log.info("delete: /api/stockable-products/delete/{} called", id);
         Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByUid(id);
         if(stockableProduct.isPresent()) {

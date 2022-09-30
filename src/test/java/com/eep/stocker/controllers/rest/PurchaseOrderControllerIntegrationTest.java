@@ -176,7 +176,7 @@ class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
         given(purchaseOrderService.getAllPurchaseOrdersBySupplierReference(anyString())).willReturn(Arrays.asList(po1, po2));
 
         //act
-        ResponseEntity<GetAllPurchaseOrdersResponse> response = restTemplate.exchange("/api/purchase-order/reference/PO001",
+        var response = restTemplate.exchange("/api/purchase-order/supplier-reference/PO001",
                 HttpMethod.GET,
                 null,
                 GetAllPurchaseOrdersResponse.class);

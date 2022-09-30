@@ -8,6 +8,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+/***
+ * @author Sam Burns
+ * @version 1.0
+ * 30/09/2022
+ *
+ * Mapper for mapping Stock Transaction to request and response objects
+ */
 @Mapper(componentModel = "spring", uses = { MapperUtils.class, StockableProductMapper.class })
 public interface StockTransactionMapper {
     @Mapping(target = "id", source = "uid")

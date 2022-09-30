@@ -1,5 +1,6 @@
 package com.eep.stocker.dto.deliveryline;
 
+import com.eep.stocker.annotations.validators.ValidUUID;
 import lombok.Data;
 
 /***
@@ -15,9 +16,16 @@ public class UpdateDeliveryLineRequest implements
         IDeliveryLineDTO.StockTransactionId,
         IDeliveryLineDTO.QuantityDelivered,
         IDeliveryLineDTO.Note {
+    @ValidUUID(message = "Purchase Order Line Id must be a UUID")
     private String purchaseOrderLineId;
+
+    @ValidUUID(message = "Delivery Id must be a UUID")
     private String deliveryId;
+
+    @ValidUUID(message = "Stock Transaction Id must be a UUID")
     private String stockTransactionId;
+
     private Double quantityDelivered;
+
     private String note;
 }

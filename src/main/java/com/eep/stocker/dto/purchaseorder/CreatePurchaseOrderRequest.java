@@ -1,5 +1,6 @@
 package com.eep.stocker.dto.purchaseorder;
 
+import com.eep.stocker.annotations.validators.ValidUUID;
 import lombok.Data;
 
 /***
@@ -14,5 +15,6 @@ public class CreatePurchaseOrderRequest implements
         IPurchaseOrderDTO.PurchaseOrderReference,
         IPurchaseOrderDTO.SupplierId {
     private String purchaseOrderReference;
+    @ValidUUID(message = "Supplier Id must be a UUID")
     private String supplierId;
 }

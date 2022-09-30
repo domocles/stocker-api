@@ -4,13 +4,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
 
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.Set;
 
+/***
+ * @author Sam Burns
+ * @version 1.0
+ * 29/09/2022
+ *
+ * Request DTO for the update stockable product endpoint
+ */
 @Data
 @Builder
 public class UpdateStockableProductRequest implements
-        IStockableProductDTO.Id,
         IStockableProductDTO.Name,
         IStockableProductDTO.Mpn,
         IStockableProductDTO.Description,
@@ -19,10 +26,12 @@ public class UpdateStockableProductRequest implements
         IStockableProductDTO.Tags,
         IStockableProductDTO.StockPrice,
         IStockableProductDTO.InStock {
-    private String id;
+    @NotBlank(message = "Name cannot be blank")
     private String name;
+    @NotBlank(message = "MPN cannot be blank")
     private String mpn;
     private String description;
+    @NotBlank(message = "Category cannot be blank")
     private String category;
     private String units;
     @Singular

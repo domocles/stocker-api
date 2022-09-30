@@ -19,23 +19,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Supplier implements Serializable {
-    /***
-     * Database ID of the supplier
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "supplier_id")
-    private Long id;
-
-    /***
-     * Universally unique id of the supplier
-     */
-    @NaturalId
-    @Builder.Default
-    @Column(name = "supplier_uid")
-    private UUID uid = UUID.randomUUID();
-
+public class Supplier extends AbstractEntity {
     /***
      * The name of the supplier e.g. Shelleys
      */

@@ -55,7 +55,7 @@ public class StockTransactionController {
      * @return {@code GetStockTransactionResponse} containing the stock transaction
      */
     @GetMapping("/{uid}")
-    public GetStockTransactionResponse getStockTransactionById(@PathVariable @ValidUUID String uid) {
+    public GetStockTransactionResponse getStockTransactionById(@PathVariable @ValidUUID(message = "Stock Transaction ID needs to be a UUID") String uid) {
         log.info("get: /api/stock-transaction/{}", uid);
         var stockTransaction = stockTransactionService.getStockTransactionByUid(uid)
                 .orElseThrow(() -> new StockTransactionDoesNotExistException("Stock Transaction Does Not Exist"));
@@ -69,7 +69,7 @@ public class StockTransactionController {
      * @return a {@code GetStockTransactionsByStockableProductResponse} that contains all the transactions for a stockable product
      */
     @GetMapping("/stockable-product/{uid}")
-    public GetStockTransactionsByStockableProductResponse getStockTransactionsForStockableProduct(@PathVariable @ValidUUID String uid) {
+    public GetStockTransactionsByStockableProductResponse getStockTransactionsForStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product ID needs to be a UUID") String uid) {
         log.info("get: /api/stock-transaction/stockable-product/{} called", uid);
         var stockableProduct = stockableProductService.getStockableProductByUid(uid)
                 .orElseThrow(() -> new StockableProductDoesNotExistException("Stockable Product Does Not Exist"));
@@ -88,7 +88,7 @@ public class StockTransactionController {
      * @return the balance of the stockable product
      */
     @GetMapping("/balance/{uid}")
-    public Double getBalanceForStockableProduct(@PathVariable @ValidUUID String uid) {
+    public Double getBalanceForStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product ID needs to be a UUID") String uid) {
         log.info("get: /api/stock-transaction/balance/{} called", uid);
         var product = stockableProductService.getStockableProductByUid(uid)
                 .orElseThrow(() -> new StockableProductDoesNotExistException("Stockable Product Does Not Exist"));
@@ -117,7 +117,7 @@ public class StockTransactionController {
      * @return - a {@code UpdateStockTransactionResponse} with the updated Stock Transaction
      */
     @PutMapping("/{uid}")
-    public UpdateStockTransactionResponse updateStockTransaction(@PathVariable @ValidUUID String uid, @RequestBody @Valid UpdateStockTransactionRequest request) {
+    public UpdateStockTransactionResponse updateStockTransaction(@PathVariable @ValidUUID(message = "Stock Transaction ID needs to be a UUID") String uid, @RequestBody @Valid UpdateStockTransactionRequest request) {
         log.info("put: /api/stock-transaction/{} called", uid);
         var stockTransaction = stockTransactionService.getStockTransactionByUid(uid)
                 .orElseThrow(() -> new StockTransactionDoesNotExistException("Stock Transaction Does Not Exist"));
@@ -136,7 +136,7 @@ public class StockTransactionController {
      * @return a message confirming that the stock transaction has been deleted
      */
     @DeleteMapping("/{uid}")
-    public String deleteStockTransaction(@PathVariable @ValidUUID String uid) {
+    public String deleteStockTransaction(@PathVariable @ValidUUID(message = "Stock Transaction ID needs to be a UUID") String uid) {
         log.info("delete: /api/stock-transaction/{} called", uid);
         var transaction = stockTransactionService.getStockTransactionByUid(uid)
                 .orElseThrow(() -> new StockTransactionDoesNotExistException("StockTransaction with id of " + uid + " does not exist"));

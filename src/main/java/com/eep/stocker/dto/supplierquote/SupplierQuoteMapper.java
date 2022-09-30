@@ -36,6 +36,9 @@ public interface SupplierQuoteMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uid", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "modifiedAt", ignore = true)
     SupplierQuote mapFromCreateRequest(CreateSupplierQuoteRequest request, Supplier supplier, StockableProduct stockableProduct);
 
     @Mapping(target = "id", ignore = true)

@@ -71,7 +71,6 @@ public class HomeControllerIntegrationTest {
                 .build();
 
         updateStockableProductRequest = UpdateStockableProductRequest.builder()
-                .id(MF220.getUid().toString())
                 .name("MF220")
                 .mpn("EEP200919005")
                 .description("Mild Steel Flange")
@@ -102,7 +101,7 @@ public class HomeControllerIntegrationTest {
         UpdateStockableProductRequest req = updateStockableProductRequest;
 
         ResponseEntity<UpdateStockableProductResponse> res = restTemplate.exchange(
-                "/api/stockable-products/update",
+                "/api/stockable-products/update/" + MF220.getUid().toString(),
                 HttpMethod.PUT,
                 new HttpEntity<>(updateStockableProductRequest),
                 UpdateStockableProductResponse.class
@@ -121,7 +120,7 @@ public class HomeControllerIntegrationTest {
         UpdateStockableProductRequest req = updateStockableProductRequest;
 
         ResponseEntity<UpdateStockableProductResponse> res = restTemplate.exchange(
-                "/api/stockable-products/update",
+                "/api/stockable-products/update/" + MF220.getUid().toString(),
                 HttpMethod.PUT,
                 new HttpEntity<>(updateStockableProductRequest),
                 UpdateStockableProductResponse.class

@@ -37,7 +37,7 @@ public class DeliveryController {
      * @return a {@code GetDeliveryResponse} containing the delivery
      */
     @GetMapping("/get/{uid}")
-    public GetDeliveryResponse getDeliveryById(@PathVariable @ValidUUID String uid) {
+    public GetDeliveryResponse getDeliveryById(@PathVariable @ValidUUID(message = "Delivery Id must be a UUID") String uid) {
         log.info("get: /api/delivery/get/{} called", uid);
         var delivery = deliveryService.getDeliveryByUid(uid)
                 .orElseThrow(() -> new DeliveryDoesNotExistException(String.format("Delivery with id of %s does not exist", uid)));
@@ -73,7 +73,7 @@ public class DeliveryController {
      * @return a {@code GetAllDeliveryResponse} containing all of the deliveries from the supplier
      */
     @GetMapping("/supplier/{supplierId}")
-    public GetAllDeliveryResponse getAllDeliveriesForSupplier(@PathVariable @ValidUUID String supplierId) {
+    public GetAllDeliveryResponse getAllDeliveriesForSupplier(@PathVariable @ValidUUID(message = "Supplier Id must be a UUID") String supplierId) {
         log.info("get: /api/delivery/supplier/{} called", supplierId);
         var supplier = supplierService.getSupplierFromUid(supplierId)
                 .orElseThrow(() -> new SupplierDoesNotExistException("Supplier with id of " + supplierId + " does not exist"));
@@ -103,7 +103,7 @@ public class DeliveryController {
      * @return a {@code GetDeliveryResponse} containing the new delivery
      */
     @PutMapping("/{uid}")
-    public GetDeliveryResponse updateDelivery(@PathVariable @ValidUUID String uid, @RequestBody @Valid UpdateDeliveryRequest updateDeliveryRequest) {
+    public GetDeliveryResponse updateDelivery(@PathVariable @ValidUUID(message = "Delivery Id must be a UUID") String uid, @RequestBody @Valid UpdateDeliveryRequest updateDeliveryRequest) {
         log.info("put: /api/delivery called");
         var deliveryOpt = deliveryService.getDeliveryByUid(uid);
         var delivery = deliveryOpt.orElseThrow(() -> new DeliveryDoesNotExistException("Delivery Does Not Exist"));
@@ -114,14 +114,14 @@ public class DeliveryController {
 
     /***
      * Delete a delivery by its unique identifier
-     * @param id - the id of the delivery to delete
+     * @param uid - the id of the delivery to delete
      * @return - a confirmation message
      */
-    @DeleteMapping("/delete/{id}")
-    public String deleteDelivery(@PathVariable String id) {
-        log.info("delete: /api/delivery/delete {} called", id);
-        var delivery = deliveryService.getDeliveryByUid(id).orElseThrow(
-                () -> new DeliveryDoesNotExistException("Delivery with ID of " + id + " does not exist")
+    @DeleteMapping("/delete/{uid}")
+    public String deleteDelivery(@PathVariable @ValidUUID(message = "Delivery Id must be a UUID") String uid) {
+        log.info("delete: /api/delivery/delete {} called", uid);
+        var delivery = deliveryService.getDeliveryByUid(uid).orElseThrow(
+                () -> new DeliveryDoesNotExistException("Delivery with ID of " + uid + " does not exist")
         );
         deliveryService.deleteDelivery(delivery);
         return "Delivery with ID of " + delivery.getUid().toString() + " deleted";

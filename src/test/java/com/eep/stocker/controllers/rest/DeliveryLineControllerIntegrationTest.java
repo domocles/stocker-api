@@ -215,7 +215,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
     @Test
     void getDeliveryLineByInvalidUidTest() {
         //act
-        var response = restTemplate.exchange("/api/delivery-line/123",
+        var response = restTemplate.exchange("/api/delivery-line/invalid",
                 HttpMethod.GET,
                 null,
                 ErrorResponse.class);
@@ -223,7 +223,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         //assert
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
-                () -> assertThat(Objects.requireNonNull(response.getBody()).getDetails()).contains("getDeliveryLineById.uid: Invalid UUID")
+                () -> assertThat(Objects.requireNonNull(response.getBody()).getDetails()).contains("getDeliveryLineById.uid: Delivery Line Id must be a UUID")
         );
     }
 
