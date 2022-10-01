@@ -82,7 +82,7 @@ public class PurchaseOrderController {
      * @param ref - the reference of the purchase order
      * @return a list containing all the purchase orders with the given reference, else empty list
      */
-    @GetMapping("/supplier-reference/{ref}")
+    @GetMapping("/supplier-reference/{ref}/")
     public GetAllPurchaseOrdersResponse getPurchaseOrdersBySupplierReference(@PathVariable String ref) {
         log.info("get: /api/purchase-order/supplier-reference/{}", ref);
 
@@ -105,7 +105,7 @@ public class PurchaseOrderController {
      * @return an GetPurchaseOrderResponse of the order if it is found, else a {@code PurchaseOrderDoesNotExistException}
      * is thrown which returns a Http.NOT_FOUND
      */
-    @GetMapping("/supplier/reference/{ref}")
+    @GetMapping("/supplier/reference/{ref}/")
     public GetPurchaseOrderResponse getPurchaseOrderByReference(@PathVariable String ref) {
         log.info("get: /api/purchase-order/reference/{}", ref);
         var purchaseOrder = purchaseOrderService.getPurchaseOrderByReference(ref)
@@ -118,7 +118,7 @@ public class PurchaseOrderController {
      * @param supplierId - the id of the supplier who's purchase orders we want to return
      * @return {@code GetAllPurchaseOrdersResponse} containing all purchase orders of the supplier
      */
-    @GetMapping("/supplier/{supplierId}")
+    @GetMapping("/supplier/{supplierId}/")
     public GetAllPurchaseOrdersResponse getAllPurchaseOrdersForSupplier(@PathVariable @ValidUUID(message = "Supplier Id must be a UUID") String supplierId) {
         log.info("get: /api/purchase-order/supplier/{} called", supplierId);
         Optional<Supplier> supplier = this.supplierService.getSupplierFromUid(supplierId);
@@ -140,7 +140,7 @@ public class PurchaseOrderController {
      * @param toDate - the end date of the range
      * @return {@code GetAllPurchaseOrdersResponse} containing all purchase orders between the supplied date range
      */
-    @GetMapping("/{fromDate}/{toDate}")
+    @GetMapping("/{fromDate}/{toDate}/")
     public GetAllPurchaseOrdersResponse getAllPurchaseOrdersBetween(@PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                                                     @PathVariable  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         log.info("get: /api/purchase-order/{}/{} called", fromDate, toDate);

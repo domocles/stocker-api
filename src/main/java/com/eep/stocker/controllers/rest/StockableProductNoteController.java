@@ -79,7 +79,7 @@ public class StockableProductNoteController {
      * @param note - the note to create
      * @return - a {@code CreateStockableProductNoteResponse} that contains the new product note
      */
-    @PostMapping(path = "")
+    @PostMapping(path = "/")
     public CreateStockableProductNoteResponse saveNote(@Valid @RequestBody CreateStockableProductNoteRequest note) {
         log.info("post: /api/stockable-product-note/create called");
         var stockableProduct = stockableProductService.getStockableProductByUid(note.getStockableProductId())

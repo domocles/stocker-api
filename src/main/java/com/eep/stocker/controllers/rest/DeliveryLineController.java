@@ -52,7 +52,7 @@ public class DeliveryLineController {
      * @param uid - the unique identifier of the delivery
      * @return a {@code GetAllDeliveryResponse} containing the delivery lines
      */
-    @GetMapping("/delivery/{uid}")
+    @GetMapping("/delivery/{uid}/")
     public GetAllByDeliveryResponse getDeliveryLineByDelivery(@PathVariable @ValidUUID(message = "Delivery Id must be a UUID") String uid) {
         log.info("get: /api/delivery-line/get/delivery/{} called", uid);
         var response = new GetAllByDeliveryResponse();
@@ -82,9 +82,9 @@ public class DeliveryLineController {
      * @param uid - the unique identifier of the supplier
      * @return a {@code GetDeliveryLinesBySupplierResponse} containing the delivery lines
      */
-    @GetMapping("/supplier/{uid}")
+    @GetMapping("/supplier/{uid}/")
     public GetDeliveryLinesBySupplierResponse getAllDeliveryLinesForSupplier(@PathVariable @ValidUUID(message = "Supplier Id must be a UUID") String uid) {
-        log.info("get: /api/delivery-line/supplier/{} called", uid);
+        log.info("get: /api/delivery-line/supplier/{}/ called", uid);
         var supplier = supplierService.getSupplierFromUid(uid)
                 .orElseThrow(() -> new SupplierDoesNotExistException(String.format("Supplier with ID of %s does not exist", uid)));
         var response = new GetDeliveryLinesBySupplierResponse();
@@ -101,9 +101,9 @@ public class DeliveryLineController {
      * @param uid - the unique identifier of the stockable product
      * @return a {@code GetDeliveryLinesByProductResponse} containing the delivery lines for the product
      */
-    @GetMapping("/stockable-product/{uid}")
+    @GetMapping("/stockable-product/{uid}/")
     public GetDeliveryLinesByProductResponse getAllDeliveryLinesForStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product Id must be a UUID") String uid) {
-        log.info("get: /api/delivery-line/supplier/{} called", uid );
+        log.info("get: /api/delivery-line/supplier/{}/ called", uid );
         var product = stockableProductService.getStockableProductByUid(uid)
                 .orElseThrow(() -> new StockableProductDoesNotExistException(String.format("Stockable Product with ID of %s does not exist", uid)));
         var response = new GetDeliveryLinesByProductResponse();
@@ -119,9 +119,9 @@ public class DeliveryLineController {
      * @param uid - the unique identifier of the purchase order
      * @return a {@code GetDeliveryLinesByPurchaseOrderResponse} containing the delivery lines for a purchase order
      */
-    @GetMapping("/purchase-order/{uid}")
+    @GetMapping("/purchase-order/{uid}/")
     public GetDeliveryLinesByPurchaseOrderResponse getAllDeliveryLinesForPurchaseOrder(@PathVariable @ValidUUID(message = "Purchase Order Id must be a UUID") String uid) {
-        log.info("get: /api/delivery-line/get/purchase-order/{} called", uid);
+        log.info("get: /api/delivery-line/get/purchase-order/{}/ called", uid);
         var purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(uid))
                 .orElseThrow(() -> new PurchaseOrderDoesNotExistException("Purchase Order with ID of " + uid + " does not exist"));
 
@@ -176,7 +176,8 @@ public class DeliveryLineController {
      * @return - a {@code UpdateDeliveryResponse} containg the updated delivery line
      */
     @PutMapping("/{uid}")
-    public UpdateDeliveryLineResponse updateDeliveryLine(@PathVariable @ValidUUID(message = "Delivery Line Id must be a UUID") String uid, @RequestBody @Valid UpdateDeliveryLineRequest request) {
+    public UpdateDeliveryLineResponse updateDeliveryLine(@PathVariable @ValidUUID(message = "Delivery Line Id must be a UUID") String uid,
+                                                         @RequestBody @Valid UpdateDeliveryLineRequest request) {
         log.info("post: /api/delivery-line/{} called", uid);
         var deliveryLine = deliveryLineService.getDeliveryLineByUid(uid)
                 .orElseThrow(() -> new DeliveryLineDoesNotExistException("Delivery Line Does not exist"));

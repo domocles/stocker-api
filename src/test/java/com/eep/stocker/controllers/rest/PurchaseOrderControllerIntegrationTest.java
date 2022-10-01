@@ -134,7 +134,7 @@ class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
         given(purchaseOrderService.getAllPurchaseOrdersForSupplier(supplier)).willReturn(Arrays.asList(po1, po2));
 
         //act
-        ResponseEntity<ErrorResponse> response = restTemplate.exchange("/api/purchase-order/supplier/1",
+        ResponseEntity<ErrorResponse> response = restTemplate.exchange("/api/purchase-order/supplier/1/",
                 HttpMethod.GET,
                 null,
                 ErrorResponse.class);
@@ -153,7 +153,7 @@ class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
         given(purchaseOrderService.getAllPurchaseOrdersForSupplier(supplier)).willReturn(Arrays.asList(po1, po2));
 
         //act
-        ResponseEntity<GetAllPurchaseOrdersResponse> response = restTemplate.exchange("/api/purchase-order/supplier/" + supplier.getUid().toString(),
+        ResponseEntity<GetAllPurchaseOrdersResponse> response = restTemplate.exchange("/api/purchase-order/supplier/" + supplier.getUid().toString() +"/",
                                                                                 HttpMethod.GET,
                                                                                 null,
                                                                                 GetAllPurchaseOrdersResponse.class);
@@ -176,7 +176,7 @@ class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
         given(purchaseOrderService.getAllPurchaseOrdersBySupplierReference(anyString())).willReturn(Arrays.asList(po1, po2));
 
         //act
-        var response = restTemplate.exchange("/api/purchase-order/supplier-reference/PO001",
+        var response = restTemplate.exchange("/api/purchase-order/supplier-reference/PO001/",
                 HttpMethod.GET,
                 null,
                 GetAllPurchaseOrdersResponse.class);
@@ -215,7 +215,7 @@ class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
                 .willReturn(Arrays.asList(po1, po2));
 
         //act
-        ResponseEntity<GetAllPurchaseOrdersResponse> response = restTemplate.exchange("/api/purchase-order/2017-01-15/2019-09-10",
+        ResponseEntity<GetAllPurchaseOrdersResponse> response = restTemplate.exchange("/api/purchase-order/2017-01-15/2019-09-10/",
                 HttpMethod.GET,
                 null,
                 GetAllPurchaseOrdersResponse.class);

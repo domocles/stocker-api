@@ -74,7 +74,7 @@ public class PurchaseOrderLineController {
      * @param productId - the unique id of the product
      * @return a {@code GetPurchaseOrderLinesByProductResponse} containing all purchase order lines
      */
-    @GetMapping("/product/{productId}")
+    @GetMapping("/product/{productId}/")
     public GetPurchaseOrderLinesByProductResponse getAllPurchaserOrderLinesForProduct(@PathVariable @ValidUUID(message = "Product ID needs to e a UUID") String productId) {
         log.info("get: /purchase-order-line/product/{} called", productId);
         var product = stockableProductService.getStockableProductByUid(productId).orElseThrow(
@@ -93,7 +93,7 @@ public class PurchaseOrderLineController {
      * @param purchaseOrderId the unique id of the purchase order to get the purchase order lines for
      * @return a {@code GetPurchaseOrderLinesByPurchaseOrderResponse} with all lines for a purchase order
      */
-    @GetMapping("/purchase-order/{purchaseOrderId}")
+    @GetMapping("/purchase-order/{purchaseOrderId}/")
     public GetPurchaseOrderLinesByPurchaseOrderResponse getAllPurchaseOrderLinesForPurchaseOrder(@PathVariable @ValidUUID(message = "Purchase Order ID needs to e a UUID") String purchaseOrderId) {
         log.info("get: /api/purchase-order-line/get/purchase-order/{} called", purchaseOrderId);
         var purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(purchaseOrderId)).orElseThrow(
@@ -139,7 +139,7 @@ public class PurchaseOrderLineController {
      * @param supplierId - uuid of the supplier
      * @return a {@code GetPurchaseOrderLinesBySupplierResponse} containing the order lines that belong to that supplier
      */
-    @GetMapping("/supplier/{supplierId}")
+    @GetMapping("/supplier/{supplierId}/")
     public GetPurchaseOrderLinesBySupplierResponse getAllPurchaseOrderLinesForSupplier(@PathVariable @ValidUUID(message = "Supplier ID needs to e a UUID") String supplierId) {
         log.info("get: /api/purchase-order-line/get/supplier/{} called", supplierId);
         Optional<Supplier> supplier = supplierService.getSupplierFromUid(supplierId);

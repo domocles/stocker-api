@@ -36,7 +36,7 @@ public class DeliveryController {
      * @param uid - the unique id of the delivery to fetch
      * @return a {@code GetDeliveryResponse} containing the delivery
      */
-    @GetMapping("/get/{uid}")
+    @GetMapping("/{uid}")
     public GetDeliveryResponse getDeliveryById(@PathVariable @ValidUUID(message = "Delivery Id must be a UUID") String uid) {
         log.info("get: /api/delivery/get/{} called", uid);
         var delivery = deliveryService.getDeliveryByUid(uid)
@@ -60,7 +60,7 @@ public class DeliveryController {
      * @param toDate - the end date of the range to fetch
      * @return a {@code GetAllDeliveryResponse} containing all of the deliveries in the range
      */
-    @GetMapping("/{fromDate}/{toDate}")
+    @GetMapping("/{fromDate}/{toDate}/")
     public GetAllDeliveryResponse getAllDeliveriesBetween(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
                                                   @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         log.info("get: /api/delivery/{}/{} called", fromDate, toDate);
@@ -72,7 +72,7 @@ public class DeliveryController {
      * @param supplierId the unique of the supplier
      * @return a {@code GetAllDeliveryResponse} containing all of the deliveries from the supplier
      */
-    @GetMapping("/supplier/{supplierId}")
+    @GetMapping("/supplier/{supplierId}/")
     public GetAllDeliveryResponse getAllDeliveriesForSupplier(@PathVariable @ValidUUID(message = "Supplier Id must be a UUID") String supplierId) {
         log.info("get: /api/delivery/supplier/{} called", supplierId);
         var supplier = supplierService.getSupplierFromUid(supplierId)
@@ -103,7 +103,8 @@ public class DeliveryController {
      * @return a {@code GetDeliveryResponse} containing the new delivery
      */
     @PutMapping("/{uid}")
-    public GetDeliveryResponse updateDelivery(@PathVariable @ValidUUID(message = "Delivery Id must be a UUID") String uid, @RequestBody @Valid UpdateDeliveryRequest updateDeliveryRequest) {
+    public GetDeliveryResponse updateDelivery(@PathVariable @ValidUUID(message = "Delivery Id must be a UUID") String uid,
+                                              @RequestBody @Valid UpdateDeliveryRequest updateDeliveryRequest) {
         log.info("put: /api/delivery called");
         var deliveryOpt = deliveryService.getDeliveryByUid(uid);
         var delivery = deliveryOpt.orElseThrow(() -> new DeliveryDoesNotExistException("Delivery Does Not Exist"));

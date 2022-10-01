@@ -256,7 +256,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
         given(deliveryLineService.getAllDeliveryLinesForSupplier(any(Supplier.class)))
                 .willReturn(Arrays.asList(deliveryLine2, deliveryLine1));
 
-        var response = restTemplate.exchange("/api/delivery-line/supplier/" + shelleys.getUid().toString(),
+        var response = restTemplate.exchange("/api/delivery-line/supplier/" + shelleys.getUid().toString() + "/",
                 HttpMethod.GET,
                 null,
                 GetDeliveryLinesBySupplierResponse.class
@@ -278,7 +278,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
                 .willReturn(Arrays.asList(deliveryLine1, deliveryLine3));
 
         var response = restTemplate.exchange(
-                "/api/delivery-line/stockable-product/" + mf220.getUid().toString(),
+                "/api/delivery-line/stockable-product/" + mf220.getUid().toString() + "/",
                 HttpMethod.GET,
                 null,
                 GetDeliveryLinesByProductResponse.class);
@@ -300,7 +300,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
                 .willReturn(Arrays.asList(deliveryLine1, deliveryLine3));
 
         var response = restTemplate.exchange(
-                "/api/delivery-line/delivery/" + mf220.getUid().toString(),
+                "/api/delivery-line/delivery/" + mf220.getUid().toString() +"/",
                 HttpMethod.GET,
                 null,
                 GetAllByDeliveryResponse.class);
@@ -322,7 +322,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
                 .willReturn(Arrays.asList(deliveryLine3, deliveryLine1));
 
         var response = restTemplate.exchange(
-                "/api/delivery-line/purchase-order/" + po1.getUid().toString(),
+                "/api/delivery-line/purchase-order/" + po1.getUid().toString() +"/",
                 HttpMethod.GET,
                 null,
                 GetDeliveryLinesByPurchaseOrderResponse.class);

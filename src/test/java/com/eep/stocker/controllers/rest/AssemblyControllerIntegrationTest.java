@@ -323,7 +323,7 @@ class AssemblyControllerIntegrationTest {
                 .willReturn(new HashSet<>(Arrays.asList(assembly1, assembly2)));
 
         var response = restTemplate.exchange(
-                "/api/assembly/component/" + MF220.getUid().toString(),
+                "/api/assembly/component/" + MF220.getUid().toString() +"/",
                 HttpMethod.GET,
                 null,
                 GetAssembliesByComponentResponse.class

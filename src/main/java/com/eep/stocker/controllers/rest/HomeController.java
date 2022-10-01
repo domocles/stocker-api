@@ -48,7 +48,7 @@ public class HomeController {
      * @return GetStockableProductResponse
      * @throws RecordNotFoundException if the stockable product does not exist
      */
-    @GetMapping("/get/{id}")
+    @GetMapping("/{id}")
     public GetStockableProductResponse getById(@PathVariable @ValidUUID(message = "Stockable Product Id must be a UUID") String id) {
         log.info("get: /api/stockable-products/get/{} called", id);
         Optional<StockableProduct> stockableProductOpt = stockableProductService.getStockableProductByUid(id);
@@ -61,7 +61,7 @@ public class HomeController {
      * Retrieve all stockable products
      * @return a list of stockable products
      */
-    @GetMapping("/get")
+    @GetMapping("/")
     public GetAllStockableProductResponse getAllStockableProducts() {
         log.info("get: /api/stockable-products/get called");
         GetAllStockableProductResponse response = new GetAllStockableProductResponse();
@@ -76,7 +76,7 @@ public class HomeController {
      * Retrieve all categories
      * @return a list of categories
      */
-    @GetMapping("/categories")
+    @GetMapping("/categories/")
     public GetAllCategoriesResponse getAllCategories() {
         log.info("get: /api/stockable-products/categories called");
         GetAllCategoriesResponse response = new GetAllCategoriesResponse();
@@ -89,7 +89,7 @@ public class HomeController {
      * @param createStockableProductRequest
      * @return the persisted stockable product
      */
-    @PostMapping(path = "/create")
+    @PostMapping(path = "/")
     public CreateStockableProductResponse createStockableProduct(@Valid @RequestBody CreateStockableProductRequest createStockableProductRequest) {
         log.info("post: /api/stockable-products/create called");
         Optional<StockableProduct> sb = stockableProductService.findStockableProductByMpn(createStockableProductRequest.getMpn());

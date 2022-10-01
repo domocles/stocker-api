@@ -71,7 +71,7 @@ public class AssemblyLineController {
      * @param uid - the unique identifier of the assembly to get assembly lines for
      * @return - a {@code GetAllAssemblyLinesResponse} containing all assembly lines for an assembly
      */
-    @GetMapping("/assembly/{uid}")
+    @GetMapping("/assembly/{uid}/")
     public GetAllAssemblyLinesResponse getAssemblyLinesForAssembly(@PathVariable @ValidUUID(message = "Assembly Id must be a UUID") String uid) {
         log.info("get: /api/assembly-line/assembly/{} called", uid);
         var assembly = this.assemblyService.getAssemblyByUid(uid).
@@ -111,7 +111,8 @@ public class AssemblyLineController {
      * @return - a {@code UpdateLineAssemblyResponse} containing the updated assembly line
      */
     @PutMapping("/{uid}")
-    public UpdateAssemblyLineResponse updateAssemblyLine(@PathVariable @ValidUUID(message = "Assembly Line Id must be a UUID") String uid, @RequestBody @Valid UpdateAssemblyLineRequest request) {
+    public UpdateAssemblyLineResponse updateAssemblyLine(@PathVariable @ValidUUID(message = "Assembly Line Id must be a UUID") String uid,
+                                                         @RequestBody @Valid UpdateAssemblyLineRequest request) {
         log.info("put: /api/assembly-line/{} called", uid);
         var assemblyLine = assemblyLineService.getAssemblyLineByUid(uid)
                 .orElseThrow(() -> new AssemblyLineDoesNotExistException("Assembly Line does not exist"));

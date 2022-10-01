@@ -84,7 +84,7 @@ class SupplierControllerIntegrationTest extends SupplierTestData {
         CreateSupplierRequest request = createSupplierRequest;
 
         ResponseEntity<CreateSupplierResponse> response = restTemplate.exchange(
-          "/api/suppliers/create",
+          "/api/suppliers/",
                 HttpMethod.POST,
                 new HttpEntity<>(request),
                 CreateSupplierResponse.class
@@ -102,7 +102,7 @@ class SupplierControllerIntegrationTest extends SupplierTestData {
         CreateSupplierRequest request = createSupplierRequest;
 
         ResponseEntity<CreateSupplierResponse> response = restTemplate.exchange(
-                "/api/suppliers/create",
+                "/api/suppliers/",
                 HttpMethod.POST,
                 new HttpEntity<>(request),
                 CreateSupplierResponse.class

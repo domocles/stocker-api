@@ -68,7 +68,7 @@ public class StockTransactionController {
      * @param uid - the unique id of the stockable product to get the transactions for
      * @return a {@code GetStockTransactionsByStockableProductResponse} that contains all the transactions for a stockable product
      */
-    @GetMapping("/stockable-product/{uid}")
+    @GetMapping("/stockable-product/{uid}/")
     public GetStockTransactionsByStockableProductResponse getStockTransactionsForStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product ID needs to be a UUID") String uid) {
         log.info("get: /api/stock-transaction/stockable-product/{} called", uid);
         var stockableProduct = stockableProductService.getStockableProductByUid(uid)

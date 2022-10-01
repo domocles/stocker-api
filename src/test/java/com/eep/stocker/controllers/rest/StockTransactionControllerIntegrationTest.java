@@ -140,7 +140,7 @@ class StockTransactionControllerIntegrationTest {
         given(stockableProductService.getStockableProductByUid(anyString())).willReturn(Optional.of(mf220));
 
         var response = restTemplate.exchange(
-                "/api/stock-transaction/stockable-product/" + stockTransaction.getUid().toString(),
+                "/api/stock-transaction/stockable-product/" + stockTransaction.getUid().toString() +"/",
                 HttpMethod.GET,
                 null,
                 GetStockTransactionsByStockableProductResponse.class);
@@ -162,7 +162,7 @@ class StockTransactionControllerIntegrationTest {
         given(stockableProductService.getStockableProductByUid(anyString())).willReturn(Optional.empty());
 
         ResponseEntity<ErrorResponse> response = restTemplate.exchange(
-                "/api/stock-transaction/stockable-product/" + stockTransaction.getUid().toString(),
+                "/api/stock-transaction/stockable-product/" + stockTransaction.getUid().toString() +"/",
                 HttpMethod.GET,
                 null,
                 ErrorResponse.class);

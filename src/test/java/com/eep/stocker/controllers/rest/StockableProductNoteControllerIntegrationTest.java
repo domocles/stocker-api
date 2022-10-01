@@ -164,7 +164,7 @@ public class StockableProductNoteControllerIntegrationTest {
         given(noteService.saveNote(any(StockableProductNote.class))).willReturn(mf220note1);
 
         var response = restTemplate.postForEntity(
-                "/api/stockable-product-note",
+                "/api/stockable-product-note/",
                 request,
                 CreateStockableProductNoteResponse.class
         );

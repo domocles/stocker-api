@@ -67,7 +67,7 @@ public class AssemblyController {
      * @param uid - the unique id of the component
      * @return - a {@code GetAssembliesByComponentResponse} containing all assemblies that contain a component
      */
-    @GetMapping("/component/{uid}")
+    @GetMapping("/component/{uid}/")
     public GetAssembliesByComponentResponse getAssemblyForComponent(@PathVariable @ValidUUID(message = "Component Id must be a UUID") String uid) {
         log.info("get: /api/assembly/component/{} called", uid);
         Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByUid(uid);
@@ -98,7 +98,7 @@ public class AssemblyController {
         return mapper.mapToGetByMpnResponse(assembly);
     }
 
-    @GetMapping("/categories")
+    @GetMapping("/categories/")
     public List<String> getCategories() {
         log.info("get: /api/assembly/categories called");
         List<String> categories = assemblyService.getAllCategories();

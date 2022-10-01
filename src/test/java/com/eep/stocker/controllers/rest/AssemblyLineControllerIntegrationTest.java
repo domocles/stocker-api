@@ -300,7 +300,7 @@ class AssemblyLineControllerIntegrationTest {
                 .willReturn(Arrays.asList(assemblyLine1, assemblyLine2, assemblyLine3));
 
         var response = restTemplate.exchange(
-                "/api/assembly-line/assembly/" + assembly1.getUid().toString(),
+                "/api/assembly-line/assembly/" + assembly1.getUid().toString() + "/",
                 HttpMethod.GET,
                 null,
                GetAllAssemblyLinesResponse.class

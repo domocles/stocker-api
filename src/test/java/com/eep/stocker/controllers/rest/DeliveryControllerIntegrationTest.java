@@ -58,7 +58,7 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
 
         //act
         ResponseEntity<GetDeliveryResponse> response = restTemplate.exchange(
-                "/api/delivery/get/" + UUID.randomUUID(),
+                "/api/delivery/" + UUID.randomUUID(),
                 HttpMethod.GET,
                 null,
                 GetDeliveryResponse.class);
@@ -91,7 +91,7 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
         given(deliveryService.getAllDeliveriesBetween(any(LocalDate.class), any(LocalDate.class)))
                 .willReturn(Arrays.asList(delivery1, delivery2));
 
-        ResponseEntity<GetAllDeliveryResponse> response = restTemplate.exchange("/api/delivery/2017-01-15/2019-09-10",
+        ResponseEntity<GetAllDeliveryResponse> response = restTemplate.exchange("/api/delivery/2017-01-15/2019-09-10/",
                 HttpMethod.GET,
                 null,
                 GetAllDeliveryResponse.class);
@@ -108,7 +108,7 @@ class DeliveryControllerIntegrationTest extends SupplierTestData {
         given(supplierService.getSupplierFromUid(anyString())).willReturn(Optional.of(supplier));
         given(deliveryService.getAllDeliveriesForSupplier(any(Supplier.class))).willReturn(Arrays.asList(delivery1, delivery2));
 
-        ResponseEntity<GetAllDeliveryResponse> response = restTemplate.exchange("/api/delivery/supplier/" + supplier.getUid().toString(),
+        ResponseEntity<GetAllDeliveryResponse> response = restTemplate.exchange("/api/delivery/supplier/" + supplier.getUid().toString() + "/",
                 HttpMethod.GET,
                 null,
                 GetAllDeliveryResponse.class);

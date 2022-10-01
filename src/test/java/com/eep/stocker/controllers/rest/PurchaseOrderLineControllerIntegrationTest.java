@@ -172,7 +172,7 @@ class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
                 .willReturn(lines);
 
         //act
-        ResponseEntity<GetPurchaseOrderLinesByProductResponse> response = restTemplate.exchange("/api/purchase-order-line/product/" + MF286.getUid(),
+        ResponseEntity<GetPurchaseOrderLinesByProductResponse> response = restTemplate.exchange("/api/purchase-order-line/product/" + MF286.getUid() +"/",
                 HttpMethod.GET,
                 null,
                 GetPurchaseOrderLinesByProductResponse.class);
@@ -193,7 +193,7 @@ class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
         given(stockableProductService.getStockableProductByID(any(Long.class))).willReturn(Optional.empty());
 
         //act
-        ResponseEntity<ErrorResponse> response = restTemplate.exchange("/api/purchase-order-line/product/" + MF286.getUid(),
+        ResponseEntity<ErrorResponse> response = restTemplate.exchange("/api/purchase-order-line/product/" + MF286.getUid() +"/",
                 HttpMethod.GET,
                 null,
                 ErrorResponse.class);
@@ -214,7 +214,7 @@ class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
                 .willReturn(Arrays.asList(poLine1, poLine2));
 
         //act
-        ResponseEntity<GetPurchaseOrderLinesByPurchaseOrderResponse> response = restTemplate.exchange("/api/purchase-order-line/purchase-order/" + po1.getUid(),
+        ResponseEntity<GetPurchaseOrderLinesByPurchaseOrderResponse> response = restTemplate.exchange("/api/purchase-order-line/purchase-order/" + po1.getUid() + "/",
                 HttpMethod.GET,
                 null,
                 GetPurchaseOrderLinesByPurchaseOrderResponse.class);
@@ -268,7 +268,7 @@ class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
         given(purchaseOrderLineService.getAllPurchaseOrderLinesForPurchaseOrder(po1)).willReturn(List.of(poLine1));
         given(purchaseOrderLineService.getAllPurchaseOrderLinesForPurchaseOrder(po2)).willReturn(List.of(poLine2));
 
-        var response = restTemplate.exchange("/api/purchase-order-line/supplier/" + shelleys.getUid(),
+        var response = restTemplate.exchange("/api/purchase-order-line/supplier/" + shelleys.getUid() +"/",
                 HttpMethod.GET,
                 null,
                 GetPurchaseOrderLinesBySupplierResponse.class);

@@ -54,7 +54,7 @@ public class SupplierController {
      * @param supplierRequest - CreateSupplierRequest
      * @return CreateSupplierResponse - including id
      */
-    @PostMapping(path = "/create")
+    @PostMapping(path = "/")
     public CreateSupplierResponse createSupplier(@RequestBody @Valid CreateSupplierRequest supplierRequest) {
         log.info("post: /api/suppliers/create called");
         if(supplierService.supplierExists(supplierRequest.getSupplierName()))
