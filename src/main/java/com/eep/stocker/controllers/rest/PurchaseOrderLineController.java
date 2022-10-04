@@ -210,6 +210,12 @@ public class PurchaseOrderLineController {
         return mapper.mapToUpdateResponse(orderLineService.savePurchaseOrderLine(purchaseOrderLine));
     }
 
+    /***
+     * Update the status of a purchase order line
+     * @param uid - the unique identifier of the purchase order line to update
+     * @param request - contains the status to update to
+     * @return - an {@code UpdateStatusResponse} containing the purchase order line
+     */
     @PutMapping("/status/{uid}")
     public UpdateStatusResponse updateStatusOfPurchaseOrderLine(@PathVariable @ValidUUID(message = "Purchase Order Line ID must be a UUID") String uid,
                                                                 @RequestBody @Valid UpdateStatusRequest request) {

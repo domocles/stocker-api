@@ -252,7 +252,7 @@ class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
         given(purchaseOrderService.savePurchaseOrder(any(PurchaseOrder.class))).willReturn(po3saved);
 
         //act
-        ResponseEntity<CreatePurchaseOrderResponse> response = restTemplate.postForEntity(
+        var response = restTemplate.postForEntity(
                 "/api/purchase-order/",
                 request,
                 CreatePurchaseOrderResponse.class);
@@ -264,6 +264,29 @@ class PurchaseOrderControllerIntegrationTest extends SupplierTestData {
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                 () -> assertThat(response.getBody()).isEqualTo(testResponse),
                 () -> assertThat(Objects.requireNonNull(response.getBody()).getId()).isNotNull()
+        );
+    }
+
+    @Test
+    void updatePurchaseOrderStatusTest() {
+        var updatedPurchaseOrder = po1.toBuilder().status(Status.CANCELLED).build();
+        given(purchaseOrderService.getPurchaseOrderFromUid(any(UUID.class))).willReturn(Optional.of(po1));
+        given(purchaseOrderService.savePurchaseOrder(any(PurchaseOrder.class))).willReturn(updatedPurchaseOrder);
+
+        var request = new UpdatePurchaseOrderStatusRequest(Status.CANCELLED);
+
+        var response = restTemplate.exchange(
+                "/api/purchase-order/status/" + po1.getUid().toString(),
+                HttpMethod.PUT,
+                new HttpEntity<>(request),
+                UpdatePurchaseOrderStatusResponse.class
+        );
+
+        var testRes = mapper.mapToUpdateStatusResponse(updatedPurchaseOrder);
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody()).isEqualTo(testRes)
         );
     }
 

@@ -20,6 +20,9 @@ public interface PurchaseOrderMapper {
     @Mapping(source = "uid", target = "id")
     UpdatePurchaseOrderResponse mapToUpdateResponse(PurchaseOrder value);
 
+    @Mapping(source = "uid", target = "id")
+    UpdatePurchaseOrderStatusResponse mapToUpdateStatusResponse(PurchaseOrder value);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "uid", ignore = true)
     @Mapping(target="supplier", ignore = true)

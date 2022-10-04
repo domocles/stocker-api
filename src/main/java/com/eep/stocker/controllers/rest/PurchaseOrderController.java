@@ -196,6 +196,22 @@ public class PurchaseOrderController {
     }
 
     /***
+     * Update the status of a purchase order
+     * @param uid - the unique id of the purchase order to update
+     * @param request - the status to update the purchase order to
+     * @return an {@code UpdatePurchaseOrderStatusResponse} containing the updated {@code PurchaseOrder}
+     */
+    @PutMapping("/status/{uid}")
+    public UpdatePurchaseOrderStatusResponse updatePurchaseOrderStatus(@PathVariable @ValidUUID(message = "Purchase Order ID must be a UUID") String uid,
+                                                                       @RequestBody @Valid UpdatePurchaseOrderStatusRequest request) {
+        log.info("put: /api/purchase-order/status/{}", uid);
+        var purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(uid)).orElseThrow(() -> new DomainObjectDoesNotExistException("Purchase Order does not exists"));
+        purchaseOrder.setStatus(request.getStatus());
+        purchaseOrder = purchaseOrderService.savePurchaseOrder(purchaseOrder);
+        return mapper.mapToUpdateStatusResponse(purchaseOrder);
+    }
+
+    /***
      * Delete a purchase order defined by its UUID
      * @param uuid unique id of the purchase order
      * @return a String detailing that the purchase order that was deleted
