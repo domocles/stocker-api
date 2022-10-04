@@ -210,6 +210,17 @@ public class PurchaseOrderLineController {
         return mapper.mapToUpdateResponse(orderLineService.savePurchaseOrderLine(purchaseOrderLine));
     }
 
+    @PutMapping("/status/{uid}")
+    public UpdateStatusResponse updateStatusOfPurchaseOrderLine(@PathVariable @ValidUUID(message = "Purchase Order Line ID must be a UUID") String uid,
+                                                                @RequestBody @Valid UpdateStatusRequest request) {
+        log.info("put: /api/purchase-order-line/status/{} called", uid);
+        var purchaseOrderLine = orderLineService.getPurchaseOrderLineByUid(uid)
+                .orElseThrow(() -> new PurchaseOrderLineDoesNotExistException("Purchase Order Line does not exist"));
+        purchaseOrderLine.setStatus(request.getStatus());
+        purchaseOrderLine = orderLineService.savePurchaseOrderLine(purchaseOrderLine);
+        return mapper.mapToUpdateStatusResponse(purchaseOrderLine);
+    }
+
     /***
      * Delete a purchase order line by its id
      * @param orderLineId - the uid of the purchase order line

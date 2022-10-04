@@ -18,6 +18,9 @@ public interface PurchaseOrderLineMapper {
     UpdatePurchaseOrderLineResponse mapToUpdateResponse(PurchaseOrderLine source);
 
     @Mapping(target = "id", source = "uid")
+    UpdateStatusResponse mapToUpdateStatusResponse(PurchaseOrderLine orderLine);
+
+    @Mapping(target = "id", source = "uid")
     @Mapping(target = "purchaseOrderId", source = "purchaseOrder.uid")
     @Mapping(target = "stockableProductId", source = "stockableProduct.uid")
     GetPurchaseOrderLineLowDetailResponse mapToGetLowDetailResponse(PurchaseOrderLine orderLine);

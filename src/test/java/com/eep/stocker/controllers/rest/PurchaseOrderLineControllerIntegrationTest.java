@@ -1,10 +1,7 @@
 package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.controllers.error.ErrorResponse;
-import com.eep.stocker.domain.PurchaseOrder;
-import com.eep.stocker.domain.PurchaseOrderLine;
-import com.eep.stocker.domain.StockableProduct;
-import com.eep.stocker.domain.Supplier;
+import com.eep.stocker.domain.*;
 import com.eep.stocker.dto.purchaseorderline.*;
 import com.eep.stocker.services.*;
 import com.eep.stocker.testdata.SupplierTestData;
@@ -303,6 +300,27 @@ class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
                 ()-> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
                 () -> assertThat(Objects.requireNonNull(response.getBody()).getId()).isNotNull(),
                 () -> assertThat(response.getBody()).isEqualTo(testResponse)
+        );
+    }
+
+    @Test
+    void updateStatusOfPurchaseOrderLineTest() {
+        var updatedOrderLine = poLine1.toBuilder().status(Status.CANCELLED).build();
+        given(purchaseOrderLineService.getPurchaseOrderLineByUid(anyString())).willReturn(Optional.of(poLine1));
+        given(purchaseOrderLineService.savePurchaseOrderLine(any(PurchaseOrderLine.class))).willReturn(updatedOrderLine);
+
+        var request = new UpdateStatusRequest(Status.CANCELLED);
+
+        var response = restTemplate.exchange(
+                "/api/purchase-order-line/status/" + poLine1.getUid().toString(),
+                HttpMethod.PUT,
+                new HttpEntity<>(request),
+                UpdateStatusResponse.class
+        );
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().getStatus()).isEqualTo(Status.CANCELLED)
         );
     }
 
