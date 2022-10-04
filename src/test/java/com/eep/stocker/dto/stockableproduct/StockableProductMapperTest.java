@@ -1,13 +1,13 @@
 package com.eep.stocker.dto.stockableproduct;
 
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.services.StockableProductService;
 import org.junit.jupiter.api.Test;
-import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -17,6 +17,9 @@ class StockableProductMapperTest {
 
     @Autowired
     StockableProductMapper stockableProductMapper;
+
+    @MockBean
+    private StockableProductService service;
 
     private StockableProduct stockableProduct = StockableProduct.builder()
             .id(1L)
@@ -70,7 +73,7 @@ class StockableProductMapperTest {
     @Test
     void stockableProductToStockableProductRequest() {
 
-        CreateStockableProductRequest req = stockableProductMapper.stockableProductToStockableProductRequest(stockableProduct);
+        CreateStockableProductRequest req = stockableProductMapper.mapToCreateRequest(stockableProduct);
         assertThat(req.getName()).isEqualTo("51mm x 152mm Ilok Flex");
         assertThat(req.getMpn()).isEqualTo("FX-51-152-I");
         assertThat(req.getDescription()).isEqualTo("An ilok lined flex with a bore of 51mm and an overall length of 152mm.  " +
@@ -83,7 +86,7 @@ class StockableProductMapperTest {
 
     @Test
     void stockableProductFromCreateStockableProductRequest() {
-        StockableProduct stockableProduct = stockableProductMapper.stockableProductFromCreateStockableProductRequest(request);
+        StockableProduct stockableProduct = stockableProductMapper.mapFromCreateRequest(request);
         assertThat(stockableProduct.getName()).isEqualTo("51mm x 152mm Ilok Flex");
         assertThat(stockableProduct.getUid().toString()).isNotEmpty();
         assertThat(stockableProduct.getMpn()).isEqualTo("FX-51-152-I");
@@ -97,7 +100,7 @@ class StockableProductMapperTest {
 
     @Test
     void createStockableProductResponseFromStockableProduct() {
-        CreateStockableProductResponse res = stockableProductMapper.createStockableProductResponseFromStockableProduct(stockableProduct);
+        var res = stockableProductMapper.mapToCreateResponse(stockableProduct);
         assertThat(res.getName()).isEqualTo("51mm x 152mm Ilok Flex");
         assertThat(res.getId()).isNotEmpty();
         assertThat(res.getMpn()).isEqualTo("FX-51-152-I");
@@ -111,15 +114,18 @@ class StockableProductMapperTest {
 
     @Test
     void createGetStockableProductResponseFromStockableProduct() {
-        GetStockableProductResponse res = stockableProductMapper.stockableProductResponseFromStockableProduct(stockableProduct);
+        var res = stockableProductMapper.mapToGetResponse(stockableProduct, 0.0);
         assertThat(res.getName()).isEqualTo("51mm x 152mm Ilok Flex");
         assertThat(res.getId()).isNotEmpty();
         assertThat(res.getMpn()).isEqualTo("FX-51-152-I");
         assertThat(res.getDescription()).isEqualTo("An ilok lined flex with a bore of 51mm and an overall length of 152mm.  " +
                 "Stainless steel collars.");
-        assertThat(res.getCategory()).isEqualTo("Flex");
-        assertThat(res.getTags()).contains("51mm");
-        assertThat(res.getStockPrice()).isEqualTo(BigDecimal.valueOf(1.0));
-        assertThat(res.getInStock()).isEqualTo(BigDecimal.valueOf(50.0));
+        assertAll(
+                () -> assertThat(res.getCategory()).isEqualTo("Flex"),
+                () -> assertThat(res.getTags()).contains("51mm"),
+                () -> assertThat(res.getStockPrice()).isEqualTo(BigDecimal.valueOf(1.0)),
+                () -> assertThat(res.getInStock()).isEqualTo(BigDecimal.valueOf(50.0)),
+                () -> assertThat(res.getOnOrder()).isEqualTo(BigDecimal.valueOf(100.0))
+        );
     }
 }

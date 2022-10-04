@@ -74,6 +74,15 @@ public class DeliveryLineService {
     }
 
     /***
+     * Gets the sum of all deliveries for a stockable product
+     * @param stockableProduct - the stockable product to get the on delivery value for
+     * @return an Optional containing the delivery value
+     */
+    public Optional<Double> getSumOfDeliveryLinesForStockableProduct(StockableProduct stockableProduct) {
+        return deliveryLineRepository.getSumOfDeliveriesForStockableProduct(stockableProduct);
+    }
+
+    /***
      * Finds a delivery line by its unique identifier, if it doesn't exist returns Optional.empty().  Assumes the
      * uid is valid, wrapping in a try-catch block is potentially expensive
      * @param uid - unique identifier of the delivery line

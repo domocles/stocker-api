@@ -15,16 +15,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Delivery {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "delivery_id")
-    private Long id;
-
-    @NaturalId
-    @Column(name = "delivery_uid")
-    @Builder.Default
-    private UUID uid = UUID.randomUUID();
+public class Delivery extends AbstractEntity{
 
     @ManyToOne(fetch = FetchType.EAGER)
     private Supplier supplier;

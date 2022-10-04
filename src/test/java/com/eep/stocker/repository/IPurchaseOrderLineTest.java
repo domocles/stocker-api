@@ -7,21 +7,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @DataJpaTest
-class IDeliveryLineRepositoryTest extends SupplierTestData {
-
+public class IPurchaseOrderLineTest extends SupplierTestData {
     @Autowired
-    private IDeliveryLineRepository repository;
+    private IPurchaseOrderLineRepository repository;
 
     @Autowired
     private TestEntityManager entityManager;
@@ -31,6 +26,9 @@ class IDeliveryLineRepositoryTest extends SupplierTestData {
     private PurchaseOrderLine poLine1;
     private PurchaseOrderLine unsavedPoLine1;
     private PurchaseOrderLine poLine2;
+    private PurchaseOrderLine poLine3;
+    private PurchaseOrderLine poLine4;
+    private PurchaseOrderLine poLine5;
     private StockTransaction transaction1;
     private StockTransaction transaction2;
     private StockTransaction transaction3;
@@ -117,6 +115,32 @@ class IDeliveryLineRepositoryTest extends SupplierTestData {
         poLine2.setQty(100.0D);
         poLine2.setPrice(1.35D);
 
+        poLine3 = new PurchaseOrderLine();
+        //poLine2.setId(2L);
+        poLine3.setNote("Third purchase order line");
+        poLine3.setPurchaseOrder(po2);
+        poLine3.setStockableProduct(mf220);
+        poLine3.setQty(50.0D);
+        poLine3.setPrice(1.76D);
+
+        poLine4 = new PurchaseOrderLine();
+        //poLine2.setId(2L);
+        poLine4.setNote("Fourth purchase order line");
+        poLine4.setPurchaseOrder(po1);
+        poLine4.setStockableProduct(mf220);
+        poLine4.setQty(15.0D);
+        poLine4.setPrice(1.48D);
+        poLine4.setStatus(Status.CLOSED);
+
+        poLine5 = new PurchaseOrderLine();
+        //poLine2.setId(2L);
+        poLine5.setNote("Fourth purchase order line");
+        poLine5.setPurchaseOrder(po1);
+        poLine5.setStockableProduct(mf220);
+        poLine5.setQty(15.0D);
+        poLine5.setPrice(1.48D);
+        poLine5.setStatus(Status.CANCELLED);
+
         ukf = new Supplier();
         ukf.setSupplierName("UKF Ltd");
         ukf.setDefaultCurrency("GBP");
@@ -170,6 +194,9 @@ class IDeliveryLineRepositoryTest extends SupplierTestData {
         transaction3 = entityManager.persistFlushFind(transaction3);
         poLine1 = entityManager.persistFlushFind(poLine1);
         poLine2 = entityManager.persistFlushFind(poLine2);
+        poLine3 = entityManager.persistFlushFind(poLine3);
+        poLine4 = entityManager.persistFlushFind(poLine4);
+        poLine5 = entityManager.persistFlushFind(poLine5);
         delivery1 = entityManager.persistFlushFind(delivery1);
         delivery2 = entityManager.persistFlushFind(delivery2);
         delivery3 = entityManager.persistFlushFind(delivery3);
@@ -179,94 +206,21 @@ class IDeliveryLineRepositoryTest extends SupplierTestData {
     }
 
     @Test
-    void findAllTest() {
-
-        List<DeliveryLine> allDeliverieLines = repository.findAll();
-
-        assertThat(allDeliverieLines.size()).isEqualTo(3);
-        assertThat(allDeliverieLines).contains(deliveryLine1);
-        assertThat(allDeliverieLines).contains(deliveryLine2);
-        assertThat(allDeliverieLines).contains(deliveryLine3);
-    }
-
-    @Test
-    void findByIdTest() {
-        Optional<DeliveryLine> deliveryLine = repository.findById(deliveryLine2.getId());
-
-        assertThat(deliveryLine.isPresent()).isTrue();
-        assertThat(deliveryLine.get()).isEqualTo(deliveryLine2);
-    }
-
-    @Test
-    void findBySupplierTest() {
-        List<DeliveryLine> shelleyDeliveryLines = repository.findAllByPurchaseOrderLine_PurchaseOrder_Supplier(shelleys);
-        List<DeliveryLine> ukfDeliveryLines = repository.findAllByPurchaseOrderLine_PurchaseOrder_Supplier(ukf);
-
-        assertThat(shelleyDeliveryLines.size()).isEqualTo(3);
-        assertThat(shelleyDeliveryLines).contains(deliveryLine1);
-        assertThat(shelleyDeliveryLines).contains(deliveryLine2);
-        assertThat(shelleyDeliveryLines).contains(deliveryLine3);
-        assertThat(ukfDeliveryLines.size()).isEqualTo(0);
-    }
-
-    @Test
-    void findByProductTest() {
-        List<DeliveryLine> deliveryLines = repository.findAllByPurchaseOrderLine_StockableProduct(mf220);
-
-        assertThat(deliveryLines.size()).isEqualTo(2);
-        assertThat(deliveryLines).contains(deliveryLine1);
-        assertThat(deliveryLines).contains(deliveryLine2);
-    }
-
-    @Test
-    void findByPurchaseOrderTest() {
-        List<DeliveryLine> deliveryLines = repository.findAllByPurchaseOrderLine_PurchaseOrder(po1);
-        List<DeliveryLine> po2DeliveryLines = repository.findAllByPurchaseOrderLine_PurchaseOrder(po2);
-
-        assertThat(deliveryLines.size()).isEqualTo(3);
-        assertThat(deliveryLines).contains(deliveryLine1);
-        assertThat(deliveryLines).contains(deliveryLine2);
-        assertThat(deliveryLines).contains(deliveryLine3);
-        assertThat(po2DeliveryLines.size()).isEqualTo(0);
-    }
-
-    @Test
-    void deleteDeliveryLineTest() {
-        List<DeliveryLine> deliveryLines = repository.findAll();
-
-        assertThat(deliveryLines.size()).isEqualTo(3);
-        assertThat(deliveryLines).contains(deliveryLine1, deliveryLine2, deliveryLine3);
-
-        repository.delete(deliveryLine2);
-
-        List<DeliveryLine> deliveryLines2 = repository.findAll();
-        assertThat(deliveryLines2.size()).isEqualTo(2);
-        assertThat(deliveryLines2).contains(deliveryLine1, deliveryLine3);
-    }
-
-    @Test
-    void updateDeliveryLineTest() {
-        Long id = deliveryLine2.getId();
-
-        assertThat(deliveryLine2.getNote()).isEqualTo("A note");
-
-        deliveryLine2.setNote("An updated note");
-
-        repository.save(deliveryLine2);
-
-        Optional<DeliveryLine> deliveryLine = repository.findById(id);
-        assertThat(deliveryLine.isPresent()).isTrue();
-        assertThat(deliveryLine.get().getNote()).isEqualTo("An updated note");
-    }
-
-    @Test
-    void getSumOfDeliveredForStockableProductTest() {
-        var totalMf220 = repository.getSumOfDeliveriesForStockableProduct(mf220);
-        var totalMf286 = repository.getSumOfDeliveriesForStockableProduct(MF286);
+    void findAllByStockableProductAndAndStatusTest() {
+        var orderLines = repository.findAllByStockableProductAndAndStatus(mf220, Status.OPEN);
 
         assertAll(
-                () -> assertThat(totalMf220).isPresent().contains(25.0),
-                () -> assertThat(totalMf286).isPresent().contains(100.0)
+                () ->  assertThat(orderLines).contains(poLine1, poLine3),
+                () ->  assertThat(orderLines).doesNotContain(poLine4)
+        );
+    }
+
+    @Test
+    void getSumOfPurchaseOrderLinesForStockableProductTest() {
+        var qty = repository.getSumOfOrderLinesForStockableProduct(mf220);
+
+        assertAll(
+                () -> assertThat(qty).isPresent().contains(90.0)
         );
     }
 }

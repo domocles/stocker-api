@@ -24,5 +24,8 @@ public interface IDeliveryLineRepository extends CrudRepository<DeliveryLine, Lo
     @Query("SELECT SUM(s.quantityDelivered) FROM deliveryline s WHERE s.purchaseOrderLine = :poLine")
     Optional<Double> getSumOfDeliveriesForPurchaseOrderLine(PurchaseOrderLine poLine);
 
+    @Query("SELECT SUM(s.quantityDelivered) FROM deliveryline s WHERE s.purchaseOrderLine.stockableProduct = :stockableProduct")
+    Optional<Double> getSumOfDeliveriesForStockableProduct(StockableProduct stockableProduct);
+
     Optional<DeliveryLine> findByUid(UUID uid);
 }

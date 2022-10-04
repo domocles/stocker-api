@@ -2,6 +2,9 @@ package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.annotations.validators.ValidUUID;
 import com.eep.stocker.controllers.error.exceptions.*;
+import com.eep.stocker.domain.DeliveryLine;
+import com.eep.stocker.domain.PurchaseOrderLine;
+import com.eep.stocker.domain.Status;
 import com.eep.stocker.dto.deliveryline.*;
 import com.eep.stocker.services.*;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +13,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 /***
@@ -44,7 +48,7 @@ public class DeliveryLineController {
         log.info("get: /api/delivery-line/{} called", uid);
         var deliveryLine = deliveryLineService.getDeliveryLineByUid(uid)
                 .orElseThrow(() -> new DeliveryLineDoesNotExistException(String.format("DeliveryLine with ID of %s does not exist", uid)));
-        return mapper.mapToGetResponse(deliveryLine);
+        return mapper.mapToGetResponse(deliveryLine, getBalance(deliveryLine));
     }
 
     /***
@@ -166,7 +170,7 @@ public class DeliveryLineController {
         var deliveryLine = mapper.mapFromCreateRequest(request, orderLine, delivery, stockTransaction);
         deliveryLine = deliveryLineService.save(deliveryLine);
 
-        return mapper.mapToCreateResponse(deliveryLine);
+        return mapper.mapToCreateResponse(deliveryLine, getBalance(deliveryLine));
     }
 
     /***
@@ -199,6 +203,25 @@ public class DeliveryLineController {
         }
         deliveryLine = deliveryLineService.save(deliveryLine);
 
-        return mapper.mapToUpdateResponse(deliveryLine);
+        return mapper.mapToUpdateResponse(deliveryLine, getBalance(deliveryLine));
+    }
+
+    /***
+     * Gets the remaining balance of items to be delivered.  If the status of the order line is closed then returns 0
+     * regardless of whether all have been delivered.  If more components have been delivered than ordered then balance
+     * will be 0
+     * @param deliveryLine - the orderLine to find the balance for
+     * @return a {@code BigDecimal} with the balance
+     */
+    private BigDecimal getBalance(DeliveryLine deliveryLine) {
+        if(deliveryLine.getPurchaseOrderLine().getStatus() == Status.CLOSED)
+            return BigDecimal.ZERO;
+        var deliveredOpt = deliveryLineService.getSumDeliveredForOrderLine(deliveryLine.getPurchaseOrderLine());
+        if(deliveredOpt.isPresent()) {
+            var delivered = deliveredOpt.get();
+            var balance = deliveryLine.getPurchaseOrderLine().getQty() - delivered;
+            return BigDecimal.valueOf( balance < 0 ? 0 : balance );
+        }
+        return BigDecimal.valueOf(deliveryLine.getPurchaseOrderLine().getQty());
     }
 }

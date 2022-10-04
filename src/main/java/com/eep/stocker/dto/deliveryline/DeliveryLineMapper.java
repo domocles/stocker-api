@@ -12,6 +12,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.math.BigDecimal;
+
 /***
  * @author Sam Burns
  * @version 1.0
@@ -20,8 +22,8 @@ import org.mapstruct.MappingTarget;
  */
 @Mapper(componentModel = "spring", uses = {MapperUtils.class, PurchaseOrderLineMapper.class, DeliveryMapper.class, StockTransactionMapper.class})
 public interface DeliveryLineMapper {
-    @Mapping(target = "id", source = "uid")
-    GetDeliveryLineResponse mapToGetResponse(DeliveryLine line);
+    @Mapping(target = "id", source = "line.uid")
+    GetDeliveryLineResponse mapToGetResponse(DeliveryLine line, BigDecimal balance);
 
     @Mapping(target = "id", source = "uid")
     @Mapping(target = "purchaseOrderLineId", source = "purchaseOrderLine.uid")
@@ -40,11 +42,11 @@ public interface DeliveryLineMapper {
                                       Delivery delivery,
                                       StockTransaction stockTransaction);
 
-    @Mapping(target = "id", source = "uid")
-    CreateDeliveryLineResponse mapToCreateResponse(DeliveryLine line);
+    @Mapping(target = "id", source = "line.uid")
+    CreateDeliveryLineResponse mapToCreateResponse(DeliveryLine line, BigDecimal balance);
 
-    @Mapping(target = "id", source = "uid")
-    UpdateDeliveryLineResponse mapToUpdateResponse(DeliveryLine line);
+    @Mapping(target = "id", source = "line.uid")
+    UpdateDeliveryLineResponse mapToUpdateResponse(DeliveryLine line, BigDecimal balance);
 
     void updateFromUpdateRequest(@MappingTarget DeliveryLine deliveryLine, UpdateDeliveryLineRequest request);
 }

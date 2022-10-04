@@ -18,7 +18,8 @@ public class UpdateStockableProductResponse implements
         IStockableProductDTO.Units,
         IStockableProductDTO.Tags,
         IStockableProductDTO.StockPrice,
-        IStockableProductDTO.InStock {
+        IStockableProductDTO.InStock,
+        IStockableProductDTO.OnOrder{
     private String id;
     private String name;
     private String mpn;
@@ -29,4 +30,5 @@ public class UpdateStockableProductResponse implements
     private Set<String> tags;
     private BigDecimal stockPrice;
     private BigDecimal inStock;
+    private BigDecimal onOrder;
 }

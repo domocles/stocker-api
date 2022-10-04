@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -203,7 +204,7 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
                 null,
                 GetDeliveryLineResponse.class);
 
-        var testResponse = deliveryLineMapper.mapToGetResponse(deliveryLine2);
+        var testResponse = deliveryLineMapper.mapToGetResponse(deliveryLine2, BigDecimal.valueOf(deliveryLine2.getPurchaseOrderLine().getQty()));
 
         //assert
         assertAll(
@@ -391,7 +392,8 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
                 request,
                 CreateDeliveryLineResponse.class);
 
-        var testResponse = deliveryLineMapper.mapToCreateResponse(savedDeliveryLine);
+        var testResponse = deliveryLineMapper.mapToCreateResponse(savedDeliveryLine,
+                BigDecimal.valueOf(deliveryLine2.getPurchaseOrderLine().getQty()));
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -423,7 +425,8 @@ class DeliveryLineControllerIntegrationTest extends SupplierTestData {
                 UpdateDeliveryLineResponse.class
         );
 
-        var testResponse = deliveryLineMapper.mapToUpdateResponse(updatedDeliveryLine);
+        var testResponse = deliveryLineMapper.mapToUpdateResponse(updatedDeliveryLine,
+                BigDecimal.valueOf(deliveryLine2.getPurchaseOrderLine().getQty()));
 
         assertAll(
                 () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),

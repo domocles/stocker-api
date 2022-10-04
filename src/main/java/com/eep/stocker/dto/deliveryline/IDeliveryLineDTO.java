@@ -4,6 +4,8 @@ import com.eep.stocker.dto.delivery.GetDeliveryResponse;
 import com.eep.stocker.dto.purchaseorderline.GetPurchaseOrderLineResponse;
 import com.eep.stocker.dto.stocktransaction.GetStockTransactionResponse;
 
+import java.math.BigDecimal;
+
 /***
  * @author Sam Burns
  * @version 1.0
@@ -19,4 +21,5 @@ public interface IDeliveryLineDTO {
     interface StockTransaction { GetStockTransactionResponse getStockTransaction(); }
     interface QuantityDelivered { Double getQuantityDelivered(); }
     interface Note { String getNote(); }
+    interface Balance { BigDecimal getBalance(); }
 }

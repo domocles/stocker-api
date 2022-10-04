@@ -315,7 +315,7 @@ class StockTransactionControllerIntegrationTest {
                 UpdateStockTransactionResponse.class);
 
         var testResponse = mapper.mapToUpdateResponse(stockTransaction);
-        testResponse.setStockableProduct(stockableProductMapper.stockableProductResponseFromStockableProduct(mf236));
+        testResponse.setStockableProduct(stockableProductMapper.mapToGetResponse(mf236, 0.0));
         testResponse.setQuantity(25.0);
 
         assertAll(

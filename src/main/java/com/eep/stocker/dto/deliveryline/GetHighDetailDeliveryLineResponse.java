@@ -5,6 +5,8 @@ import com.eep.stocker.dto.purchaseorderline.GetPurchaseOrderLineResponse;
 import com.eep.stocker.dto.stocktransaction.GetStockTransactionResponse;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /***
  * @author Sam Burns
  * @version 1.0
@@ -18,11 +20,13 @@ public class GetHighDetailDeliveryLineResponse implements IDeliveryLineDTO.Id,
         IDeliveryLineDTO.Delivery,
         IDeliveryLineDTO.StockTransaction,
         IDeliveryLineDTO.QuantityDelivered,
-        IDeliveryLineDTO.Note {
+        IDeliveryLineDTO.Note,
+        IDeliveryLineDTO.Balance {
     private String id;
     private GetPurchaseOrderLineResponse purchaseOrderLine;
     private GetDeliveryResponse delivery;
     private GetStockTransactionResponse stockTransaction;
     private Double quantityDelivered;
     private String note;
+    private BigDecimal balance;
 }

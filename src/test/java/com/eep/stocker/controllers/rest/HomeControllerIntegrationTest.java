@@ -1,9 +1,12 @@
 package com.eep.stocker.controllers.rest;
 
 import com.eep.stocker.domain.StockableProduct;
+import com.eep.stocker.dto.stockableproduct.GetStockableProductResponse;
 import com.eep.stocker.dto.stockableproduct.StockableProductMapper;
 import com.eep.stocker.dto.stockableproduct.UpdateStockableProductRequest;
 import com.eep.stocker.dto.stockableproduct.UpdateStockableProductResponse;
+import com.eep.stocker.services.DeliveryLineService;
+import com.eep.stocker.services.PurchaseOrderLineService;
 import com.eep.stocker.services.StockableProductNoteService;
 import com.eep.stocker.services.StockableProductService;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +25,7 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -37,6 +41,12 @@ public class HomeControllerIntegrationTest {
 
     @MockBean
     private StockableProductNoteService stockableProductNoteService;
+
+    @MockBean
+    private PurchaseOrderLineService orderLineService;
+
+    @MockBean
+    private DeliveryLineService deliveryLineService;
 
     private StockableProductMapper stockableProductMapper = Mappers.getMapper(StockableProductMapper.class);
 
@@ -93,7 +103,29 @@ public class HomeControllerIntegrationTest {
     }
 
     @Test
-    public void updateStockableProductTest() {
+    void getStockableProductByUidTest() {
+        given(productService.getStockableProductByUid(anyString())).willReturn(Optional.of(MF220));
+        given(orderLineService.getSumOfOrdersForStockableProduct(any(StockableProduct.class)))
+                .willReturn(Optional.of(100.0));
+        given(deliveryLineService.getSumOfDeliveryLinesForStockableProduct(any(StockableProduct.class)))
+                .willReturn(Optional.of(25.0));
+
+        var response = restTemplate.exchange(
+                "/api/stockable-products/" + MF220.getUid().toString(),
+                HttpMethod.GET,
+                null,
+                GetStockableProductResponse.class
+        );
+
+        assertAll(
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+                () -> assertThat(response.getBody().getOnOrder()).isNotNull().isEqualTo(BigDecimal.valueOf(75.0))
+        );
+
+    }
+
+    @Test
+    void updateStockableProductTest() {
         given(productService.getStockableProductByUid(anyString())).willReturn(Optional.of(MF220));
         given(productService.findStockableProductByMpn(anyString())).willReturn(Optional.empty());
         given(productService.updateStockableProduct(any(StockableProduct.class))).willReturn(MF220);
@@ -113,7 +145,7 @@ public class HomeControllerIntegrationTest {
     }
 
     @Test
-    public void updateMpnWithClashThrowsMpnAlreadyExistsTest() {
+    void updateMpnWithClashThrowsMpnAlreadyExistsTest() {
         given(productService.getStockableProductByUid(anyString())).willReturn(Optional.of(MF220));
         given(productService.findStockableProductByMpn(anyString())).willReturn(Optional.of(MF286));
 

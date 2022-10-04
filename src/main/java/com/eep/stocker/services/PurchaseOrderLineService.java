@@ -58,4 +58,14 @@ public class PurchaseOrderLineService {
     public Optional<PurchaseOrderLine> getPurchaseOrderLineByUid(String uid) {
         return purchaseOrderLineRepository.findByUid(uid);
     }
+
+    /***
+     * Gets the sum of all order lines for a stockable product except those that have a {@link com.eep.stocker.domain.Status}
+     * of {@code Staust.CANCELLED}
+     * @param stockableProduct - the stockable product to get the total on order value for
+     * @return an Optional containing the on order value
+     */
+    public Optional<Double> getSumOfOrdersForStockableProduct(StockableProduct stockableProduct) {
+        return purchaseOrderLineRepository.getSumOfOrderLinesForStockableProduct(stockableProduct);
+    }
 }

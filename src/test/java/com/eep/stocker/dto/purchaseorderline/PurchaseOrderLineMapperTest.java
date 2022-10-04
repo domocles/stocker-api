@@ -3,14 +3,15 @@ package com.eep.stocker.dto.purchaseorderline;
 import com.eep.stocker.domain.PurchaseOrder;
 import com.eep.stocker.domain.PurchaseOrderLine;
 import com.eep.stocker.domain.StockableProduct;
-import com.eep.stocker.dto.MapperUtils;
 import com.eep.stocker.dto.purchaseorder.PurchaseOrderMapper;
 import com.eep.stocker.dto.stockableproduct.StockableProductMapper;
+import com.eep.stocker.services.StockableProductService;
 import com.eep.stocker.testdata.SupplierTestData;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDate;
 
@@ -23,6 +24,9 @@ public class PurchaseOrderLineMapperTest extends SupplierTestData {
     PurchaseOrderMapper poMapper;
     @Autowired
     StockableProductMapper spMapper;
+
+    @MockBean
+    StockableProductService stockableProductService;
 
 
     private PurchaseOrder po1;
@@ -108,7 +112,7 @@ public class PurchaseOrderLineMapperTest extends SupplierTestData {
                 .note(poLine1.getNote())
                 .qty(poLine1.getQty())
                 .status(poLine1.getStatus())
-                .stockableProduct(spMapper.stockableProductResponseFromStockableProduct(poLine1.getStockableProduct()))
+                .stockableProduct(spMapper.mapToGetResponse(poLine1.getStockableProduct(), 0.0))
                 .build();
 
         assertThat(testMappedValue).isEqualTo(mappedValue);

@@ -1,5 +1,6 @@
 package com.eep.stocker.dto.stockableproduct;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Singular;
@@ -8,11 +9,12 @@ import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
+@AllArgsConstructor
 @Builder
 public class GetStockableProductResponse implements IStockableProductDTO.Id,
             IStockableProductDTO.Name, IStockableProductDTO.Mpn, IStockableProductDTO.Description,
             IStockableProductDTO.Category, IStockableProductDTO.Units, IStockableProductDTO.Tags,
-            IStockableProductDTO.StockPrice, IStockableProductDTO.InStock {
+            IStockableProductDTO.StockPrice, IStockableProductDTO.InStock, IStockableProductDTO.OnOrder {
     private String id;
     private String name;
     private String mpn;
@@ -23,4 +25,5 @@ public class GetStockableProductResponse implements IStockableProductDTO.Id,
     private Set<String> tags;
     private BigDecimal stockPrice;
     private BigDecimal inStock;
+    private BigDecimal onOrder;
 }

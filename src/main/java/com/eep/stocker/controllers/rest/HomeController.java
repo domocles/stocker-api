@@ -6,13 +6,11 @@ import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
 import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.dto.stockableproduct.*;
-import com.eep.stocker.services.StockableProductNoteService;
+import com.eep.stocker.services.DeliveryLineService;
+import com.eep.stocker.services.PurchaseOrderLineService;
 import com.eep.stocker.services.StockableProductService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +21,6 @@ import javax.validation.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /***
  * @author Sam Burns
@@ -39,6 +36,9 @@ import java.util.stream.Collectors;
 @Validated
 public class HomeController {
     private final StockableProductService stockableProductService;
+    private final PurchaseOrderLineService orderLineService;
+    private final DeliveryLineService deliveryLineService;
+
     private final StockableProductMapper stockableProductMapper;
 
 
@@ -54,7 +54,7 @@ public class HomeController {
         Optional<StockableProduct> stockableProductOpt = stockableProductService.getStockableProductByUid(id);
         StockableProduct stockableProduct = stockableProductOpt.orElseThrow(()
                 -> new RecordNotFoundException("Stockable Product ID: '" + id + "' does not exist"));
-        return stockableProductMapper.stockableProductResponseFromStockableProduct(stockableProduct);
+        return stockableProductMapper.mapToGetResponse(stockableProduct, getOnOrderForStockableProduct(stockableProduct));
     }
 
     /***
@@ -67,7 +67,7 @@ public class HomeController {
         GetAllStockableProductResponse response = new GetAllStockableProductResponse();
         List<StockableProduct> allProducts = stockableProductService.getAllStockableProducts();
         allProducts.stream()
-                .map(stockableProductMapper::stockableProductResponseFromStockableProduct)
+                .map(p -> stockableProductMapper.mapToGetResponse(p, getOnOrderForStockableProduct(p)))
                 .forEach(response::addGetStockableProductResponse);
         return response;
     }
@@ -97,9 +97,9 @@ public class HomeController {
             log.info("MPN already exists: '{}'", createStockableProductRequest.getMpn());
             throw new MpnNotUniqueException(createStockableProductRequest.getMpn() + " already exists");
         }
-        StockableProduct stockableProduct = stockableProductMapper.stockableProductFromCreateStockableProductRequest(createStockableProductRequest);
+        StockableProduct stockableProduct = stockableProductMapper.mapFromCreateRequest(createStockableProductRequest);
         stockableProduct = stockableProductService.saveStockableProduct(stockableProduct);
-        return stockableProductMapper.createStockableProductResponseFromStockableProduct(stockableProduct);
+        return stockableProductMapper.mapToCreateResponse(stockableProduct);
     }
 
     /***
@@ -121,9 +121,9 @@ public class HomeController {
                     throw new MpnNotUniqueException("You are updating the mpn on the stockable product to one that" +
                             "already exists");
             }
-            stockableProductMapper.updateStockableProductFromDto(request, sb);
+            stockableProductMapper.updateFromUpdateRequest(sb, request);
             sb = stockableProductService.updateStockableProduct(sb);
-            UpdateStockableProductResponse response = stockableProductMapper.updateStockableResponseFromStockableProduct(sb);
+            var response = stockableProductMapper.mapToUpdateResponse(sb, getOnOrderForStockableProduct(sb));
             return response;
         } else
             throw new StockableProductDoesNotExistException("Stockable Product does not exist");
@@ -146,6 +146,12 @@ public class HomeController {
         } else {
             throw new ResourceNotFoundException(String.format("StockableProduct with id '%s' doesn't exist", id));
         }
+    }
+
+    private Double getOnOrderForStockableProduct(StockableProduct stockableProduct) {
+        var ordered = orderLineService.getSumOfOrdersForStockableProduct(stockableProduct).orElse(0.0);
+        var delivered = deliveryLineService.getSumOfDeliveryLinesForStockableProduct(stockableProduct).orElse(0.0);
+        return ordered - delivered;
     }
 
     @PostConstruct

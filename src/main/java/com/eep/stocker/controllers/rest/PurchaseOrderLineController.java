@@ -33,11 +33,11 @@ import java.util.UUID;
 @Validated
 @RequestMapping("/api/purchase-order-line")
 public class PurchaseOrderLineController {
+    private final DeliveryLineService deliveryLineService;
+    private final PurchaseOrderService purchaseOrderService;
     private final PurchaseOrderLineService orderLineService;
     private final StockableProductService stockableProductService;
-    private final PurchaseOrderService purchaseOrderService;
     private final SupplierService supplierService;
-    private final DeliveryLineService deliveryLineService;
 
     private final PurchaseOrderLineMapper mapper;
 
@@ -47,10 +47,12 @@ public class PurchaseOrderLineController {
      * @return a {@code GetPurchaseOrderLineResponse} or {@code HttpStatus.NOT_FOUND}
      */
     @GetMapping("/{uid}")
-    public GetPurchaseOrderLineResponse getPurchaseOrderLineResponseByUid(@PathVariable @ValidUUID(message = "Purchase Order Line ID needs to e a UUID") String uid) {
+    public GetPurchaseOrderLineResponse getPurchaseOrderLineResponseByUid(
+            @PathVariable @ValidUUID(message = "Purchase Order Line ID needs to e a UUID") String uid) {
         log.info("get: /api/purchase-order-line/{} called", uid);
         var orderLine = orderLineService.getPurchaseOrderLineByUid(uid)
-                .orElseThrow(() -> new PurchaseOrderLineDoesNotExistException(String.format("Purchase Order Line with uid of %s, does not exist", uid)));
+                .orElseThrow(() -> new PurchaseOrderLineDoesNotExistException(
+                        String.format("Purchase Order Line with uid of %s, does not exist", uid)));
         return mapper.mapToGetResponse(orderLine);
     }
 
@@ -78,7 +80,8 @@ public class PurchaseOrderLineController {
     public GetPurchaseOrderLinesByProductResponse getAllPurchaserOrderLinesForProduct(@PathVariable @ValidUUID(message = "Product ID needs to e a UUID") String productId) {
         log.info("get: /purchase-order-line/product/{} called", productId);
         var product = stockableProductService.getStockableProductByUid(productId).orElseThrow(
-                () -> new StockableProductDoesNotExistException(String.format("Stockable product with id of %s, does not exist", productId)));
+                () -> new StockableProductDoesNotExistException(
+                        String.format("Stockable product with id of %s, does not exist", productId)));
         log.info("Stockable Product = {}", product.getName());
         var orderLines = orderLineService.getAllPurchaseOrderLinesForProduct(product);
         var response = new GetPurchaseOrderLinesByProductResponse();
@@ -94,9 +97,11 @@ public class PurchaseOrderLineController {
      * @return a {@code GetPurchaseOrderLinesByPurchaseOrderResponse} with all lines for a purchase order
      */
     @GetMapping("/purchase-order/{purchaseOrderId}/")
-    public GetPurchaseOrderLinesByPurchaseOrderResponse getAllPurchaseOrderLinesForPurchaseOrder(@PathVariable @ValidUUID(message = "Purchase Order ID needs to e a UUID") String purchaseOrderId) {
+    public GetPurchaseOrderLinesByPurchaseOrderResponse getAllPurchaseOrderLinesForPurchaseOrder(
+            @PathVariable @ValidUUID(message = "Purchase Order ID needs to e a UUID") String purchaseOrderId) {
         log.info("get: /api/purchase-order-line/get/purchase-order/{} called", purchaseOrderId);
-        var purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(purchaseOrderId)).orElseThrow(
+        var purchaseOrder = purchaseOrderService.getPurchaseOrderFromUid(UUID.fromString(purchaseOrderId))
+                .orElseThrow(
                 () -> new PurchaseOrderDoesNotExistException(String.format("Purchase order with id of %s, does not exist", purchaseOrderId)));
         var response = new GetPurchaseOrderLinesByPurchaseOrderResponse();
         var orderLines = orderLineService.getAllPurchaseOrderLinesForPurchaseOrder(purchaseOrder);

@@ -14,4 +14,6 @@ public interface IStockableProductDTO {
     interface TagString{ String getTagString(); }
     interface StockPrice{ BigDecimal getStockPrice(); }
     interface InStock{ BigDecimal getInStock(); }
+    interface OnOrder{ BigDecimal getOnOrder(); }
+    interface ProjectedQty{ BigDecimal getProjectedQty(); }
 }
