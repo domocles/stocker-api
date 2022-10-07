@@ -53,7 +53,7 @@ public class PurchaseOrderLineController {
         var orderLine = orderLineService.getPurchaseOrderLineByUid(uid)
                 .orElseThrow(() -> new PurchaseOrderLineDoesNotExistException(
                         String.format("Purchase Order Line with uid of %s, does not exist", uid)));
-        return mapper.mapToGetResponse(orderLine);
+        return mapper.mapToGetResponse(orderLine, getBalanceForPurchaseOrderLine(orderLine));
     }
 
     /***
@@ -242,5 +242,20 @@ public class PurchaseOrderLineController {
         orderLineService.deletePurchaseOrderLine(purchaseOrderLine);
 
         return String.format("Purchase Order Line with ID %s has been deleted", orderLineId);
+    }
+
+    /***
+     * Gets the balance of the order line.  The balance is equal to the amount ordered minus the amount delivered.  If
+     * the status of the order line is {@code Status.CLOSED} or {@code Status.CANCELLED} then the balance will be 0.
+     * @param orderLine - the orderline to find the balance for
+     * @return - a Double which represents the outstanding balance of the order line
+     */
+    private Double getBalanceForPurchaseOrderLine(PurchaseOrderLine orderLine) {
+        if(orderLine.getStatus().equals(Status.CLOSED) || orderLine.getStatus().equals(Status.CANCELLED))
+            return 0.0;
+        var delivered = deliveryLineService.getSumDeliveredForOrderLine(orderLine).orElse(0.0);
+        var balance = orderLine.getQty() - delivered;
+        return Math.max(balance, 0.0);
+
     }
 }

@@ -1,9 +1,13 @@
 package com.eep.stocker.dto.supplier;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class GetSupplierResponse implements ISupplierDTO.Id,
         ISupplierDTO.SupplierName,

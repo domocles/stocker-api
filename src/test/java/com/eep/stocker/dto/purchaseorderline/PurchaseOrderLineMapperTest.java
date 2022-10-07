@@ -104,7 +104,7 @@ public class PurchaseOrderLineMapperTest extends SupplierTestData {
 
     @Test
     void mapperMapsToGetResponseTest() {
-        var mappedValue = mapper.mapToGetResponse(poLine1);
+        var mappedValue = mapper.mapToGetResponse(poLine1, 0.0);
         var testMappedValue = GetPurchaseOrderLineResponse.builder()
                 .balance(poLine1.getBalance())
                 .purchaseOrder(poMapper.mapGetResponse(poLine1.getPurchaseOrder()))

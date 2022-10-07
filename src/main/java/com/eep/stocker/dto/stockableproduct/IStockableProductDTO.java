@@ -1,6 +1,13 @@
 package com.eep.stocker.dto.stockableproduct;
 
+import com.eep.stocker.dto.delivery.GetDeliveryResponse;
+import com.eep.stocker.dto.purchaseorder.GetPurchaseOrderHighDetailResponse;
+import com.eep.stocker.dto.stockableproduct.composite.StockableProductPurchaseOrderCompositeDTO;
+import com.eep.stocker.dto.stocktransaction.GetStockTransactionResponse;
+import com.eep.stocker.dto.supplierquote.GetSupplierQuoteResponse;
+
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 public interface IStockableProductDTO {
@@ -16,4 +23,9 @@ public interface IStockableProductDTO {
     interface InStock{ BigDecimal getInStock(); }
     interface OnOrder{ BigDecimal getOnOrder(); }
     interface ProjectedQty{ BigDecimal getProjectedQty(); }
+    interface Orders{ List<StockableProductPurchaseOrderCompositeDTO> getOrders(); }
+    interface Deliveries{ List<GetDeliveryResponse> getDeliveries(); }
+    interface StockTransactions{ List<GetStockTransactionResponse> getStockTransactions(); }
+    interface SupplierQuotes{ List<GetSupplierQuoteResponse> getSupplierQuotes(); }
+
 }

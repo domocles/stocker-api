@@ -11,8 +11,9 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring", uses = {MapperUtils.class, SupplierMapper.class, PurchaseOrderMapper.class, StockableProductMapper.class})
 public interface PurchaseOrderLineMapper {
-    @Mapping(target = "id", source = "uid")
-    GetPurchaseOrderLineResponse mapToGetResponse(PurchaseOrderLine source);
+    @Mapping(target = "id", source = "orderLine.uid")
+    @Mapping(target = "balance", source = "balance", defaultValue = "0.0")
+    GetPurchaseOrderLineResponse mapToGetResponse(PurchaseOrderLine orderLine, Double balance);
 
     @Mapping(target = "id", source = "uid")
     UpdatePurchaseOrderLineResponse mapToUpdateResponse(PurchaseOrderLine source);

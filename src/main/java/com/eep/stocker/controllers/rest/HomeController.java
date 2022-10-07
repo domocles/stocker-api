@@ -4,11 +4,13 @@ import com.eep.stocker.annotations.validators.ValidUUID;
 import com.eep.stocker.controllers.error.exceptions.MpnNotUniqueException;
 import com.eep.stocker.controllers.error.exceptions.RecordNotFoundException;
 import com.eep.stocker.controllers.error.exceptions.StockableProductDoesNotExistException;
+import com.eep.stocker.domain.DeliveryLine;
+import com.eep.stocker.domain.PurchaseOrderLine;
 import com.eep.stocker.domain.StockableProduct;
 import com.eep.stocker.dto.stockableproduct.*;
-import com.eep.stocker.services.DeliveryLineService;
-import com.eep.stocker.services.PurchaseOrderLineService;
-import com.eep.stocker.services.StockableProductService;
+import com.eep.stocker.dto.stockableproductnote.StockableProductNoteMapper;
+import com.eep.stocker.dto.stocktransaction.StockTransactionMapper;
+import com.eep.stocker.services.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -21,6 +23,9 @@ import javax.validation.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /***
  * @author Sam Burns
@@ -38,8 +43,14 @@ public class HomeController {
     private final StockableProductService stockableProductService;
     private final PurchaseOrderLineService orderLineService;
     private final DeliveryLineService deliveryLineService;
+    private final PurchaseOrderLineService purchaseOrderLineService;
+    private final StockTransactionService stockTransactionService;
+    private final StockableProductNoteService noteService;
 
     private final StockableProductMapper stockableProductMapper;
+    private final StockableProductNoteMapper noteMapper;
+    private final StockTransactionMapper transactionMapper;
+    private final SupplierQuoteService supplierQuoteService;
 
 
     /***
@@ -50,7 +61,7 @@ public class HomeController {
      */
     @GetMapping("/{id}")
     public GetStockableProductResponse getById(@PathVariable @ValidUUID(message = "Stockable Product Id must be a UUID") String id) {
-        log.info("get: /api/stockable-products/get/{} called", id);
+        log.info("get: /api/stockable-products/{} called", id);
         Optional<StockableProduct> stockableProductOpt = stockableProductService.getStockableProductByUid(id);
         StockableProduct stockableProduct = stockableProductOpt.orElseThrow(()
                 -> new RecordNotFoundException("Stockable Product ID: '" + id + "' does not exist"));
@@ -63,12 +74,58 @@ public class HomeController {
      */
     @GetMapping("/")
     public GetAllStockableProductResponse getAllStockableProducts() {
-        log.info("get: /api/stockable-products/get called");
+        log.info("get: /api/stockable-products/ called");
         GetAllStockableProductResponse response = new GetAllStockableProductResponse();
         List<StockableProduct> allProducts = stockableProductService.getAllStockableProducts();
         allProducts.stream()
                 .map(p -> stockableProductMapper.mapToGetResponse(p, getOnOrderForStockableProduct(p)))
                 .forEach(response::addGetStockableProductResponse);
+        return response;
+    }
+
+    /***
+     * Retrieve a stockable product with all the details associated with it.  This is quite a heavy call so should only
+     * be used when necessary.  It will fetch all purchase orders, deliveries, transactions, supplier quotes and notes
+     * associated with the stockable product.
+     * @param uid - the unique identifier of the stockable product
+     * @return - a {@link GetFullDetailStockableProductResponse} containing the stockable product
+     */
+    @GetMapping("/full/{uid}")
+    public GetFullDetailStockableProductResponse getFullStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product ID must be a UUID") String uid) {
+        log.info("get: /api/stockable-products/full/{} called", uid);
+        var stockableProduct = stockableProductService.getStockableProductByUid(uid)
+                .orElseThrow(() -> new StockableProductDoesNotExistException("Stockable Product does not exist"));
+
+        var purchaseOrderLines = purchaseOrderLineService.getAllPurchaseOrderLinesForProduct(stockableProduct);
+        var purchaseOrders = purchaseOrderLines.stream().collect(groupingBy(PurchaseOrderLine::getPurchaseOrder));
+        var purchaseOrderComposites = purchaseOrders.keySet().stream()
+                .map(stockableProductMapper::mapPurchaseOrderToComposite)
+                .collect(Collectors.toList());
+
+        var deliveryLines = deliveryLineService.getAllDeliveryLinesForStockableProduct(stockableProduct);
+        var deliveries = deliveryLines.stream().collect(groupingBy(DeliveryLine::getDelivery));
+        var deliveryComposites = deliveries.entrySet().stream()
+                .map(e -> stockableProductMapper.mapDeliveryToComposite(e.getKey(), e.getValue().stream().map(stockableProductMapper::mapDeliveryLineToComposite).collect(Collectors.toList())))
+                .collect(Collectors.toList());
+
+        var transactions = stockTransactionService.getAllStockTransactionsForStockableProduct(stockableProduct);
+        var transactionComposites = transactions.stream().map(transactionMapper::mapToLowDetailResponse).collect(Collectors.toList());
+
+        var supplierQuotes = supplierQuoteService.getAllSupplierQuotesForStockableProduct(stockableProduct);
+        var supplierQuoteComposites = supplierQuotes.stream().map(stockableProductMapper::mapToSupplierQuoteComposite).collect(Collectors.toList());
+
+        var notes = noteService.getAllNotesForStockableProductUid(stockableProduct.getUid().toString());
+        var noteComposites = notes.stream().map(noteMapper::mapToLowDetailResponse).collect(Collectors.toList());
+
+        var response = stockableProductMapper.mapToFullUpdateResponse(
+                stockableProduct,
+                getOnOrderForStockableProduct(stockableProduct),
+                purchaseOrderComposites,
+                deliveryComposites,
+                transactionComposites,
+                supplierQuoteComposites,
+                noteComposites
+        );
         return response;
     }
 

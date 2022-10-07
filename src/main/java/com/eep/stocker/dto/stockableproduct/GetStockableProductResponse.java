@@ -1,16 +1,15 @@
 package com.eep.stocker.dto.stockableproduct;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.Singular;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.util.Set;
 
 @Data
 @AllArgsConstructor
-@Builder
+@NoArgsConstructor
+@SuperBuilder
 public class GetStockableProductResponse implements IStockableProductDTO.Id,
             IStockableProductDTO.Name, IStockableProductDTO.Mpn, IStockableProductDTO.Description,
             IStockableProductDTO.Category, IStockableProductDTO.Units, IStockableProductDTO.Tags,
