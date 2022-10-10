@@ -290,7 +290,7 @@ public class HomeControllerIntegrationTest extends SupplierTestData {
         given(stockableProductNoteService.getAllNotesForStockableProductUid(anyString()))
                 .willReturn(List.of(mf220note));
 
-        var po = stockableProductMapper.mapPurchaseOrderToComposite(po1);
+        var po = stockableProductMapper.mapPurchaseOrderCompositeFromLines(List.of(poLine1));
         var deliveryLine = stockableProductMapper.mapDeliveryLineToComposite(deliveryLine1);
         var delivery = stockableProductMapper.mapDeliveryToComposite(delivery1, List.of(deliveryLine));
         var transaction = transactionMapper.mapToLowDetailResponse(deliveryLine1.getStockTransaction());
@@ -315,7 +315,7 @@ public class HomeControllerIntegrationTest extends SupplierTestData {
                 .stockPrice(BigDecimal.valueOf(MF220.getStockPrice()))
                 .inStock(BigDecimal.valueOf(MF220.getInStock()))
                 .onOrder(BigDecimal.valueOf(50.0))
-                .purchaseOrder(po)
+                .purchaseOrder(po.get(0))
                 .delivery(delivery)
                 .stockTransaction(transaction)
                 .quote(supplierQuote)

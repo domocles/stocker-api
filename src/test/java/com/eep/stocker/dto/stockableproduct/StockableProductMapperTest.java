@@ -311,24 +311,25 @@ class StockableProductMapperTest extends SupplierTestData {
 
     @Test
     void createFullDetailResponseTest() {
-        var po = stockableProductMapper.mapPurchaseOrderToComposite(po1);
-        var deliveryLine = stockableProductMapper.mapDeliveryLineToComposite(deliveryLine1);
-        var delivery = stockableProductMapper.mapDeliveryToComposite(delivery1, List.of(deliveryLine));
+        var po = stockableProductMapper.mapPurchaseOrderCompositeFromLines(List.of(poLine1, poLine2));
+        var delLine1 = stockableProductMapper.mapDeliveryLineToComposite(deliveryLine1);
+        var delLine2 = stockableProductMapper.mapDeliveryLineToComposite(deliveryLine2);
+        var delivery = stockableProductMapper.mapDeliveryToComposite(delivery1, List.of(delLine1));
         var transaction = transactionMapper.mapToLowDetailResponse(deliveryLine1.getStockTransaction());
         var supplierQuote = stockableProductMapper.mapToSupplierQuoteComposite(supplierQuote1);
         var note = stockableProductNoteMapper.mapToLowDetailResponse(mf220note);
         var res = stockableProductMapper.mapToFullUpdateResponse(stockableProduct,
                 50.0,
-                List.of(po),
-                List.of(delivery),
-                List.of(transaction),
-                List.of(supplierQuote),
-                List.of(note));
+                List.of(poLine1, poLine2),
+                List.of(deliveryLine1, deliveryLine2),
+                List.of(deliveryLine1.getStockTransaction()),
+                List.of(supplierQuote1),
+                List.of(mf220note));
         assertAll(
                 () -> assertThat(res).isNotNull(),
                 () -> assertThat(res.getCategory()).isNotNull().isEqualTo(stockableProduct.getCategory()),
                 () -> assertThat(res.getName()).isNotNull().isEqualTo(stockableProduct.getName()),
-                () -> assertThat(res.getPurchaseOrders()).contains(po),
+                () -> assertThat(res.getPurchaseOrders()).contains(po.get(0)),
                 () -> assertThat(res.getDeliveries()).contains(delivery),
                 () -> assertThat(res.getStockTransactions()).contains(transaction),
                 () -> assertThat(res.getQuotes()).contains(supplierQuote)
@@ -337,14 +338,14 @@ class StockableProductMapperTest extends SupplierTestData {
 
     @Test
     void createPurchaseOrderCompositeTest() {
-        var po = stockableProductMapper.mapPurchaseOrderToComposite(po1);
+        var po = stockableProductMapper.mapPurchaseOrderCompositeFromLines(List.of(poLine1));
         var supplier = supplierMapper.getSupplierResponseFromSupplier(po1.getSupplier());
         assertAll(
-                () -> assertThat(po.getSupplier()).isEqualTo(supplier),
-                () -> assertThat(po.getPurchaseOrderReference()).isEqualTo(po1.getPurchaseOrderReference()),
-                () -> assertThat(po.getPurchaseOrderDate()).isEqualTo(po1.getPurchaseOrderDate()),
-                () -> assertThat(po.getStatus()).isEqualTo(po1.getStatus()),
-                () -> assertThat(po.getId()).isEqualTo(po1.getUid().toString())
+                () -> assertThat(po.get(0).getSupplier()).isEqualTo(supplier),
+                () -> assertThat(po.get(0).getPurchaseOrderReference()).isEqualTo(po1.getPurchaseOrderReference()),
+                () -> assertThat(po.get(0).getPurchaseOrderDate()).isEqualTo(po1.getPurchaseOrderDate()),
+                () -> assertThat(po.get(0).getStatus()).isEqualTo(po1.getStatus()),
+                () -> assertThat(po.get(0).getId()).isEqualTo(po1.getUid().toString())
         );
     }
 

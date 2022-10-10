@@ -8,6 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.List;
+
 /***
  * @author Sam Burns
  * @version 1.0
@@ -29,6 +31,8 @@ public interface StockTransactionMapper {
     @Mapping(target = "id", source = "uid")
     @Mapping(target = "stockableProductId", source = "stockableProduct.uid")
     GetStockTransactionLowDetailResponse mapToLowDetailResponse(StockTransaction transaction);
+
+    List<GetStockTransactionLowDetailResponse> ampToLowDetailResponses(List<StockTransaction> transactions);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "stockableProduct", source = "stockableProduct")

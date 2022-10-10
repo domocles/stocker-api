@@ -97,34 +97,19 @@ public class HomeController {
                 .orElseThrow(() -> new StockableProductDoesNotExistException("Stockable Product does not exist"));
 
         var purchaseOrderLines = purchaseOrderLineService.getAllPurchaseOrderLinesForProduct(stockableProduct);
-        var purchaseOrders = purchaseOrderLines.stream().collect(groupingBy(PurchaseOrderLine::getPurchaseOrder));
-        var purchaseOrderComposites = purchaseOrders.keySet().stream()
-                .map(stockableProductMapper::mapPurchaseOrderToComposite)
-                .collect(Collectors.toList());
-
         var deliveryLines = deliveryLineService.getAllDeliveryLinesForStockableProduct(stockableProduct);
-        var deliveries = deliveryLines.stream().collect(groupingBy(DeliveryLine::getDelivery));
-        var deliveryComposites = deliveries.entrySet().stream()
-                .map(e -> stockableProductMapper.mapDeliveryToComposite(e.getKey(), e.getValue().stream().map(stockableProductMapper::mapDeliveryLineToComposite).collect(Collectors.toList())))
-                .collect(Collectors.toList());
-
         var transactions = stockTransactionService.getAllStockTransactionsForStockableProduct(stockableProduct);
-        var transactionComposites = transactions.stream().map(transactionMapper::mapToLowDetailResponse).collect(Collectors.toList());
-
         var supplierQuotes = supplierQuoteService.getAllSupplierQuotesForStockableProduct(stockableProduct);
-        var supplierQuoteComposites = supplierQuotes.stream().map(stockableProductMapper::mapToSupplierQuoteComposite).collect(Collectors.toList());
-
         var notes = noteService.getAllNotesForStockableProductUid(stockableProduct.getUid().toString());
-        var noteComposites = notes.stream().map(noteMapper::mapToLowDetailResponse).collect(Collectors.toList());
 
         var response = stockableProductMapper.mapToFullUpdateResponse(
                 stockableProduct,
                 getOnOrderForStockableProduct(stockableProduct),
-                purchaseOrderComposites,
-                deliveryComposites,
-                transactionComposites,
-                supplierQuoteComposites,
-                noteComposites
+                purchaseOrderLines,
+                deliveryLines,
+                transactions,
+                supplierQuotes,
+                notes
         );
         return response;
     }

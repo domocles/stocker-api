@@ -8,6 +8,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", uses = {MapperUtils.class, StockableProductMapper.class})
 public interface StockableProductNoteMapper {
     @Mapping(target = "id", source = "uid")
@@ -16,6 +18,8 @@ public interface StockableProductNoteMapper {
     @Mapping(target = "id", source = "uid")
     @Mapping(target = "stockableProductId", source = "stockableProduct.uid")
     GetStockableProductNoteLowDetailResponse mapToLowDetailResponse(StockableProductNote note);
+
+    List<GetStockableProductNoteLowDetailResponse> mapToLowDetailResponses(List<StockableProductNote> note);
 
     StockableProductNote mapFromCreateRequest(CreateStockableProductNoteRequest request, StockableProduct stockableProduct);
 
