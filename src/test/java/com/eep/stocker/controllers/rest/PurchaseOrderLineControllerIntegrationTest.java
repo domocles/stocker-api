@@ -129,7 +129,7 @@ class PurchaseOrderLineControllerIntegrationTest extends SupplierTestData {
                 GetPurchaseOrderLineResponse.class
         );
 
-        var res = mapper.mapToGetResponse(poLine1, 0.0);
+        var res = mapper.mapToGetResponse(poLine1, 25.0);
 
         assertAll(
                 () -> assertThat(response.getBody()).isEqualTo(res)

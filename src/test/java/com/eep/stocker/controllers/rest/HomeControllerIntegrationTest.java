@@ -145,6 +145,7 @@ public class HomeControllerIntegrationTest extends SupplierTestData {
                 .units("Flanges")
                 .stockPrice(BigDecimal.valueOf(1.72))
                 .inStock(BigDecimal.valueOf(25.0))
+                .onOrder(BigDecimal.valueOf(0.0))
                 .build();
 
         mf220note = new StockableProductNote();

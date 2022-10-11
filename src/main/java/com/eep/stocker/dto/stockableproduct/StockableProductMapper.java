@@ -40,6 +40,10 @@ public interface StockableProductMapper {
     GetStockableProductResponse mapToGetResponse(StockableProduct product, Double onOrder);
 
     @Mapping(target = "id", source = "product.uid")
+    @Mapping(target = "onOrder", constant = "0.0")
+    GetStockableProductResponse mapToGetResponse(StockableProduct product);
+
+    @Mapping(target = "id", source = "product.uid")
     @Mapping(target = "onOrder", source = "onOrder", defaultValue = "0.0")
     UpdateStockableProductResponse mapToUpdateResponse(StockableProduct product, Double onOrder);
 

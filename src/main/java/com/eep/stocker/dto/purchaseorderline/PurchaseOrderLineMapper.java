@@ -9,7 +9,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
-@Mapper(componentModel = "spring", uses = {MapperUtils.class, SupplierMapper.class, PurchaseOrderMapper.class, StockableProductMapper.class})
+@Mapper(componentModel = "spring", uses = { MapperUtils.class,
+        SupplierMapper.class, PurchaseOrderMapper.class, StockableProductMapper.class})
 public interface PurchaseOrderLineMapper {
     @Mapping(target = "id", source = "orderLine.uid")
     @Mapping(target = "balance", source = "balance", defaultValue = "0.0")

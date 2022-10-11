@@ -294,7 +294,7 @@ class StockableProductMapperTest extends SupplierTestData {
 
     @Test
     void createGetStockableProductResponseFromStockableProduct() {
-        var res = stockableProductMapper.mapToGetResponse(stockableProduct, 0.0);
+        var res = stockableProductMapper.mapToGetResponse(stockableProduct, 100.0);
         assertThat(res.getName()).isEqualTo("51mm x 152mm Ilok Flex");
         assertThat(res.getId()).isNotEmpty();
         assertThat(res.getMpn()).isEqualTo("FX-51-152-I");

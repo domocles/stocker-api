@@ -11,7 +11,7 @@
 
     <groupId>com.eep</groupId>
     <artifactId>stocker</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>stocker</name>
     <description>Stock control service for Every Exhaust Part</description>
 

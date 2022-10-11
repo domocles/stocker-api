@@ -106,11 +106,12 @@ public class PurchaseOrderLineMapperTest extends SupplierTestData {
     void mapperMapsToGetResponseTest() {
         var mappedValue = mapper.mapToGetResponse(poLine1, 0.0);
         var testMappedValue = GetPurchaseOrderLineResponse.builder()
-                .balance(poLine1.getBalance())
+                .balance(0.0)
                 .purchaseOrder(poMapper.mapGetResponse(poLine1.getPurchaseOrder()))
                 .id(poLine1.getUid().toString())
                 .note(poLine1.getNote())
                 .qty(poLine1.getQty())
+                .price(1.27)
                 .status(poLine1.getStatus())
                 .stockableProduct(spMapper.mapToGetResponse(poLine1.getStockableProduct(), 0.0))
                 .build();
@@ -127,6 +128,7 @@ public class PurchaseOrderLineMapperTest extends SupplierTestData {
                 .id(poLine1.getUid().toString())
                 .note(poLine1.getNote())
                 .qty(poLine1.getQty())
+                .price(1.27)
                 .status(poLine1.getStatus())
                 .stockableProductId(poLine1.getStockableProduct().getUid().toString())
                 .build();
