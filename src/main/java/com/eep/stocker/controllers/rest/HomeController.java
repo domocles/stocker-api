@@ -198,7 +198,7 @@ public class HomeController {
 
     @PostConstruct
     private void initialize() {
-        /*StockableProduct flex51x100 = new StockableProduct();
+        StockableProduct flex51x100 = new StockableProduct();
         flex51x100.setName("FX51x101ILOK");
         flex51x100.setMpn("FX24");
         flex51x100.setCategory("Flex");
@@ -212,7 +212,7 @@ public class HomeController {
         try {
             flex51x100 = this.stockableProductService.saveStockableProduct(flex51x100);
 
-            StockableProductNote note = new StockableProductNote();
+            /*StockableProductNote note = new StockableProductNote();
             note.setNote("This is a note you know");
             note.setStockableProduct(flex51x100);
 
@@ -221,10 +221,10 @@ public class HomeController {
             note2.setStockableProduct(flex51x100);
 
             this.stockableProductNoteService.saveNote(note);
-            this.stockableProductNoteService.saveNote(note2);
+            this.stockableProductNoteService.saveNote(note2);*/
         } catch(MpnNotUniqueException e) {
             log.error(e.getLocalizedMessage());
-        }*/
+        }
     }
 
 }

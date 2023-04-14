@@ -21,6 +21,8 @@ public interface StockableProductNoteMapper {
 
     List<GetStockableProductNoteLowDetailResponse> mapToLowDetailResponses(List<StockableProductNote> note);
 
+    @Mapping(target = "uid", ignore = true)
+    @Mapping(target = "stockableProduct", source = "stockableProduct")
     StockableProductNote mapFromCreateRequest(CreateStockableProductNoteRequest request, StockableProduct stockableProduct);
 
     @Mapping(target = "id", source = "uid")

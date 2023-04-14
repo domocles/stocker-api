@@ -1,13 +1,14 @@
 package com.eep.stocker.domain;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity(name = "deliveryline")
 @Table(name = "delivery_line")
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @Getter
 @Setter
 @NoArgsConstructor

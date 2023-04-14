@@ -1,5 +1,7 @@
 package com.eep.stocker.dto.assembly;
 
+import lombok.experimental.SuperBuilder;
+
 /***
  * @author Sam Burns
  * @version 1.0
@@ -7,7 +9,7 @@ package com.eep.stocker.dto.assembly;
  *
  * Response DTO for the assembly
  */
-
+@SuperBuilder
 public class GetAssemblyResponse extends GetHighDetailAssemblyResponse {
 
 }

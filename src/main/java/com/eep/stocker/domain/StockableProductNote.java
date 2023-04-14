@@ -2,6 +2,7 @@ package com.eep.stocker.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
@@ -15,7 +16,7 @@ import java.util.Objects;
  */
 @Entity(name="StockableProductNote")
 @Table(name = "stockable_product_note")
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @Getter
 @Setter
 @NoArgsConstructor

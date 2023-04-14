@@ -85,6 +85,7 @@ public class StockableProductNoteController {
         var stockableProduct = stockableProductService.getStockableProductByUid(note.getStockableProductId())
                 .orElseThrow(() -> new StockableProductDoesNotExistException("Stockable Product does not exist"));
         var newNote = mapper.mapFromCreateRequest(note, stockableProduct);
+        newNote.setId(null);
         newNote = stockableProductNoteService.saveNote(newNote);
         return mapper.mapToCreateResponse(newNote);
     }

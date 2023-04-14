@@ -1,6 +1,7 @@
 package com.eep.stocker.domain;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -14,7 +15,7 @@ import java.util.Objects;
  */
 @Entity(name="AssemblyLine")
 @Table(name="assembly_line")
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @Getter
 @Setter
 @NoArgsConstructor

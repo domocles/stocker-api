@@ -1,5 +1,7 @@
 package com.eep.stocker.dto.purchaseorder;
 
+import lombok.experimental.SuperBuilder;
+
 /***
  * @author Sam Burns
  * @version 1.0
@@ -7,6 +9,7 @@ package com.eep.stocker.dto.purchaseorder;
  *
  * DTO for a purchase order
  */
+@SuperBuilder
 public class GetPurchaseOrderResponse extends GetPurchaseOrderHighDetailResponse {
 
 }
