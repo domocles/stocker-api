@@ -150,7 +150,7 @@ public class HomeController {
      * @param request - details of the stockable product
      * @return an {@code UpdateStockableProductResponse} containing the updated stockable product
      */
-    @PutMapping(path = "/update/{uid}")
+    @PutMapping(path = "/{uid}")
     public UpdateStockableProductResponse updateStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product Id must be a UUID") String uid, @Valid @RequestBody UpdateStockableProductRequest request) {
         log.info("put: /api/stockable-products/update called");
         Optional<StockableProduct> sbOpt = stockableProductService.getStockableProductByUid(uid);
@@ -177,7 +177,7 @@ public class HomeController {
      * @return a response as to whether the stockable product has been deleted
      * @throws ResourceNotFoundException - if the id is not found
      */
-    @DeleteMapping(path = "/delete/{id}")
+    @DeleteMapping(path = "/{id}")
     public Response deleteStockableProduct(@PathVariable @ValidUUID(message = "Stockable Product Id must be a UUID") String id) throws ResourceNotFoundException {
         log.info("delete: /api/stockable-products/delete/{} called", id);
         Optional<StockableProduct> stockableProduct = stockableProductService.getStockableProductByUid(id);
