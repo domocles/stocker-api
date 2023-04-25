@@ -7,10 +7,10 @@ services:
         source: ./database
         target: /docker-entrypoint-initdb.d
     environment:
-      - MYSQL_ROOT_PASSWORD=YzB3UC1t1XrF
+      - MYSQL_ROOT_PASSWORD=changeme
       - MYSQL_DATABASE=stocker
       - MYSQL_USER=eep
-      - MYSQL_PASSWORD=YzB3UC1t1XrF
+      - MYSQL_PASSWORD=changeme
     ports:
       - 33061:3306
     networks:
@@ -24,7 +24,7 @@ services:
     environment:
       - DATABASE_HOST=mysql-host
       - DATABASE_USER=eep
-      - DATABASE_PASSWORD=YzB3UC1t1XrF
+      - DATABASE_PASSWORD=changeme
       - DATABASE_NAME=stocker
       - DATABASE_PORT=3306
       - SPRING_PROFILES_ACTIVE=docker
